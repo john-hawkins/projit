@@ -2,8 +2,10 @@
 ### Project Integration for Data Science Work 
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[comment]: <> ![build](https://github.com/john-hawkins/projit/workflows/build/badge.svg)
-[comment]: <> [![PyPI](https://img.shields.io/pypi/v/projit.svg)](https://pypi.org/project/projit)
+<!--
+![build](https://github.com/john-hawkins/projit/workflows/build/badge.svg)
+[![PyPI](https://img.shields.io/pypi/v/projit.svg)](https://pypi.org/project/projit)
+-->
 
 Projit is a tool for managing Data Science Project structure, properties, data, experiments & collaboration.
 
