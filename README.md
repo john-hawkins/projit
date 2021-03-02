@@ -2,8 +2,8 @@
 ### Project Integration for Data Science Work 
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-<!--
 ![build](https://github.com/john-hawkins/projit/workflows/build/badge.svg)
+<!--
 [![PyPI](https://img.shields.io/pypi/v/projit.svg)](https://pypi.org/project/projit)
 -->
 
