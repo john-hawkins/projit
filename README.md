@@ -47,8 +47,6 @@ Use the runner:
 ./projit-runner.py status
 ```
 
-Which was used to generate the markdown [output test file](markdown_test.md)
-
 Invoke the directory as a package:
 
 ```
@@ -56,7 +54,7 @@ python -m projit status
 ```
 
 Or simply install the package and use the command line application directly
-
+as shown in the process below:
 
 # Installation
 
@@ -72,7 +70,6 @@ python setup.py install
 pip install projit
 ```
 
-
 Now, the ``projit`` command is available::
 
 ```
@@ -80,5 +77,5 @@ projit init
 ```
 
 This will initialise the current directory as a Data Science Project using
-the default template.
+the default template. Please refer to the [docs for more detail]().
 
