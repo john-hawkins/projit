@@ -23,7 +23,7 @@ and the Git utility.
 
 Released and distributed via setuptools/PyPI/pip for Python 3.
  
-Additional detail available in the [companion blog post](https://john-hawkins.github.io)
+Additional detail available in the [documentation](https://john-hawkins.github.io)
 
 Built using the 
 [bootstrap cmdline template](https://github.com/jgehrcke/python-cmdline-bootstrap)
@@ -44,13 +44,13 @@ You can use this application multiple ways
 Use the runner:
 
 ```
-./projit-runner.py status
+./projit-runner.py init "Test Project" 
 ```
 
 Invoke the directory as a package:
 
 ```
-python -m projit status 
+python -m projit init "Test Project"
 ```
 
 Or simply install the package and use the command line application directly
@@ -73,7 +73,7 @@ pip install projit
 Now, the ``projit`` command is available::
 
 ```
-projit init 
+projit init "Test Project"
 ```
 
 This will initialise the current directory as a Data Science Project using
