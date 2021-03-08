@@ -9,6 +9,9 @@ import os
 
 from .utils import locate_projit_config
 from .config import config_folder
+from .utils import initialise_project
+from .utils import get_properties
+from .utils import write_properties
 
 def main():
     if len(sys.argv) < 2:
@@ -18,13 +21,15 @@ def main():
     else:
         cmd = sys.argv[1]
         if cmd == "init":
-            initialise_project(sys.argv)
+            init(sys.argv)
         else:
-            config_file = locate_projit_config() 
-            print("CONFIG:", config_file)
-            if config_file=="":
-                print("This is not a projit project. Please use '>projit init'")
+            config_path = locate_projit_config() 
+            print("CONFIG:", config_path)
+            if config_path=="":
+                print("This is not a projit project. Please use '>projit init <Project_Name>'")
                 exit(1)
+            if cmd == "update":
+                update(config_path)
             if cmd == "status":
                 project_status(sys.argv)
             if cmd == "render":
@@ -32,12 +37,37 @@ def main():
 
 
 ##########################################################################################        
-def initialise_project(argv):
+def init(argv):
     print("YOU WANT TO INITIALISE")
+    config_file = locate_projit_config()
+    if config_file != "":
+        print("ERROR: Project exists. Run `projit update` to change details ")
+        exit(1)
     if len(argv) < 3:
         print("ERROR: Project initialistion requires parameter: <Project_Name>")
         exit(1)
-    os.mkdir(config_folder)
+    print("Please enter a description for your project (or Press Enter to Cancel)")
+    descrip = input(">")
+    if len(descrip) > 0:
+        initialise_project(argv[2], descrip)
+    else:
+        print("Cancelling...")
+        exit(0)
+
+##########################################################################################       
+def update(config_path):
+    cfg = get_properties(config_path)
+    print("Current Project Name: ", cfg['project_name'])
+    print("Enter an alternative project name (or press enter to keep)")
+    name = input(">")
+    print("Current Description: ", cfg['description'])
+    print("Enter an alternative description (or press enter to keep)")
+    descrip = input(">")
+    if name != "":
+        cfg['project_name'] = name
+    if descrip != "":
+        cfg['description'] = descrip
+    write_properties(config_path, cfg)
 
 
 ##########################################################################################        
