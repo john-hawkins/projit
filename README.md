@@ -3,6 +3,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests](https://github.com/john-hawkins/projit/actions/workflows/python-package.yml/badge.svg)](https://github.com/john-hawkins/projit/actions/workflows/python-package.yml)
+[![Documentation Status](https://readthedocs.org/projects/projit/badge/?version=latest)](https://projit.readthedocs.io/en/latest/?badge=latest)
 <!--
 [![PyPI](https://img.shields.io/pypi/v/projit.svg)](https://pypi.org/project/projit)
 -->
@@ -23,7 +24,7 @@ and the Git utility.
 
 Released and distributed via setuptools/PyPI/pip for Python 3.
  
-Additional detail available in the [documentation](https://john-hawkins.github.io)
+Additional detail available in the [documentation](https://projit.readthedocs.io)
 
 Built using the 
 [bootstrap cmdline template](https://github.com/jgehrcke/python-cmdline-bootstrap)
