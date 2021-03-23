@@ -8,6 +8,11 @@
 [![PyPI](https://img.shields.io/pypi/v/projit.svg)](https://pypi.org/project/projit)
 -->
 
+```
+Status : Non-Functional. This is a work in progress.
+```
+
+
 Projit is a tool for managing Data Science Project structure, properties, data, experiments & collaboration.
 
 The goal of this project is to allow data science teams to work on
