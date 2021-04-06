@@ -1,6 +1,9 @@
 Introduction
 ============
 
+.. warning::
+   This project is non-functional. 
+
 projit is a package and application that assists with managing your data science projects.
 It can be used to maintain a consistent view of the data sets used across experiemnts,
 track the experiments and outcomes, generate project documentation and ensure your

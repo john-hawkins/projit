@@ -1,6 +1,9 @@
 Installation
 ============
 
+.. warning::
+   This project is non-functional. 
+
 The projit application is maintained inside the PyPi package manager.
 
 Install the package from PyPi as follows:

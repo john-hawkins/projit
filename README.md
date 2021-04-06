@@ -9,7 +9,7 @@
 -->
 
 ```
-Status : Non-Functional. This is a work in progress.
+> :warning: **Non-Functional**: This project is a work in progress.
 ```
 
 

@@ -3,7 +3,7 @@
  
 """Convenience wrapper for running projit directly from source tree."""
  
-from projit.projit import main
+from projit.cli import main
  
 if __name__ == '__main__':
     main()

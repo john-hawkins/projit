@@ -14,18 +14,13 @@ version = re.search(
 with open("README.md", "rb") as f:
     long_descr = f.read().decode("utf-8")
 
-with open("markdown_test.md", "rb") as f:
-    example = f.read().decode("utf-8")
-
-long_descr = long_descr + "\n" + example
-
 setup(
     name = "projit",
     packages = ["projit"],
     license = "MIT",
     install_requires = ['pandas>=0.25.3', 'numpy>=1.16.4'],
     entry_points = {
-        "console_scripts": ['projit = projit.projit:main']
+        "console_scripts": ['projit = projit.cli:main']
     },
     include_package_data=True,
     version = version,
