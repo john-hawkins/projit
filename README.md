@@ -11,6 +11,7 @@
 ```
 > :warning: **Non-Functional**: This project is a work in progress.
 ```
+> :warning: **Non-Functional**: This project is a work in progress.
 
 
 Projit is a tool for managing Data Science Project structure, properties, data, experiments & collaboration.
