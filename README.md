@@ -10,11 +10,11 @@
 [![PyPI](https://img.shields.io/pypi/v/projit.svg)](https://pypi.org/project/projit)
 -->
 
-Projit is a tool for managing Data Science Project structure, properties, data, experiments & collaboration.
+Projit is a utility for managing Data Science Project structure, properties, data, experiments & collaboration.
 
 The goal of this project is to allow data science teams to work on
 projects in a structured and standardized way. The projit utility
-allows you to establish a project according to a configurable template.
+allows you to establish a project according to a standardized template.
 It then provides a python library that can be used inside experiments and
 scripts so that references to training, evaluations and test data sets
 is standardized.
@@ -22,15 +22,9 @@ is standardized.
 This project was inspired by a combination of the CookieCutter template
 and the Git utility.
 
-
-
-Released and distributed via setuptools/PyPI/pip for Python 3.
+To be released and distributed via setuptools/PyPI/pip for Python 3.
  
 Additional detail available in the [documentation](https://projit.readthedocs.io)
-
-Built using the 
-[bootstrap cmdline template](https://github.com/jgehrcke/python-cmdline-bootstrap)
- by [jgehrcke](https://github.com/jgehrcke)
 
 
 ## Notes
@@ -80,5 +74,13 @@ projit init "Test Project"
 ```
 
 This will initialise the current directory as a Data Science Project using
-the default template. Please refer to the [docs for more detail]().
+the default template. Please refer to the 
+[documentation for more detail on projit commands](https://projit.readthedocs.io).
+
+# Acknowledgements
+
+Python package built using the 
+[bootstrap cmdline template](https://github.com/jgehrcke/python-cmdline-bootstrap)
+ by [jgehrcke](https://github.com/jgehrcke)
+
 
