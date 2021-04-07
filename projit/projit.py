@@ -1,92 +1,110 @@
-# -*- coding: utf-8 -*-
-
-"""projit.projit: provides entry point main()."""
-
-__version__ = "0.1.0"
-
-import sys
+import json
+import re
 import os
 
-from .utils import locate_projit_config
+from .config import config_file
 from .config import config_folder
-from .utils import initialise_project
-from .utils import get_properties
-from .utils import write_properties
 
-def main():
-    if len(sys.argv) < 2:
-        print("ERROR: MISSING ARGUMENTS")
-        print_usage(sys.argv)
-        exit(1)
-    else:
-        cmd = sys.argv[1]
-        if cmd == "init":
-            init(sys.argv)
+class Projit:
+    """
+    Projit Class.
+    This is a data structure to contain the core elements of a data science 
+    project. It will permit loose coupling between processes and experiments
+    but provide a simple overarching structure for communication and 
+    documentation.
+    """
+
+    def __init__(self, path, name, desc="", experiments=[], datasets={}):
+        """
+        Initialise a projit project class.
+
+        :param path: The path to the project file.
+        :type path: string, required
+
+        :param name: The project name
+        :type name: string, required
+
+        :param desc: The project description
+        :type desc: string, optional
+
+        :param experiments: The array of experiments
+        :type experiments: Array, optional
+
+        :param datasets: The dictionary of datasets 'name':'path'
+        :type datasets: Dictionary, optional
+
+        :return: None 
+        :rtype: None 
+        """
+        self.path = path
+        self.name = name
+        self.desc = desc
+        self.experiments = experiments
+        self.datasets = datasets
+
+    def add_experiment(self, name, path):
+        """
+        Add information of a new experiment to the project. 
+        """
+        self.experiments.append( (name, path) )
+
+    def add_dataset(self, name, path):
+        """
+        Add a named dataset to the project.
+        """
+        self.datasets[name] = path
+
+    def get_dataset(self, name):
+        if name in self.datasets:
+            return self.datasets[name]
         else:
-            config_path = locate_projit_config() 
-            print("CONFIG:", config_path)
-            if config_path=="":
-                print("This is not a projit project. Please use '>projit init <Project_Name>'")
-                exit(1)
-            if cmd == "update":
-                update(config_path)
-            if cmd == "status":
-                project_status(sys.argv)
-            if cmd == "render":
-                render_doc(sys.argv)
+            raise Exception("ERROR: Named dataset '%s' not available:"%name)
+
+    def save(self):
+        """
+        Save your projit project. 
+        """
+        path_to_json = self.path + "/" + config_file
+        with open(path_to_json, 'w') as outfile:
+            json.dump(self.__dict__, outfile)
 
 
-##########################################################################################        
-def init(argv):
-    print("YOU WANT TO INITIALISE")
-    config_file = locate_projit_config()
-    if config_file != "":
-        print("ERROR: Project exists. Run `projit update` to change details ")
-        exit(1)
-    if len(argv) < 3:
-        print("ERROR: Project initialistion requires parameter: <Project_Name>")
-        exit(1)
-    print("Please enter a description for your project (or Press Enter to Cancel)")
-    descrip = input(">")
-    if len(descrip) > 0:
-        initialise_project(argv[2], descrip)
-    else:
-        print("Cancelling...")
-        exit(0)
+def load(config_path):
+    """
+    This function allows you to instantiate a Projit project from an existing config_path
+    The config path must contain the required config file that contains the required fields.
 
-##########################################################################################       
-def update(config_path):
-    cfg = get_properties(config_path)
-    print("Current Project Name: ", cfg['project_name'])
-    print("Enter an alternative project name (or press enter to keep)")
-    name = input(">")
-    print("Current Description: ", cfg['description'])
-    print("Enter an alternative description (or press enter to keep)")
-    descrip = input(">")
-    if name != "":
-        cfg['project_name'] = name
-    if descrip != "":
-        cfg['description'] = descrip
-    write_properties(config_path, cfg)
+    Note: This function will always overwrite the path variable in the object so the instance
+    is aware of where it is relative to the config directory.
 
+    :param config_path: The path to the projit configuration
+    :type config_path: string, required
 
-##########################################################################################        
-def project_status(argv):
-    print("YOU WANT STATUS")
+    :return: Projit Object
+    :rtype: Projit
+    """
+    path_to_json = config_path + "/" + config_file
+    with open(path_to_json) as f:
+        _dict = json.load(f)
+    _object = Projit(**_dict)
+    _object.path = config_path
+    return _object
 
-##########################################################################################        
-def render_doc(argv):
-    print("YOU WANT A DOC RENDERED")
+def init(name, desc=""):
+    """
+    Initialise a new projit project.
+    Create the config directory and write the project config there.
 
-##########################################################################################        
-def print_usage(args):
-    """ Command line application usage instrutions. """
-    print("USAGE ")
-    print(args[0], " <COMMAND> [<SUBCOMMAND>] [<PATH>]")
-    print("  <COMMAND>    - Task to perform: init, status, run, render, clean")
-    print("  <SUBCOMMAND> - (OPTIONAL) Dependant on task")
-    print("  <PATH >      - (OPTIONAL) Dependant on task")
-    print("")
+    :param name: The name of the project
+    :type name: string, required
 
+    :param desc: The project description
+    :type desc: string, required
 
-##########################################################################################        
+    :return: Projit Object
+    :rtype: Projit
+    """
+    os.mkdir(config_folder)
+    project = Projit(config_folder, name, desc)
+    project.save()
+    return project

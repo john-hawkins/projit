@@ -1,4 +1,6 @@
 import shutil
+from os import path
+import projit.projit as proj
 from projit.config import config_folder
 from projit.utils import walk_up
 from projit.utils import locate_projit_config
@@ -19,6 +21,8 @@ def test_locate_projit_config():
     assert locate_projit_config() == ""
 
 def test_projit_init():
+    if path.isdir(config_folder):
+        shutil.rmtree(config_folder)
     initialise_project("TEST", "TEST")
     assert locate_projit_config() != ""
     cfg = get_properties(config_folder)
@@ -27,6 +31,8 @@ def test_projit_init():
     shutil.rmtree(config_folder)
 
 def test_projit_update():
+    if path.isdir(config_folder):
+        shutil.rmtree(config_folder)
     initialise_project("TEST", "TEST")
     assert locate_projit_config() != ""
     cfg = get_properties(config_folder)
@@ -38,3 +44,19 @@ def test_projit_update():
     assert cfg2['description'] == "TEST2"
     shutil.rmtree(config_folder)
 
+def test_projit_init_v2():
+    if path.isdir(config_folder):
+        shutil.rmtree(config_folder)
+    project = proj.init("TEST", "TEST")
+    assert locate_projit_config() != ""
+    assert project.name == "TEST"
+    assert project.desc == "TEST"
+    shutil.rmtree(config_folder)
+
+def test_projit_load():
+    """
+    In this test we see that we can load a JSON file into a Projit object
+    """
+    project = proj.load("tests")
+    assert project.name == "TEST"
+    assert project.desc == "TEST"

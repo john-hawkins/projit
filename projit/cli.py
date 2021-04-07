@@ -12,7 +12,8 @@ from .config import config_folder
 from .utils import initialise_project
 from .utils import get_properties
 from .utils import write_properties
-
+import projit as proj
+ 
 def main():
     if len(sys.argv) < 2:
         print("ERROR: MISSING ARGUMENTS")
@@ -28,12 +29,23 @@ def main():
             if config_path=="":
                 print("This is not a projit project. Please use '>projit init <Project_Name>'")
                 exit(1)
+
+            project = proj.load(config_path)
+
             if cmd == "update":
-                update(config_path)
+                update(project)
             if cmd == "status":
-                project_status(sys.argv)
+                project_status(project)
             if cmd == "render":
-                render_doc(sys.argv)
+                render_doc(project)
+            if cmd == "list":
+                if len(sys.argv) < 2:
+                    print("ERROR: MISSING ARGUMENTS")
+                    print_usage(sys.argv)
+                    exit(1)
+                else:
+                    subcmd = sys.argv[2]
+                    list(subcmd, config_path)
 
 
 ##########################################################################################        
@@ -44,7 +56,7 @@ def init(argv):
         print("ERROR: Project exists. Run `projit update` to change details ")
         exit(1)
     if len(argv) < 3:
-        print("ERROR: Project initialistion requires parameter: <Project_Name>")
+        print("ERROR: Project initialisation requires parameter: <Project_Name>")
         exit(1)
     print("Please enter a description for your project (or Press Enter to Cancel)")
     descrip = input(">")
@@ -71,21 +83,27 @@ def update(config_path):
 
 
 ##########################################################################################        
-def project_status(argv):
-    print("YOU WANT STATUS")
+def project_status(project):
+    print(" > Project: %s" % project.name)
+    print(" > Datasets: %s" % project.name)
+    print(" > Experiments: %s" % project.name)
 
 ##########################################################################################        
-def render_doc(argv):
+def render_doc(project):
     print("YOU WANT A DOC RENDERED")
+ 
+##########################################################################################        
+def list(subcmd, project):
+    print("LISTING")
 
 ##########################################################################################        
 def print_usage(args):
     """ Command line application usage instrutions. """
     print("USAGE ")
-    print(args[0], " <COMMAND> [<SUBCOMMAND>] [<PATH>]")
-    print("  <COMMAND>    - Task to perform: init, status, run, render, clean")
-    print("  <SUBCOMMAND> - (OPTIONAL) Dependant on task")
-    print("  <PATH >      - (OPTIONAL) Dependant on task")
+    print(args[0], " <COMMAND> [<SUBCOMMAND>] [<PARAMS>*]")
+    print("  <COMMAND>     - Core Task: init, status, list, add, run, render")
+    print("  <SUBCOMMAND>  - (OPTIONAL) Dependant on task")
+    print("  <PARAMS>      - (OPTIONAL) Dependant on task")
     print("")
 
 
