@@ -12,7 +12,8 @@ from .config import config_folder
 from .utils import initialise_project
 from .utils import get_properties
 from .utils import write_properties
-import projit as proj
+from .projit import load as projit_load
+from .projit import init as projit_init
  
 def main():
     if len(sys.argv) < 2:
@@ -25,12 +26,12 @@ def main():
             init(sys.argv)
         else:
             config_path = locate_projit_config() 
-            print("CONFIG:", config_path)
+            #print("CONFIG:", config_path)
             if config_path=="":
                 print("This is not a projit project. Please use '>projit init <Project_Name>'")
                 exit(1)
 
-            project = proj.load(config_path)
+            project = projit_load(config_path)
 
             if cmd == "update":
                 update(project)
@@ -45,12 +46,20 @@ def main():
                     exit(1)
                 else:
                     subcmd = sys.argv[2]
-                    list(subcmd, config_path)
+                    list(subcmd, project)
+            if cmd == "add":
+                if len(sys.argv) < 2:
+                    print("ERROR: MISSING ARGUMENTS")
+                    print_usage(sys.argv)
+                    exit(1)
+                else:
+                    subcmd = sys.argv[2]
+                    add(subcmd, project, sys.argv)
 
 
 ##########################################################################################        
 def init(argv):
-    print("YOU WANT TO INITIALISE")
+    #print("YOU WANT TO INITIALISE")
     config_file = locate_projit_config()
     if config_file != "":
         print("ERROR: Project exists. Run `projit update` to change details ")
@@ -61,32 +70,34 @@ def init(argv):
     print("Please enter a description for your project (or Press Enter to Cancel)")
     descrip = input(">")
     if len(descrip) > 0:
-        initialise_project(argv[2], descrip)
+        project = projit_init(argv[2], descrip)
     else:
         print("Cancelling...")
         exit(0)
 
 ##########################################################################################       
-def update(config_path):
-    cfg = get_properties(config_path)
-    print("Current Project Name: ", cfg['project_name'])
+def update(project):
+    print("Current Project Name: ", project.name)
     print("Enter an alternative project name (or press enter to keep)")
     name = input(">")
-    print("Current Description: ", cfg['description'])
+    print("Current Description: ", project.desc)
     print("Enter an alternative description (or press enter to keep)")
     descrip = input(">")
     if name != "":
-        cfg['project_name'] = name
+        project.name = name
     if descrip != "":
-        cfg['description'] = descrip
-    write_properties(config_path, cfg)
+        project.desc = descrip
+    project.save()
 
 
 ##########################################################################################        
 def project_status(project):
-    print(" > Project: %s" % project.name)
-    print(" > Datasets: %s" % project.name)
-    print(" > Experiments: %s" % project.name)
+    print("")
+    print("  Project: %s" % project.name)
+    print("  Description: %s" % project.desc)
+    print("  Datasets: %i" % len(project.datasets))
+    print("  Experiments: %i" % len(project.experiments))
+    print("")
 
 ##########################################################################################        
 def render_doc(project):
@@ -94,7 +105,41 @@ def render_doc(project):
  
 ##########################################################################################        
 def list(subcmd, project):
-    print("LISTING")
+    if subcmd == "datasets":
+        long_key = max([len(k) for k in project.datasets.keys()])
+        print(" ___Datasets________________________________________")
+        for ds in project.datasets:
+            print(" ", ds, filler(len(ds), long_key+1 ), project.datasets[ds] )
+        print("")
+    elif subcmd == "experiments":
+        print(" ___Experiments_____________________________________")
+        long_key = max([len(k[0]) for k in project.experiments])
+        for exp in project.experiments:
+            print(" ", exp[0], filler(len(exp[0]), long_key+1 ), exp[1] )
+        print("")
+    else:
+        print("ERROR: Unrecognised SUBCOMMAND: %s" % subcmd)
+        exit(1)
+
+def filler(current, max_len):
+    return " " * (max_len - current) 
+
+##########################################################################################        
+def add(subcmd, project, args):
+    if subcmd == "dataset":
+        name = args[3]
+        path = args[4]
+        project.add_dataset(name, path)
+        project.save()
+    elif subcmd == "experiment":
+        name = args[3]
+        path = args[4]
+        project.add_experiment(name, path)
+        project.save()
+    else:
+        print("ERROR: Unrecognised SUBCOMMAND: %s" % subcmd)
+        exit(1)
+
 
 ##########################################################################################        
 def print_usage(args):
@@ -102,8 +147,16 @@ def print_usage(args):
     print("USAGE ")
     print(args[0], " <COMMAND> [<SUBCOMMAND>] [<PARAMS>*]")
     print("  <COMMAND>     - Core Task: init, status, list, add, run, render")
-    print("  <SUBCOMMAND>  - (OPTIONAL) Dependant on task")
-    print("  <PARAMS>      - (OPTIONAL) Dependant on task")
+    print("  <SUBCOMMAND>  - (OPTIONAL) Dependant on COMMAND: dataset, experiment")
+    print("  <PARAMS>      - (OPTIONAL) Dependant on task, names and paths")
+    print("")
+    print("COMMON PATTERN")
+    print(args[0], "init 'Project name'")
+    print(args[0], "status")
+    print(args[0], "add dataset train data/train.csv")
+    print(args[0], "add dataset test data/test.csv")
+    print(args[0], "add experiment exploration exp/explore.ipynb")
+    print(args[0], "lists datasets")
     print("")
 
 

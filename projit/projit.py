@@ -68,7 +68,7 @@ class Projit:
         with open(path_to_json, 'w') as outfile:
             json.dump(self.__dict__, outfile)
 
-
+##########################################################################################
 def load(config_path):
     """
     This function allows you to instantiate a Projit project from an existing config_path
@@ -90,6 +90,7 @@ def load(config_path):
     _object.path = config_path
     return _object
 
+##########################################################################################
 def init(name, desc=""):
     """
     Initialise a new projit project.
@@ -108,3 +109,6 @@ def init(name, desc=""):
     project = Projit(config_folder, name, desc)
     project.save()
     return project
+
+##########################################################################################
+
