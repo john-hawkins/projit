@@ -70,7 +70,11 @@ def init(argv):
     print("Please enter a description for your project (or Press Enter to Cancel)")
     descrip = input(">")
     if len(descrip) > 0:
-        project = projit_init(argv[2], descrip)
+        if len(argv)>3:
+            template=argv[3]
+        else:
+            template='default'
+        project = projit_init(template, argv[2], descrip)
     else:
         print("Cancelling...")
         exit(0)

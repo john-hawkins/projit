@@ -47,7 +47,7 @@ def test_projit_update():
 def test_projit_init_v2():
     if path.isdir(config_folder):
         shutil.rmtree(config_folder)
-    project = proj.init("TEST", "TEST")
+    project = proj.init("default", "TEST", "TEST")
     assert locate_projit_config() != ""
     assert project.name == "TEST"
     assert project.desc == "TEST"

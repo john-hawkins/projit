@@ -4,6 +4,7 @@ import os
 
 from .config import config_file
 from .config import config_folder
+from .template import load_template
 
 class Projit:
     """
@@ -91,7 +92,7 @@ def load(config_path):
     return _object
 
 ##########################################################################################
-def init(name, desc=""):
+def init(template, name, desc=""):
     """
     Initialise a new projit project.
     Create the config directory and write the project config there.
@@ -108,6 +109,10 @@ def init(name, desc=""):
     os.mkdir(config_folder)
     project = Projit(config_folder, name, desc)
     project.save()
+    temp = load_template(template)
+    for d in temp['dirs']:
+        if not os.path.isdir(d):
+            os.mkdir(d) 
     return project
 
 ##########################################################################################
