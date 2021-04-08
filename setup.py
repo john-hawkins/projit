@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
  
 """setup.py: setuptools control."""
- 
+
 import re
 from setuptools import setup
- 
+
 version = re.search(
         '^__version__\s*=\s*"(.*)"',
-        open('projit/projit.py').read(),
+        open('projit/__init__.py').read(),
         re.M
-    ).group(1)
- 
+    ).group(1) 
+
 with open("README.md", "rb") as f:
     long_descr = f.read().decode("utf-8")
 
@@ -18,7 +18,7 @@ setup(
     name = "projit",
     packages = ["projit"],
     license = "MIT",
-    install_requires = ['pandas>=0.25.3', 'numpy>=1.16.4'],
+    install_requires = ['pyyaml'],
     entry_points = {
         "console_scripts": ['projit = projit.cli:main']
     },

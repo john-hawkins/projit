@@ -14,13 +14,19 @@ Projit is a utility for managing Data Science Project structure, properties, dat
 
 The goal of this project is to allow data science teams to work on
 projects in a structured and standardized way. The projit utility
-allows you to establish a project according to a standardized template.
-It then provides a python library that can be used inside experiments and
-scripts so that references to training, evaluations and test data sets
-is standardized.
+allows you to establish a project with a centralised meta-data repository.
+This meta-data is used by the application and package to facilitate loosely 
+coupled communication between scripts and experiments. 
+For example, projit provides a python library that can be used inside experiments and
+scripts so references to training, evaluation and test data sets is simple.
 
-This project was inspired by a combination of the CookieCutter template
-and the Git utility.
+In additon the project can be initialised according to a standardized layout
+so that the diectory structure is familiar to all team members.
+
+This project was inspired by a combination of other projects:
+* [Cookiecutter Data Science](https://drivendata.github.io/cookiecutter-data-science/) 
+* [The Python CookieCutter Application](https://cookiecutter.readthedocs.io/)
+* [The Git Source Control Utility]()
 
 To be released and distributed via setuptools/PyPI/pip for Python 3.
  
