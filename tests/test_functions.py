@@ -1,4 +1,5 @@
 import shutil
+import os
 from os import path
 import projit.projit as proj
 from projit.config import config_folder
@@ -60,3 +61,15 @@ def test_projit_load():
     project = proj.load("tests")
     assert project.name == "TEST"
     assert project.desc == "TEST"
+
+
+def test_template_results():
+    testdir = "temp_test_dir_xyz"
+    os.mkdir(testdir)
+    os.chdir(testdir)
+    project = proj.init("default", "subdir", "sub dir test")
+    assert project.name == "subdir"
+    assert path.isdir("data")
+    os.chdir("../")
+    shutil.rmtree(testdir)
+
