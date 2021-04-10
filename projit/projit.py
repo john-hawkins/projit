@@ -5,6 +5,9 @@ import os
 from .config import config_file
 from .config import config_folder
 from .template import load_template
+from .utils import locate_projit_config
+
+##########################################################################################
 
 class Projit:
     """
@@ -90,6 +93,10 @@ def load(config_path):
     _object = Projit(**_dict)
     _object.path = config_path
     return _object
+
+##########################################################################################
+def projit_load():
+    return load( locate_projit_config() )
 
 ##########################################################################################
 def init(template, name, desc=""):
