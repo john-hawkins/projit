@@ -31,7 +31,7 @@ setup(
     author_email = "john@getting-data-science-done.com",
     url = "http://john-hawkins.github.io",
     project_urls = {
-        'Documentation': "http://john-hawkins.github.io",
+        'Documentation': "https://projit.readthedocs.io",
         'Source': "https://github.com/john-hawkins/projit",
         'Tracker': "https://github.com/john-hawkins/projit/issues" 
       }

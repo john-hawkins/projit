@@ -1,7 +1,7 @@
-# ProjIt
+# Projit
 ### Project Integration for Data Science Work 
 
-> :warning: **Non-Functional**: This project is a work in progress.
+> Status: **Incomplete** : This project is a work in progress.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests](https://github.com/john-hawkins/projit/actions/workflows/python-package.yml/badge.svg)](https://github.com/john-hawkins/projit/actions/workflows/python-package.yml)
@@ -20,7 +20,7 @@ coupled communication between scripts and experiments.
 For example, projit provides a python library that can be used inside experiments and
 scripts so references to training, evaluation and test data sets is simple.
 
-In additon the project can be initialised according to a standardized layout
+In addition the project can be initialised according to a standardized layout
 so that the diectory structure is familiar to all team members.
 
 This project was inspired by a combination of other projects:
@@ -42,7 +42,7 @@ info about data sets and experimental results.
 
 ## Usage
 
-You can use this application multiple ways
+You can use this application in multiple ways
 
 Use the runner:
 
@@ -64,6 +64,8 @@ as shown in the process below:
 Installation from the source tree:
 
 ```
+git clone https://github.com/john-hawkins/projit
+cd projit
 python setup.py install
 ```
 
