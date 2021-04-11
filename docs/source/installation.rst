@@ -1,10 +1,8 @@
 Installation
 ============
 
-.. warning::
-   This project is non-functional. 
-
-The projit application is maintained inside the PyPi package manager.
+The projit codebase is available on Github, and the package is maintained 
+inside the PyPi package manager.
 
 Install the package from PyPi as follows:
 
@@ -26,9 +24,6 @@ Installation depends on the following packages:
 
 .. code-block:: bash
 
-    Flask==1.1.1
-    numpy>=1.16.4
-    pandas>=0.25.3
-    matplotlib==3.1.0
+    pyyaml
 
 

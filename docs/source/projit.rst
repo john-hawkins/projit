@@ -4,6 +4,14 @@ projit package
 Submodules
 ----------
 
+projit.cli module
+-----------------
+
+.. automodule:: projit.cli
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 projit.config module
 --------------------
 
@@ -16,6 +24,14 @@ projit.projit module
 --------------------
 
 .. automodule:: projit.projit
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+projit.template module
+----------------------
+
+.. automodule:: projit.template
    :members:
    :undoc-members:
    :show-inheritance:
