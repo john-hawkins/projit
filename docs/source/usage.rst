@@ -16,7 +16,7 @@ You can then update these properties as follows:
 
 .. code-block:: bash
 
-    >projit upate
+    >projit update
 
 This will show you the current values and prompt for an update
 

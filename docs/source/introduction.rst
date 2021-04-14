@@ -8,6 +8,6 @@ projects confirm to a standardised repeatable pattern.
 
 Usage of projit is facilitated through the command line application for standard tasks,
 and through the package for programmatic access to data sets and registration of reasults.
- 
+
 Follow the usage instructions for an example of standard usage.
 

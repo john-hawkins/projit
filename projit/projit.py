@@ -70,7 +70,7 @@ class Projit:
         """
         path_to_json = self.path + "/" + config_file
         with open(path_to_json, 'w') as outfile:
-            json.dump(self.__dict__, outfile)
+            json.dump(self.__dict__, outfile, indent=0)
 
 ##########################################################################################
 def load(config_path):
