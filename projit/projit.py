@@ -40,11 +40,15 @@ class Projit:
         :return: None 
         :rtype: None 
         """
+
         self.path = path
         self.name = name
         self.desc = desc
         self.experiments = experiments
         self.datasets = datasets
+
+    def get_root_path(self):
+        return self.path[0:len(self.path) - len(config_folder)]
 
     def add_experiment(self, name, path):
         """
@@ -62,7 +66,26 @@ class Projit:
         if name in self.datasets:
             return self.datasets[name]
         else:
-            raise Exception("ERROR: Named dataset '%s' not available:"%name)
+            raise Exception("ERROR: Named dataset '%s' not available:" % name)
+
+    def get_path_to_dataset(self, name):
+        ds = self.get_dataset(name)
+        if self.is_complete_path(ds):
+            return ds
+        else:
+            return self.create_local_path(ds)
+
+    def is_complete_path(self, path):
+        if path[0:1] == "/":
+            return True
+        if path[0:3] == "s3:":
+            return True
+        if path[0:4] == "http":
+            return True
+        return False
+
+    def create_local_path(self, ds):
+        return self.get_root_path() + ds
 
     def save(self):
         """
