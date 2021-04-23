@@ -9,6 +9,8 @@ from projit.utils import initialise_project
 from projit.utils import get_properties
 from projit.utils import write_properties
 
+from projit.projit import projit_load
+
 def test_walk():
     gena = walk_up("./tests")
     path, dirs, files = gena.__next__()
@@ -54,7 +56,7 @@ def test_projit_init_v2():
     assert project.desc == "TEST"
     shutil.rmtree(config_folder)
 
-def test_projit_load():
+def test_projit_json_load():
     """
     In this test we see that we can load a JSON file into a Projit object
     """
@@ -62,6 +64,21 @@ def test_projit_load():
     assert project.name == "TEST"
     assert project.desc == "TEST"
 
+
+def test_projit_load():
+    testdir = "temp_test_dir_xyz"
+    os.mkdir(testdir)
+    os.chdir(testdir)
+    project = proj.init("default", "myproject", "myproject")
+    os.mkdir("someotherdir")
+    os.chdir("someotherdir")
+    theproject = projit_load()
+    print("ORIGINAL:", project.path)
+    print("LOADED:", theproject.path)
+    assert project.name == theproject.name 
+    os.chdir("../")
+    os.chdir("../")
+    shutil.rmtree(testdir)
 
 def test_template_results():
     testdir = "temp_test_dir_xyz"
