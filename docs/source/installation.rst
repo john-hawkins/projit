@@ -25,5 +25,5 @@ Installation depends on the following packages:
 .. code-block:: bash
 
     pyyaml
-
+    pandas
 
