@@ -46,5 +46,40 @@ when you record the data it must be given a path relative to the root directory 
 Manage Experiments
 ^^^^^^^^^^^^^^^^^^^^^
 
-TODO
+You can add experiments using the CLI
+
+.. code-block:: bash
+
+    >projit add experiment "Initial Exp" experiments/exp_one.py
+
+This can also be done inside the experiment script itself:
+
+.. code-block:: python
+
+    import projit as pit
+    project = pit.projit_load()
+    project.add_experiment("Initial Exp", "experiments/exp_one.py")
+
+You can also add results associated with an experiment. 
+You just supply the experiment name, the metric and the value.
+
+.. code-block:: python
+
+    import projit as pit
+    project = pit.projit_load()
+    project.add_result("Initial Exp", "rmse", 10.4)
+
+You can add as many metric as you want in an ad-hoc fashion.
+
+Once you have finished running multiple experiments you can retrieve
+a table with all experimental results.
+
+.. code-block:: python
+
+    import projit as pit
+    project = pit.projit_load()
+    results = project.get_results()
+
+
+
 
