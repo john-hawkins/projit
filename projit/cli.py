@@ -132,12 +132,10 @@ def add(subcmd, project, args):
         name = args[3]
         path = args[4]
         project.add_dataset(name, path)
-        project.save()
     elif subcmd == "experiment":
         name = args[3]
         path = args[4]
         project.add_experiment(name, path)
-        project.save()
     else:
         print("ERROR: Unrecognised SUBCOMMAND: %s" % subcmd)
         exit(1)

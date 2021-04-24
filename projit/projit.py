@@ -1,3 +1,4 @@
+import pandas as pd
 import json
 import re
 import os
@@ -18,7 +19,7 @@ class Projit:
     documentation.
     """
 
-    def __init__(self, path, name, desc="", experiments=[], datasets={}):
+    def __init__(self, path, name, desc="", experiments=[], datasets={}, results={}):
         """
         Initialise a projit project class.
 
@@ -37,30 +38,88 @@ class Projit:
         :param datasets: The dictionary of datasets 'name':'path'
         :type datasets: Dictionary, optional
 
+        :param results: The dictionary of datasets 'experiment':{'metric':'value'}
+        :type results: Dictionary of Dictionary, optional
+
         :return: None 
         :rtype: None 
         """
-
         self.path = path
         self.name = name
         self.desc = desc
         self.experiments = experiments
         self.datasets = datasets
+        self.results = results
+
 
     def get_root_path(self):
+        """
+        Get the path to where the project folder is located
+        """
         return self.path[0:len(self.path) - len(config_folder)]
+
 
     def add_experiment(self, name, path):
         """
         Add information of a new experiment to the project. 
+        Then save the project configuration.
+
+        :param name: The experiment name
+        :type name: string, required
+
+        :param path: The path to the experiment.
+        :type path: string, required
         """
         self.experiments.append( (name, path) )
+        self.save()
+
 
     def add_dataset(self, name, path):
         """
         Add a named dataset to the project.
+
+        :param name: The dataset name
+        :type name: string, required
+
+        :param path: The path to the data set (either local path, URL or S3 Bucket)
+        :type path: string, required
         """
         self.datasets[name] = path
+        self.save()
+
+
+    def add_result(self, experiment, metric, value):
+        """
+        Add results from an experiment to the project.
+
+        :param name: The experiment name
+        :type name: string, required
+
+        :param metric: The name of the metric we are adding.
+        :type path: string, required
+
+        :param value: The value of the metric to add.
+        :type value: float, required
+        """
+        if experiment in self.results:
+            rez = self.results[experiment]
+        else:
+            rez = {}
+        rez[metric] = value
+        self.results[experiment] = rez
+        self.save()
+
+    def get_results(self):
+        df = pd.DataFrame()
+        for exp in self.experiments:
+            key = exp[0]
+            if key in self.results:
+                rez = self.results[key]
+            else:
+                rez = {}
+            rez['experiment'] = key
+            df = df.append(rez, ignore_index=True)
+        return df 
 
     def get_dataset(self, name):
         if name in self.datasets:
@@ -146,4 +205,5 @@ def init(template, name, desc=""):
     return project
 
 ##########################################################################################
+
 

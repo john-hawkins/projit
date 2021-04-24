@@ -18,7 +18,7 @@ setup(
     name = "projit",
     packages = ["projit"],
     license = "MIT",
-    install_requires = ['pyyaml'],
+    install_requires = ['pyyaml', 'pandas'],
     entry_points = {
         "console_scripts": ['projit = projit.cli:main']
     },

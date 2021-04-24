@@ -90,3 +90,18 @@ def test_template_results():
     os.chdir("../")
     shutil.rmtree(testdir)
 
+def test_experiment_results():
+    testdir = "temp_test_dir_xyz"
+    os.mkdir(testdir)
+    os.chdir(testdir)
+    project = proj.init("default", "exp", "exp test")
+    project.add_experiment("test",  "experiments")
+    project.add_result("test",  "rmse", 0.5)
+    results = project.get_results()
+    assert str(type(results)) == "<class 'pandas.core.frame.DataFrame'>"
+    assert "experiment" in results.columns
+    assert "rmse" in results.columns
+    os.chdir("../")
+    shutil.rmtree(testdir)
+
+
