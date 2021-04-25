@@ -48,13 +48,16 @@ def test_projit_update():
     shutil.rmtree(config_folder)
 
 def test_projit_init_v2():
-    if path.isdir(config_folder):
-        shutil.rmtree(config_folder)
+    testdir = "temp_test_dir_xyz"
+    os.mkdir(testdir)
+    os.chdir(testdir)
     project = proj.init("default", "TEST", "TEST")
     assert locate_projit_config() != ""
     assert project.name == "TEST"
     assert project.desc == "TEST"
-    shutil.rmtree(config_folder)
+    assert path.isdir("data")
+    os.chdir("../")
+    shutil.rmtree(testdir)
 
 def test_projit_json_load():
     """

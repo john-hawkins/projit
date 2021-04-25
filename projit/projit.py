@@ -198,12 +198,16 @@ def init(template, name, desc=""):
     os.mkdir(config_folder)
     project = Projit(config_folder, name, desc)
     project.save()
-    temp = load_template(template)
-    for d in temp['dirs']:
-        if not os.path.isdir(d):
-            os.mkdir(d) 
+    init_template(template)
     return project
 
 ##########################################################################################
+
+def init_template(template):
+    if template != "":
+        temp = load_template(template)
+        for d in temp['dirs']:
+            if not os.path.isdir(d):
+                os.mkdir(d)
 
 

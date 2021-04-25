@@ -3,14 +3,35 @@ Usage Guide
 
 Usage of projit happens at multiple points in a project development
 
+Project Initialization
+^^^^^^^^^^^^^^^^^^^^^^
+
 Initialise a project as follows
 
 .. code-block:: bash
 
-    >projit init "Project Name"
+    >projit init <Project-Name>
 
 This command will prompt you to provide a project deascription and then
-create the projit configuration folder then write the project properties file.
+create the projit configuration folder then write the project properties
+file.
+
+If you would like the initialisation process to create a set of 
+directories you can add an additional parameter for the template to use.
+For example:
+
+.. code-block:: bash
+
+    >projit init <Project-Name> template=default
+
+OR
+
+.. code-block:: bash
+
+    >projit init <Project-Name> template=cookiecutter-data-science
+
+Each of these two commands will read the template definitions inside the
+```templates``` directory and create all the specified directories.
 
 You can then update these properties as follows:
 

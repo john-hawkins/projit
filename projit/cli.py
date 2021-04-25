@@ -70,8 +70,11 @@ def init(argv):
     if len(descrip) > 0:
         if len(argv)>3:
             template=argv[3]
+            if len(template)>9:
+                if template[0:9]=="template=":
+                    template=template[9:]
         else:
-            template='default'
+            template=''
         project = projit_init(template, argv[2], descrip)
     else:
         print("Cancelling...")

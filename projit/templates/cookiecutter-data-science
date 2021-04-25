@@ -1,0 +1,4 @@
+{
+    "dirs":["data","docs","models","notebooks","reports","references","src"],
+    "files":["README.md","setup.py","LICENSE","Makefile","requirements.txt"]
+}
