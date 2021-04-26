@@ -38,7 +38,7 @@ def main():
             if cmd == "render":
                 render_doc(project)
             if cmd == "list":
-                if len(sys.argv) < 2:
+                if len(sys.argv) < 3:
                     print("ERROR: MISSING ARGUMENTS")
                     print_usage(sys.argv)
                     exit(1)
@@ -46,7 +46,7 @@ def main():
                     subcmd = sys.argv[2]
                     list(subcmd, project)
             if cmd == "add":
-                if len(sys.argv) < 2:
+                if len(sys.argv) < 5:
                     print("ERROR: MISSING ARGUMENTS")
                     print_usage(sys.argv)
                     exit(1)
@@ -159,7 +159,7 @@ def print_usage(args):
     print(args[0], "add dataset train data/train.csv")
     print(args[0], "add dataset test data/test.csv")
     print(args[0], "add experiment exploration exp/explore.ipynb")
-    print(args[0], "lists datasets")
+    print(args[0], "list datasets")
     print("")
 
 

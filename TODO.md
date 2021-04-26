@@ -25,3 +25,7 @@ TODO LIST
   * Retrieve paths to data
   * Initialise Project
 
+* Register a canonical way to read data
+  * e.g. if the default `read_csv` in Python or R makes encoding mistakes
+  * e.g. if there are specific variable typings or date conversions to enforce
+
