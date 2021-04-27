@@ -1,2 +1,4 @@
-pyYaml
+numpy
+pyyaml
 pandas
+fpdf

@@ -7,6 +7,7 @@ from .config import config_file
 from .config import config_folder
 from .template import load_template
 from .utils import locate_projit_config
+from .pdf import PDF
 
 ##########################################################################################
 
@@ -153,6 +154,15 @@ class Projit:
         path_to_json = self.path + "/" + config_file
         with open(path_to_json, 'w') as outfile:
             json.dump(self.__dict__, outfile, indent=0)
+
+    def render(self, path):
+        results = self.get_results()
+        pdf = PDF()
+        pdf.setup()
+        pdf.add_title(self.name)
+        pdf.add_description(self.desc)
+        pdf.output(path, 'F')
+
 
 ##########################################################################################
 def load(config_path):

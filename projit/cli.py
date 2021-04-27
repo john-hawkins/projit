@@ -36,7 +36,12 @@ def main():
             if cmd == "status":
                 project_status(project)
             if cmd == "render":
-                render_doc(project)
+                if len(sys.argv) < 3:
+                    print("ERROR: Rendering a project requires a path for output file.")
+                    exit(1)
+                else:
+                    path = sys.argv[2]
+                    render_doc(project, path)
             if cmd == "list":
                 if len(sys.argv) < 3:
                     print("ERROR: MISSING ARGUMENTS")
@@ -105,8 +110,8 @@ def project_status(project):
     print("")
 
 ##########################################################################################        
-def render_doc(project):
-    print("YOU WANT A DOC RENDERED")
+def render_doc(project, path):
+    project.render(path)
  
 ##########################################################################################        
 def list(subcmd, project):
