@@ -1,24 +1,26 @@
 # Projit
-### Project Integration for Data Science Work
+### Project Integrator for Decoupled Data Science
 
-> Status: **Incomplete** : This project is a work in progress.
+> Status: **Beta** Functional but incomplete. This project is a work in progress.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests](https://github.com/john-hawkins/projit/actions/workflows/python-package.yml/badge.svg)](https://github.com/john-hawkins/projit/actions/workflows/python-package.yml)
 [![Documentation Status](https://readthedocs.org/projects/projit/badge/?version=latest)](https://projit.readthedocs.io/en/latest/?badge=latest)
 [![PyPI](https://img.shields.io/pypi/v/projit.svg)](https://pypi.org/project/projit)
 
-Projit is a utility for managing Data Science Project structure, properties,
-data, experiments & collaboration.
+Projit is a utility to help data scientists manage projects that contain multiple experiments
+and components that need to interact in a de-coupled manner. 
+Use it define and manage project structure, properties, data, experiments & collaboration.
 
-The goal of this project is to allow data science teams to work on projects in
+The goal of this project is to data scientists and teams to work on projects in
 a structured and standardized way. The projit utility allows you to establish a
 project with a centralised meta-data repository. This meta-data is used by the
 application and package to facilitate loosely coupled communication between
 scripts and experiments.
+
 For example, projit provides a python library that can be used inside
 experiments and scripts so references to training, evaluation and test data
-sets is simple.
+sets can accessed without passing around and maintaing paths.
 
 In addition the project can be initialised according to a standardized layout
 so that the diectory structure is familiar to all team members.

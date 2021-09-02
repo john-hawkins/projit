@@ -107,4 +107,14 @@ def test_experiment_results():
     os.chdir("../")
     shutil.rmtree(testdir)
 
+def test_project_params():
+    testdir = "temp_test_dir_xyz"
+    os.mkdir(testdir)
+    os.chdir(testdir)
+    project = proj.init("default", "test params", "param test")
+    project.add_param("test",  "myval")
+    results = project.get_param("test")
+    assert results == "myval"
+    os.chdir("../")
+    shutil.rmtree(testdir)
 

@@ -1,4 +1,4 @@
-__version__ = "0.1.5"
+__version__ = "0.1.6"
 
 from .utils import locate_projit_config
 from .projit import projit_load

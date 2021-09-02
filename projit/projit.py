@@ -20,7 +20,7 @@ class Projit:
     documentation.
     """
 
-    def __init__(self, path, name, desc="", experiments=[], datasets={}, results={}):
+    def __init__(self, path, name, desc="", experiments=[], datasets={}, results={}, params={}):
         """
         Initialise a projit project class.
 
@@ -42,6 +42,10 @@ class Projit:
         :param results: The dictionary of datasets 'experiment':{'metric':'value'}
         :type results: Dictionary of Dictionary, optional
 
+        :param params: A dictionary of additional parameters share across experiments. 
+                       For example: target variable name, identifier column.
+        :type params: Dictionary, optional
+
         :return: None 
         :rtype: None 
         """
@@ -51,6 +55,7 @@ class Projit:
         self.experiments = experiments
         self.datasets = datasets
         self.results = results
+        self.params = params
 
 
     def get_root_path(self):
@@ -64,6 +69,8 @@ class Projit:
         """
         Add information of a new experiment to the project. 
         Then save the project configuration.
+        This function will overwrite an experiment of the same name
+        and delete any previous results.
 
         :param name: The experiment name
         :type name: string, required
@@ -71,6 +78,10 @@ class Projit:
         :param path: The path to the experiment.
         :type path: string, required
         """
+        for elem in self.experiments: 
+            if elem[0] == name:
+                self.experiments.remove(elem)
+                self.results[name] = {}
         self.experiments.append( (name, path) )
         self.save()
 
@@ -86,6 +97,19 @@ class Projit:
         :type path: string, required
         """
         self.datasets[name] = path
+        self.save()
+
+    def add_param(self, name, value):
+        """
+        Add a parameter to the project.
+
+        :param name: The parameter name
+        :type name: string, required
+
+        :param value: The value taken by that parameter
+        :type value: Any
+        """
+        self.params[name] = value 
         self.save()
 
 
@@ -127,6 +151,12 @@ class Projit:
             return self.datasets[name]
         else:
             raise Exception("ERROR: Named dataset '%s' not available:" % name)
+
+    def get_param(self, name):
+        if name in self.params:
+            return self.params[name]
+        else:
+            raise Exception("ERROR: Named parameter '%s' is not available:" % name)
 
     def get_path_to_dataset(self, name):
         ds = self.get_dataset(name)

@@ -24,7 +24,7 @@ setup(
     },
     include_package_data=True,
     version = version,
-    description = "Python library and ccommand line application for data science project workflow management.",
+    description = "Python library and CLI for de-coupled data science project integration and management.",
     long_description = long_descr,
     long_description_content_type='text/markdown',
     author = "John Hawkins",
