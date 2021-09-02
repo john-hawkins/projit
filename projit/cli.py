@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """projit.cli: provides entry point main()."""
-
+import pandas as pd
 import sys
 import os
 
