@@ -20,9 +20,19 @@ class Projit:
     documentation.
     """
 
-    def __init__(self, path, name, desc="", experiments=[], datasets={}, results={}, params={}):
+    def __init__(self, 
+                 path, 
+                 name, 
+                 desc="", 
+                 experiments=[], 
+                 datasets={},
+                 results={}, 
+                 params={},
+                 dataresults={}):
         """
-        Initialise a projit project class.
+        Initialise a projit project object.
+        This class will be used for storing and retrieving all data about the project,
+        as well as ensuring that it is written to the projit meta-data files.
 
         :param path: The path to the project file.
         :type path: string, required
@@ -39,12 +49,19 @@ class Projit:
         :param datasets: The dictionary of datasets 'name':'path'
         :type datasets: Dictionary, optional
 
-        :param results: The dictionary of datasets 'experiment':{'metric':'value'}
+        :param results: The dictionary of results by experiment.
+                        Structure: {'experiment':{'metric':'value'}}
         :type results: Dictionary of Dictionary, optional
 
         :param params: A dictionary of additional parameters share across experiments. 
                        For example: target variable name, identifier column.
         :type params: Dictionary, optional
+
+        :param dataresults: The dictionary of results on specific data sets.
+                            These are used when you want your experimental results broken
+                            down by the datasets. 
+                            Structure: {'dataset':{'experiment':{'metric':'value'}}}
+        :type dataresults: Dictionary of Dictionary of Dictionary, optional
 
         :return: None 
         :rtype: None 
@@ -56,6 +73,7 @@ class Projit:
         self.datasets = datasets
         self.results = results
         self.params = params
+        self.dataresults = dataresults
 
 
     def get_root_path(self):
@@ -81,10 +99,17 @@ class Projit:
         for elem in self.experiments: 
             if elem[0] == name:
                 self.experiments.remove(elem)
-                self.results[name] = {}
+                self.clean_experimental_results(name)
         self.experiments.append( (name, path) )
         self.save()
 
+    def clean_experimental_results(self, name):
+        """
+        Remove all results for a given experiment
+        """
+        self.results[name] = {}
+        for dataset in dataresults:
+            self.dataresults[dataset][name] = {}
 
     def add_dataset(self, name, path):
         """
@@ -113,33 +138,74 @@ class Projit:
         self.save()
 
 
-    def add_result(self, experiment, metric, value):
+    def add_result(self, experiment, metric, value, dataset=None):
         """
         Add results from an experiment to the project.
+
+        They can be overall project results, or associated with a specific dataset
 
         :param name: The experiment name
         :type name: string, required
 
         :param metric: The name of the metric we are adding.
-        :type path: string, required
+        :type metric: string, required
 
         :param value: The value of the metric to add.
         :type value: float, required
+
+        :param dataset: The dataset against which the results are generated
+        :type dataset: string, optional 
+
+        :return: None
+        :rtype: None
         """
-        if experiment in self.results:
-            rez = self.results[experiment]
-        else:
-            rez = {}
-        rez[metric] = value
-        self.results[experiment] = rez
+
+        if dataset==None:
+            if experiment in self.results:
+                rez = self.results[experiment]
+            else:
+                rez = {}
+            rez[metric] = value
+            self.results[experiment] = rez
+        else: 
+            if dataset in self.dataresults:
+                rez = self.dataresults[dataset]
+            else:
+                rez = {}
+            if experiment in rez:
+                rez2 = rez[experiment]
+            else:
+                rez2 = {}
+            rez2[metric] = value
+            rez[experiment] = rez2
+            self.dataresults[dataset] = rez
         self.save()
 
-    def get_results(self):
+    def get_results(self, dataset=None):
+        """
+        Retrieve the experimental results as a DataFrame.
+
+        They can be overall project results, or associated with a specific dataset
+
+        :param dataset: The dataset against which the results are generated
+        :type dataset: string, optional
+
+        :return: DataFrame of results
+        :rtype: pandas.DataFrame
+        """
+
         df = pd.DataFrame()
+        if dataset==None:
+            myresults = self.results
+        else:
+            if dataset in self.dataresults:
+                myresults = self.dataresults[dataset]
+            else:
+                raise Exception("ERROR: No results for dataset: %s " % dataset)
         for exp in self.experiments:
             key = exp[0]
-            if key in self.results:
-                rez = self.results[key]
+            if key in myresults:
+                rez = myresults[key]
             else:
                 rez = {}
             rez['experiment'] = key
@@ -147,6 +213,15 @@ class Projit:
         return df 
 
     def get_dataset(self, name):
+        """
+        Retrieve the dataset by name.
+
+        :param name: The dataset to retrieve
+        :type name: string, required
+
+        :return: Path to dataset
+        :rtype: String
+        """
         if name in self.datasets:
             return self.datasets[name]
         else:

@@ -64,7 +64,7 @@ def main():
                 exit(1)
             else:
                 subcmd = sys.argv[2]
-                list(subcmd, project)
+                list(subcmd, project, sys.argv)
                 exit(1)
         if cmd == "add":
             if len(sys.argv) < 5:
@@ -132,7 +132,7 @@ def render_doc(project, path):
     project.render(path)
  
 ##########################################################################################        
-def list(subcmd, project):
+def list(subcmd, project, argv):
     if subcmd == "datasets":
         long_key = max([len(k) for k in project.datasets.keys()])
         print(" ___Datasets________________________________________")
@@ -146,7 +146,11 @@ def list(subcmd, project):
             print(" ", exp[0], filler(len(exp[0]), long_key+1 ), exp[1] )
         print("")
     elif subcmd == "results":
-        rez = project.get_results()
+        if len(argv)>3:
+            dataset = argv[3]
+            rez = project.get_results(dataset)
+        else:
+            rez = project.get_results()
         print(" ___Results_____________________________________")
         pd.set_option('expand_frame_repr', False)
         pd.set_option('display.max_columns', 999)

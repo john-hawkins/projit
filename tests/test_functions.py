@@ -1,16 +1,19 @@
-import shutil
 import os
+import pytest
+import shutil
 from os import path
+import pandas as pd
+import datatest as dt
 import projit.projit as proj
-from projit.config import config_folder
 from projit.utils import walk_up
+from projit.config import config_folder
 from projit.utils import locate_projit_config
 from projit.utils import initialise_project 
 from projit.utils import get_properties
 from projit.utils import write_properties
-
 from projit.projit import projit_load
 
+#################################################################
 def test_walk():
     gena = walk_up("./tests")
     path, dirs, files = gena.__next__()
@@ -20,9 +23,11 @@ def test_walk():
     assert 'projit' in dirs
     assert 'tests' in dirs
 
+#################################################################
 def test_locate_projit_config():
     assert locate_projit_config() == ""
 
+#################################################################
 def test_projit_init():
     if path.isdir(config_folder):
         shutil.rmtree(config_folder)
@@ -33,6 +38,7 @@ def test_projit_init():
     assert cfg['description'] == "TEST"
     shutil.rmtree(config_folder)
 
+#################################################################
 def test_projit_update():
     if path.isdir(config_folder):
         shutil.rmtree(config_folder)
@@ -47,6 +53,7 @@ def test_projit_update():
     assert cfg2['description'] == "TEST2"
     shutil.rmtree(config_folder)
 
+#################################################################
 def test_projit_init_v2():
     testdir = "temp_test_dir_xyz"
     os.mkdir(testdir)
@@ -59,6 +66,7 @@ def test_projit_init_v2():
     os.chdir("../")
     shutil.rmtree(testdir)
 
+#################################################################
 def test_projit_json_load():
     """
     In this test we see that we can load a JSON file into a Projit object
@@ -68,6 +76,7 @@ def test_projit_json_load():
     assert project.desc == "TEST"
 
 
+#################################################################
 def test_projit_load():
     testdir = "temp_test_dir_xyz"
     os.mkdir(testdir)
@@ -83,6 +92,7 @@ def test_projit_load():
     os.chdir("../")
     shutil.rmtree(testdir)
 
+#################################################################
 def test_template_results():
     testdir = "temp_test_dir_xyz"
     os.mkdir(testdir)
@@ -93,6 +103,7 @@ def test_template_results():
     os.chdir("../")
     shutil.rmtree(testdir)
 
+#################################################################
 def test_experiment_results():
     testdir = "temp_test_dir_xyz"
     os.mkdir(testdir)
@@ -107,6 +118,7 @@ def test_experiment_results():
     os.chdir("../")
     shutil.rmtree(testdir)
 
+#################################################################
 def test_project_params():
     testdir = "temp_test_dir_xyz"
     os.mkdir(testdir)
@@ -118,3 +130,38 @@ def test_project_params():
     os.chdir("../")
     shutil.rmtree(testdir)
 
+
+#################################################################
+
+def test_project_experiment_results():
+    testdir = "temp_test_dir_xyz"
+    os.mkdir(testdir)
+    os.chdir(testdir)
+    project = proj.init("default", "test", "test")
+    project.add_experiment("myexp", "mypath")
+    project.add_dataset("mydata", "datapath")
+    project.add_result("myexp", "RMSE", 0.4, "mydata")
+    results = project.get_results("mydata")
+    dt.validate(
+        results.RMSE,
+        float
+    )
+    assert str(type(results)) == "<class 'pandas.core.frame.DataFrame'>"
+    dt.validate(
+        results.columns,
+        {'RMSE', 'experiment'},
+    )
+    resultslen = len(results)
+
+    # Add a result to the base structure and ensure it does not interfere
+    project.add_result("myexp", "RMSE", 0.3)
+    results2 = project.get_results("mydata")
+    assert str(type(results2)) == "<class 'pandas.core.frame.DataFrame'>"
+    dt.validate(
+        results2.columns,
+        {'RMSE', 'experiment'},
+    )
+    assert len(results) == len(results2)
+
+    os.chdir("../")
+    shutil.rmtree(testdir)

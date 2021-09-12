@@ -81,8 +81,16 @@ This can also be done inside the experiment script itself:
     project = pit.projit_load()
     project.add_experiment("Initial Exp", "experiments/exp_one.py")
 
+```
+Note: The path to the experiment should be relative to the root directory.
+TODO: Automate the resolution of these paths.
+```
+
+Manage Results
+^^^^^^^^^^^^^^^^^^^^^
+
 You can also add results associated with an experiment. 
-You just supply the experiment name, the metric and the value.
+You supply the experiment name, the metric and the value.
 
 .. code-block:: python
 
@@ -91,6 +99,7 @@ You just supply the experiment name, the metric and the value.
     project.add_result("Initial Exp", "rmse", 10.4)
 
 You can add as many metric as you want in an ad-hoc fashion.
+There is no requirement for every experiment to track the same metrics.
 
 Once you have finished running multiple experiments you can retrieve
 a table with all experimental results.
@@ -100,6 +109,38 @@ a table with all experimental results.
     import projit as pit
     project = pit.projit_load()
     results = project.get_results()
+
+
+This can also be done at the command line with the command:
+
+.. code-block:: bash
+
+    >projit list results
+
+
+Experimental results can also be added such that they are associated with specific
+datasets. This is useful to track performance on validation, test or holdouts sets.
+As well as separate out-of-time test sets.
+
+To add the results to a specific dataset:
+
+.. code-block:: python
+
+    import projit as pit
+    project = pit.projit_load()
+    project.add_result("Initial Exp", "rmse", 10.4, "MyTestDataSet")
+
+You can then list the results just for that specific dataset:
+
+.. code-block:: bash
+
+    >projit list results MyTestDataSet
+
+
+
+
+
+
 
 
 
