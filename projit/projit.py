@@ -108,7 +108,7 @@ class Projit:
         Remove all results for a given experiment
         """
         self.results[name] = {}
-        for dataset in dataresults:
+        for dataset in self.dataresults:
             self.dataresults[dataset][name] = {}
 
     def add_dataset(self, name, path):
