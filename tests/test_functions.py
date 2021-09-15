@@ -130,6 +130,21 @@ def test_project_params():
     os.chdir("../")
     shutil.rmtree(testdir)
 
+#################################################################
+def test_project_hyperparams():
+    testdir = "temp_test_dir_xyz"
+    os.mkdir(testdir)
+    os.chdir(testdir)
+    project = proj.init("default", "test params", "param test")
+    with pytest.raises(Exception) as e_info:
+        project.add_hyperparam("myexp",  "myval")
+
+    project.add_experiment("myexp", "mypath")
+    project.add_hyperparam("myexp",  "myval")
+    results = project.get_hyperparam("myexp")
+    assert results == "myval"
+    os.chdir("../")
+    shutil.rmtree(testdir)
 
 #################################################################
 

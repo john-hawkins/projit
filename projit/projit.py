@@ -28,6 +28,7 @@ class Projit:
                  datasets={},
                  results={}, 
                  params={},
+                 hyperparams={},
                  dataresults={}):
         """
         Initialise a projit project object.
@@ -57,6 +58,10 @@ class Projit:
                        For example: target variable name, identifier column.
         :type params: Dictionary, optional
 
+        :param hyperparams: A dictionary of hyper parameters for experiments. 
+                       Structure: {'experiment':{'param':'value', etc}} 
+        :type hyperparams: Dictionary, optional
+
         :param dataresults: The dictionary of results on specific data sets.
                             These are used when you want your experimental results broken
                             down by the datasets. 
@@ -73,6 +78,7 @@ class Projit:
         self.datasets = datasets
         self.results = results
         self.params = params
+        self.hyperparams = hyperparams
         self.dataresults = dataresults
 
 
@@ -102,6 +108,13 @@ class Projit:
                 self.clean_experimental_results(name)
         self.experiments.append( (name, path) )
         self.save()
+
+
+    def experiment_exists(self, name):
+        for elem in self.experiments:
+            if elem[0] == name:
+                return True
+        return False
 
     def clean_experimental_results(self, name):
         """
@@ -137,6 +150,21 @@ class Projit:
         self.params[name] = value 
         self.save()
 
+    def add_hyperparam(self, name, value):
+        """
+        Add a set of hyper parameters to the project.
+
+        :param name: The experiment name
+        :type name: string, required
+
+        :param value: The Dictionary of hyperparameters
+        :type value: Dictionary
+        """
+        if self.experiment_exists(name):
+            self.hyperparams[name] = value
+            self.save()
+        else:
+            raise Exception("ERROR: No experiment called: '%s' -- Register your experiment first." % name)
 
     def add_result(self, experiment, metric, value, dataset=None):
         """
@@ -232,6 +260,12 @@ class Projit:
             return self.params[name]
         else:
             raise Exception("ERROR: Named parameter '%s' is not available:" % name)
+
+    def get_hyperparam(self, name):
+        if name in self.hyperparams:
+            return self.hyperparams[name]
+        else:
+            raise Exception("ERROR: Hyper parameters for experiemnt '%s' are not available:" % name)
 
     def get_path_to_dataset(self, name):
         ds = self.get_dataset(name)
