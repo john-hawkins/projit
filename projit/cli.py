@@ -146,12 +146,13 @@ def list(subcmd, project, argv):
             print(" ", exp[0], filler(len(exp[0]), long_key+1 ), exp[1] )
         print("")
     elif subcmd == "results":
+        dataset = "*"
         if len(argv)>3:
             dataset = argv[3]
             rez = project.get_results(dataset)
         else:
             rez = project.get_results()
-        print(" ___Results_____________________________________")
+        print(" ___Results__________________________________[ %s ]___" % dataset)
         pd.set_option('expand_frame_repr', False)
         pd.set_option('display.max_columns', 999)
         print(rez)

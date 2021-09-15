@@ -238,7 +238,13 @@ class Projit:
                 rez = {}
             rez['experiment'] = key
             df = df.append(rez, ignore_index=True)
-        return df 
+
+        # Ensure that the first column in the results is "experiments"
+        cols = ["experiment"]
+        rest = df.columns.to_list()
+        rest.remove('experiment')
+        cols.extend(rest)
+        return df.loc[:,cols]
 
     def get_dataset(self, name):
         """
