@@ -87,6 +87,18 @@ This will initialise the current directory as a Data Science Project using the
 default template. Please refer to the
 [documentation for more detail on projit commands](https://projit.readthedocs.io).
 
+## Output
+
+By adding experiments and results to a projit project you can examine them.
+Example output in the table below:
+
+| Results on [test]            |||
+| experiment | MAE      | MAPE   |
+| ----------:| --------:| ------:|
+| mytest     | 11230.46 |  13.46 |
+| mytest2    |      nan |  15.86 |
+
+
 # Acknowledgements
 
 Python package built using the
