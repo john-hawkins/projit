@@ -23,10 +23,10 @@ def main():
     else:
         cmd = sys.argv[1]
         if len(sys.argv) == 2:
-            if sys.argv[1] == "-v":
+            if sys.argv[1] in ["-v", "--version"]:
                 print(" Version:", __version__)
                 exit(1)
-            elif sys.argv[1] == "-h":
+            elif sys.argv[1] in ["-h", "--help"]:
                 print_usage(sys.argv)
                 exit(1)
         
@@ -64,7 +64,7 @@ def main():
                 exit(1)
             else:
                 subcmd = sys.argv[2]
-                list(subcmd, project, sys.argv)
+                printlist(subcmd, project, sys.argv)
                 exit(1)
         if cmd == "add":
             if len(sys.argv) < 5:
@@ -132,7 +132,7 @@ def render_doc(project, path):
     project.render(path)
  
 ##########################################################################################        
-def list(subcmd, project, argv):
+def printlist(subcmd, project, argv):
     if subcmd == "datasets":
         long_key = max([len(k) for k in project.datasets.keys()])
         print(" ___Datasets________________________________________")
@@ -147,21 +147,79 @@ def list(subcmd, project, argv):
         print("")
     elif subcmd == "results":
         dataset = "*"
+        title = "Results"
         if len(argv)>3:
             dataset = argv[3]
             rez = project.get_results(dataset)
+            title += " on [%s]"%dataset
         else:
             rez = project.get_results()
-        print(" ___Results__________________________________[ %s ]___" % dataset)
-        pd.set_option('expand_frame_repr', False)
-        pd.set_option('display.max_columns', 999)
-        print(rez)
+        #print(" ___Results__________________________________[ %s ]___" % dataset)
+        #pd.set_option('expand_frame_repr', False)
+        #pd.set_option('display.max_columns', 999)
+        print_results_markdown(title, rez)
     else:
         print("ERROR: Unrecognised SUBCOMMAND: %s" % subcmd)
         exit(1)
 
+##########################################################################################        
 def filler(current, max_len):
     return " " * (max_len - current) 
+
+##########################################################################################        
+
+def print_results_markdown(title, df):
+    longest_name = max(df["experiment"].apply(lambda x: len(x)))
+    name_spacer = 12
+    if(longest_name>10):
+        name_spacer = longest_name+2
+
+    col_widths = [name_spacer]
+    def colwidth(input):
+         wid = len(input)
+         if (wid<6):
+             return 8
+         return wid+2
+
+    other_cols = list(df.columns)
+    other_cols.remove("experiment")
+    other_col_widths = list(map(colwidth, other_cols))
+
+    def widthGenerator(col_names, col_widths):
+        for colname, colwidth in zip(col_names, col_widths):
+            longest =  max( df[colname].apply(lambda x: len(str(round(x,2)))))
+            if longest > (colwidth-2):
+                yield longest+2
+            else:
+                yield colwidth
+
+    mygen = widthGenerator(other_cols, other_col_widths)
+    other_col_widths = list(mygen)
+    col_widths.extend(other_col_widths)
+    total_widths = sum(col_widths)
+    # This title line was an attempt to print it as a merged table cell 
+    # titleline = "| %s%s %s" % (title, " "*(total_widths-len(title)-2), "|"*(len(col_widths)) )
+    titleline = "\n%s\n%s" % (title, "-"*len(title))
+    print(titleline)
+    header = ""
+    for colname, colwidth in zip(list(df.columns), col_widths):
+        header += ("| %s%s "% (colname, " "*(colwidth-len(colname)-2) ))
+    header += "|"
+    under = ""
+    for colwith in col_widths:
+        under += ("| %s:"% ( "-"*(colwith-2) ))
+    under += "|"
+    print(header)
+    print(under)
+    for i in range(len(df)):
+        name = df.loc[i,"experiment"]
+        rowcontent = "| %s%s "%(name, " "*(name_spacer-len(name)-2) )
+        for colname, colwidth in zip(other_cols, other_col_widths):
+            content = str(round(df.loc[i,colname],2))
+            rowcontent += "| %s%s "%( " "*(colwidth-len(content)-2), content )
+        rowcontent += "|"
+        print(rowcontent)
+    print("\n")
 
 ##########################################################################################        
 def add(subcmd, project, args):
