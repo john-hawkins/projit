@@ -92,7 +92,9 @@ default template. Please refer to the
 By adding experiments and results to a projit project you can examine them.
 Example output in the table below:
 
-| Results on [test]            |||
+
+Results on [test] 
+-----------------
 | experiment | MAE      | MAPE   |
 | ----------:| --------:| ------:|
 | mytest     | 11230.46 |  13.46 |
