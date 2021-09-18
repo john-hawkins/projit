@@ -1,9 +1,14 @@
-# -*- coding: utf-8 -*-
-
-"""projit.cli: provides entry point main()."""
+import argparse
 import pandas as pd
 import sys
 import os
+
+# -*- coding: utf-8 -*-
+  
+"""
+   projit.cli: Command line interface for projit.
+   This file provide argument parsing and execution via entry point main()
+"""
 
 from .utils import locate_projit_config
 from .config import config_folder
@@ -14,97 +19,30 @@ from .projit import load as projit_load
 from .projit import init as projit_init
 
 from projit import __version__
- 
-def main():
-    if len(sys.argv) < 2:
-        print("ERROR: MISSING ARGUMENTS")
-        print_usage(sys.argv)
-        exit(1)
-    else:
-        cmd = sys.argv[1]
-        if len(sys.argv) == 2:
-            if sys.argv[1] in ["-v", "--version"]:
-                print(" Version:", __version__)
-                exit(1)
-            elif sys.argv[1] in ["-h", "--help"]:
-                print_usage(sys.argv)
-                exit(1)
-        
-        if cmd == "init":
-            init(sys.argv)
-            exit(1)
 
-        config_path = locate_projit_config() 
-        if config_path=="":
-            print(" ERROR: This is not a projit project.")
-            print("        Please initialise the project first.")
-            print(" > projit init <PROJECT NAME>")
-            exit(1)
-
-        project = projit_load(config_path)
-
-        if cmd == "update":
-            update(project)
-            exit(1)
-        if cmd == "status":
-            project_status(project)
-            exit(1)
-        if cmd == "render":
-            if len(sys.argv) < 3:
-                print(" ERROR: Rendering a project requires a path for output file.")
-                exit(1)
-            else:
-                path = sys.argv[2]
-                render_doc(project, path)
-                exit(1)
-        if cmd == "list":
-            if len(sys.argv) < 3:
-                print(" ERROR: MISSING ARGUMENTS")
-                print_usage(sys.argv)
-                exit(1)
-            else:
-                subcmd = sys.argv[2]
-                printlist(subcmd, project, sys.argv)
-                exit(1)
-        if cmd == "add":
-            if len(sys.argv) < 5:
-                print(" ERROR: MISSING ARGUMENTS")
-                print_usage(sys.argv)
-                exit(1)
-            else:
-                subcmd = sys.argv[2]
-                add(subcmd, project, sys.argv)
-                exit(1)
-
-        print(" ERROR: UNKNOWN ARGUMENTS")
-        print_usage(sys.argv)
-
-##########################################################################################        
-def init(argv):
+##########################################################################################
+def task_init(name, template=''):
+    """
+    Initialise a project from the command line.
+    This function request a description, and thus runs in interactive mode.
+    """
     config_file = locate_projit_config()
     if config_file != "":
-        print("ERROR: Project exists. Run `projit update` to change details ")
-        exit(1)
-    if len(argv) < 3:
-        print("ERROR: Project initialisation requires parameter: <Project_Name>")
+        print("ERROR: Projit Project already exists. Run `projit update` to change details.")
         exit(1)
     print("Please enter a description for your project (or Press Enter to Cancel)")
     descrip = input(">")
-    if len(descrip) > 0:
-        if len(argv)>3:
-            template=argv[3]
-            if len(template)>9:
-                if template[0:9]=="template=":
-                    template=template[9:]
-        else:
-            template=''
-        project = projit_init(template, argv[2], descrip)
-    else:
-        print("Cancelling...")
-        exit(0)
+    if len(template)>9:
+        if template[0:9]=="template=":
+            template=template[9:]
+    project = projit_init(template, argv[2], descrip)
 
-##########################################################################################       
-def update(project):
+
+##########################################################################################
+def task_update(project):
+    """
+    Update a project from the command line
+    """
     print("Current Project Name: ", project.name)
     print("Enter an alternative project name (or press enter to keep)")
     name = input(">")
@@ -117,9 +55,8 @@ def update(project):
         project.desc = descrip
     project.save()
 
-
-##########################################################################################        
-def project_status(project):
+##########################################################################################
+def task_status(project):
     print("")
     print("  Project: %s" % project.name)
     print("  Description: %s" % project.desc)
@@ -127,12 +64,11 @@ def project_status(project):
     print("  Experiments: %i" % len(project.experiments))
     print("")
 
-##########################################################################################        
-def render_doc(project, path):
-    project.render(path)
- 
-##########################################################################################        
-def printlist(subcmd, project, argv):
+##########################################################################################
+def task_list(subcmd, project, dataset, markdown):
+    """
+    List content of a project from the command line
+    """
     if subcmd == "datasets":
         long_key = max([len(k) for k in project.datasets.keys()])
         print(" ___Datasets________________________________________")
@@ -146,27 +82,39 @@ def printlist(subcmd, project, argv):
             print(" ", exp[0], filler(len(exp[0]), long_key+1 ), exp[1] )
         print("")
     elif subcmd == "results":
-        dataset = "*"
         title = "Results"
-        if len(argv)>3:
-            dataset = argv[3]
+        if dataset == "":
+            rez = project.get_results()
+        else:
             rez = project.get_results(dataset)
             title += " on [%s]"%dataset
+        
+        if markdown:
+            print_results_markdown(title, rez)
         else:
-            rez = project.get_results()
-        #print(" ___Results__________________________________[ %s ]___" % dataset)
-        #pd.set_option('expand_frame_repr', False)
-        #pd.set_option('display.max_columns', 999)
-        print_results_markdown(title, rez)
+            print(" ___Results__________________________________[ %s ]___" % dataset)
+            pd.set_option('expand_frame_repr', False)
+            pd.set_option('display.max_columns', 999)
+            print(rez)
+
     else:
-        print("ERROR: Unrecognised SUBCOMMAND: %s" % subcmd)
+        print(" ERROR: List received an unrecognised sub-command: %s" % subcmd)
         exit(1)
 
-##########################################################################################        
-def filler(current, max_len):
-    return " " * (max_len - current) 
 
-##########################################################################################        
+
+##########################################################################################
+def task_render(project, path):
+    """
+    Generates a pdf and writes it to the provided path
+    """
+    project.render(path)
+
+##########################################################################################
+def filler(current, max_len):
+    return " " * (max_len - current)
+
+##########################################################################################
 
 def print_results_markdown(title, df):
     longest_name = max(df["experiment"].apply(lambda x: len(x)))
@@ -185,6 +133,7 @@ def print_results_markdown(title, df):
     other_cols.remove("experiment")
     other_col_widths = list(map(colwidth, other_cols))
 
+
     def widthGenerator(col_names, col_widths):
         for colname, colwidth in zip(col_names, col_widths):
             longest =  max( df[colname].apply(lambda x: len(str(round(x,2)))))
@@ -197,7 +146,7 @@ def print_results_markdown(title, df):
     other_col_widths = list(mygen)
     col_widths.extend(other_col_widths)
     total_widths = sum(col_widths)
-    # This title line was an attempt to print it as a merged table cell 
+    # This title line was an attempt to print it as a merged table cell
     # titleline = "| %s%s %s" % (title, " "*(total_widths-len(title)-2), "|"*(len(col_widths)) )
     titleline = "\n%s\n%s" % (title, "-"*len(title))
     print(titleline)
@@ -221,42 +170,116 @@ def print_results_markdown(title, df):
         print(rowcontent)
     print("\n")
 
-##########################################################################################        
-def add(subcmd, project, args):
-    if subcmd == "dataset":
-        name = args[3]
-        path = args[4]
+##########################################################################################
+def task_add(project, asset, name, path):
+    """
+    Add elements to a project from the command line
+    """
+    if asset == "dataset":
         project.add_dataset(name, path)
-    elif subcmd == "experiment":
-        name = args[3]
-        path = args[4]
+    elif asset == "experiment":
         project.add_experiment(name, path)
     else:
-        print("ERROR: Unrecognised SUBCOMMAND: %s" % subcmd)
+        print("ERROR: Request to add unrecognised asset type: %s" % asset)
         exit(1)
 
-
-##########################################################################################        
-def print_usage(args):
+##########################################################################################
+def print_usage(prog):
     """ Command line application usage instrutions. """
     print(" USAGE ")
-    print(" ", args[0], " [OPTIONS] <COMMAND> [<SUBCOMMAND>] [<PARAMS>*]")
+    print(" ", prog, "[OPTIONS] <COMMAND> [<ASSET>] [<PARAMS>*]")
     print("   <COMMAND>     - CORE TASK TO PERFORM: [init | upate | status | add | list | render]")
-    print("   <SUBCOMMAND>  - (OPTIONAL) Dependant on COMMAND: [dataset | experiment | results]")
+    print("   <ASSET>       - (OPTIONAL) Dependant on COMMAND: [dataset | experiment | results]")
     print("   <PARAMS>      - (OPTIONAL) Dependant on COMMAND: Usually names and paths")
     print("   [OPTIONS]")
-    print("      -v             - Print version")
-    print("      -h             - Print this usage help")
+    print("      -v, --version          - Print version")
+    print("      -h, --help             - Get command help")
+    print("      -m, --markdown         - Print out with markdown")
     print("")
-    print("   COMMON PATTERNS")
-    print("   ", args[0], "init 'Project name'")
-    print("   ", args[0], "status")
-    print("   ", args[0], "add dataset train data/train.csv")
-    print("   ", args[0], "add dataset test data/test.csv")
-    print("   ", args[0], "add experiment exploration exp/explore.ipynb")
-    print("   ", args[0], "list datasets")
-    print("   ", args[0], "list experiments")
-    print("   ", args[0], "list results")
+    print("   COMMON USAGE PATTERNS")
+    print("   ", prog, "init 'Project name'                     # Initialise project")
+    print("   ", prog, "status                                  # View project status")
+    print("   ", prog, "add dataset train data/train.csv        # Register training data")
+    print("   ", prog, "add dataset test data/test.csv          # Register testing data")
+    print("   ", prog, "add experiment explore explore.ipynb    # Register an experiment script")
+    print("   ", prog, "list datasets                           # List the available datasets")
+    print("   ", prog, "list experiments                        # List the registered experiments")
+    print("   ", prog, "list results                            # List the registered results ")
+    print("   ", prog, "-m list results test                    # List results on test data in markdown")
     print("")
 
-##########################################################################################        
+
+
+##########################################################################################
+def main():
+   parser = argparse.ArgumentParser()
+   parser.add_argument('-v', '--version', help='Print Version', action='store_true')
+   parser.add_argument('-m', '--markdown', help='Use markdown for output', action='store_true')
+
+   subparsers = parser.add_subparsers(dest="cmd") 
+
+   init_parser = subparsers.add_parser('init')
+   init_parser.add_argument('name')
+   init_parser.add_argument('template', nargs='?', default="")
+
+   up_parser = subparsers.add_parser('update')
+
+   add_parser = subparsers.add_parser('add')
+   add_parser.add_argument('asset')
+   add_parser.add_argument('name')
+   add_parser.add_argument('path')
+
+   list_parser = subparsers.add_parser('list')
+   list_parser.add_argument('subcmd')
+   list_parser.add_argument('dataset', nargs='?', default="")
+
+   ren_parser = subparsers.add_parser('render')
+   ren_parser.add_argument('path')
+
+   sta_parser = subparsers.add_parser('status')
+ 
+   args = parser.parse_args() 
+
+   if args.version:
+       print(" Version:", __version__)
+       exit(1)
+
+   if args.cmd == None:
+       print_usage("projit")
+       exit(1)
+
+   if args.cmd == "init":
+      task_init(args.name)
+      exit(1)
+
+   """
+   From this point on all commands required that we are inside a valid projit project
+   """
+   config_path = locate_projit_config()
+   if config_path=="":
+       print(" ERROR: This is not a projit project.")
+       print("        Please initialise the project first.")
+       print(" > projit init <PROJECT NAME>")
+       exit(1)
+
+   project = projit_load(config_path)
+
+   if args.cmd == 'list':
+      task_list(args.subcmd, project, args.dataset, args.markdown)
+
+   if args.cmd == 'add':
+      task_add(project, args.asset, args.name, args.path)
+
+   if args.cmd == 'update':
+      task_update(project)
+
+   if args.cmd == 'status':
+      task_status(project)
+
+   if args.cmd == 'render':
+      task_render(project)
+
+
+##########################################################################################
+if __name__ == '__main__':
+    main()
