@@ -35,7 +35,7 @@ def task_init(name, template=''):
     if len(template)>9:
         if template[0:9]=="template=":
             template=template[9:]
-    project = projit_init(template, argv[2], descrip)
+    project = projit_init(template, name, descrip)
 
 
 ##########################################################################################
