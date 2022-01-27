@@ -104,6 +104,34 @@ def test_template_results():
     shutil.rmtree(testdir)
 
 #################################################################
+def test_dataset_add_remove():
+    testdir = "temp_test_dir_xyz"
+    os.mkdir(testdir)
+    os.chdir(testdir)
+    project = proj.init("default", "exp", "exp test")
+    project.add_dataset("test",  "pathtofile")
+    assert len(project.datasets) == 1
+    project.rm_dataset("test")
+    assert len(project.datasets) == 0
+    os.chdir("../")
+    shutil.rmtree(testdir)
+
+#################################################################
+def test_dataset_add_remove_all():
+    testdir = "temp_test_dir_xyz"
+    os.mkdir(testdir)
+    os.chdir(testdir)
+    project = proj.init("default", "exp", "exp test")
+    project.add_dataset("test1",  "pathtofile")
+    project.add_dataset("test2",  "pathtofile")
+    project.add_dataset("test3",  "pathtofile")
+    assert len(project.datasets) == 3
+    project.rm_dataset(".")
+    assert len(project.datasets) == 0
+    os.chdir("../")
+    shutil.rmtree(testdir)
+
+#################################################################
 def test_experiment_results():
     testdir = "temp_test_dir_xyz"
     os.mkdir(testdir)
@@ -147,7 +175,7 @@ def test_experiment_remove_all():
     project.add_result("test3",  "rmse", 0.5)
     assert len(project.experiments) == 3
     assert len(project.results) == 3
-    project.rm_experiment("*")
+    project.rm_experiment(".")
     assert len(project.experiments) == 0
     assert len(project.results) == 0
     os.chdir("../")
