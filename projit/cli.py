@@ -70,16 +70,22 @@ def task_list(subcmd, project, dataset, markdown):
     List content of a project from the command line
     """
     if subcmd == "datasets":
-        long_key = max([len(k) for k in project.datasets.keys()])
         print(" ___Datasets________________________________________")
-        for ds in project.datasets:
-            print(" ", ds, filler(len(ds), long_key+1 ), project.datasets[ds] )
+        if len(project.datasets.keys()) > 0:
+            long_key = max([len(k) for k in project.datasets.keys()])
+            for ds in project.datasets:
+                print(" ", ds, filler(len(ds), long_key+1 ), project.datasets[ds] )
+        else:
+            print(" NONE")
         print("")
     elif subcmd == "experiments":
         print(" ___Experiments_____________________________________")
-        long_key = max([len(k[0]) for k in project.experiments])
-        for exp in project.experiments:
-            print(" ", exp[0], filler(len(exp[0]), long_key+1 ), exp[1] )
+        if len(project.experiments) > 0:
+            long_key = max([len(k[0]) for k in project.experiments])
+            for exp in project.experiments:
+                print(" ", exp[0], filler(len(exp[0]), long_key+1 ), exp[1] )
+        else:
+            print(" NONE")
         print("")
     elif subcmd == "results":
         title = "Results"
@@ -184,11 +190,35 @@ def task_add(project, asset, name, path):
         exit(1)
 
 ##########################################################################################
+def task_rm(project, asset, name):
+    """
+    Remove elements to a project from the command line
+    """
+    if asset not in ["dataset","experiment"]:
+        print("ERROR: Request to remove unrecognised asset type: %s" % asset)
+        exit(1)
+
+    if name == ".":
+        print(f"Remove all {asset}s. Please confirm (y/n)")
+        response = input(">")
+    else: 
+        print(f"Remove {asset} named {name}. Please confirm (y/n)")
+        response = input(">")
+
+    if response=='y':
+        if asset == "dataset":
+            project.rm_dataset(name)
+        if asset == "experiment":
+            project.rm_experiment(name)
+    else:
+        print(f"** Remove command for {asset} named {name} cancelled ** ")
+
+##########################################################################################
 def print_usage(prog):
     """ Command line application usage instrutions. """
     print(" USAGE ")
     print(" ", prog, "[OPTIONS] <COMMAND> [<ASSET>] [<PARAMS>*]")
-    print("   <COMMAND>     - CORE TASK TO PERFORM: [init | upate | status | add | list | render]")
+    print("   <COMMAND>     - CORE TASK TO PERFORM: [init | upate | rm | status | add | list | render]")
     print("   <ASSET>       - (OPTIONAL) Dependant on COMMAND: [dataset | experiment | results]")
     print("   <PARAMS>      - (OPTIONAL) Dependant on COMMAND: Usually names and paths")
     print("   [OPTIONS]")
@@ -206,6 +236,8 @@ def print_usage(prog):
     print("   ", prog, "list experiments                        # List the registered experiments")
     print("   ", prog, "list results                            # List the registered results ")
     print("   ", prog, "-m list results test                    # List results on test data in markdown")
+    print("   ", prog, "rm experiment explore                   # Remove the experiment explore (requires confirmation)")
+    print("   ", prog, "rm experiment .                         # Remove all experiments (requires confirmation)")
     print("")
 
 
@@ -232,6 +264,11 @@ def main():
    list_parser = subparsers.add_parser('list')
    list_parser.add_argument('subcmd')
    list_parser.add_argument('dataset', nargs='?', default="")
+
+
+   rm_parser = subparsers.add_parser('rm')
+   rm_parser.add_argument('asset')
+   rm_parser.add_argument('name')
 
    ren_parser = subparsers.add_parser('render')
    ren_parser.add_argument('path')
@@ -269,6 +306,9 @@ def main():
 
    if args.cmd == 'add':
       task_add(project, args.asset, args.name, args.path)
+
+   if args.cmd == 'rm':
+      task_rm(project, args.asset, args.name)
 
    if args.cmd == 'update':
       task_update(project)

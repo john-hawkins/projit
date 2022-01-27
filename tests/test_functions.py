@@ -109,12 +109,47 @@ def test_experiment_results():
     os.mkdir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "exp", "exp test")
-    project.add_experiment("test",  "experiments")
+    project.add_experiment("test",  "pathtofiles")
     project.add_result("test",  "rmse", 0.5)
     results = project.get_results()
     assert str(type(results)) == "<class 'pandas.core.frame.DataFrame'>"
     assert "experiment" in results.columns
     assert "rmse" in results.columns
+    os.chdir("../")
+    shutil.rmtree(testdir)
+
+#################################################################
+def test_experiment_remove():
+    testdir = "temp_test_dir_xyz"
+    os.mkdir(testdir)
+    os.chdir(testdir)
+    project = proj.init("default", "exp", "exp test")
+    project.add_experiment("test",  "pathtofile")
+    project.add_result("test",  "rmse", 0.5)
+    assert len(project.experiments) == 1
+    project.rm_experiment("test")
+    assert len(project.experiments) == 0
+    assert len(project.results) == 0
+    os.chdir("../")
+    shutil.rmtree(testdir)
+
+#################################################################
+def test_experiment_remove_all():
+    testdir = "temp_test_dir_xyz"
+    os.mkdir(testdir)
+    os.chdir(testdir)
+    project = proj.init("default", "exp", "exp test")
+    project.add_experiment("test",  "pathtofile")
+    project.add_experiment("test2",  "pathtofile")
+    project.add_experiment("test3",  "pathtofile")
+    project.add_result("test",  "rmse", 0.5)
+    project.add_result("test2",  "rmse", 0.5)
+    project.add_result("test3",  "rmse", 0.5)
+    assert len(project.experiments) == 3
+    assert len(project.results) == 3
+    project.rm_experiment("*")
+    assert len(project.experiments) == 0
+    assert len(project.results) == 0
     os.chdir("../")
     shutil.rmtree(testdir)
 

@@ -120,9 +120,11 @@ class Projit:
         """
         Remove all results for a given experiment
         """
-        self.results[name] = {}
+        if name in self.results:
+            del self.results[name]
         for dataset in self.dataresults:
-            self.dataresults[dataset][name] = {}
+            if name in self.dataresults[dataset]:
+                del self.dataresults[dataset][name]
 
     def add_dataset(self, name, path):
         """
@@ -136,6 +138,41 @@ class Projit:
         """
         self.datasets[name] = path
         self.save()
+
+    def rm_dataset(self, name):
+        """
+        Remove a named dataset to the project.
+
+        :param name: The dataset name (or '.' for all datasets)
+        :type path: string, required
+        """
+        if name in self.datasets:
+            del self.datasets[name] 
+            self.save()
+        elif name==".":
+            del self.datasets
+            self.datasets = {}
+            self.save()
+
+    def rm_experiment(self, name):
+        """
+        Remove a named experiment from the project.
+
+        :param name: The experiment name (or '.' for all experiments)
+        :type path: string, required
+        """
+        if name==".":
+            for elem in self.experiments:
+                self.clean_experimental_results(elem[0])
+            self.experiments = []
+            self.save()
+        else:
+            for elem in self.experiments:
+                if elem[0] == name:
+                    self.experiments.remove(elem)
+                    self.clean_experimental_results(name)
+            self.save()
+
 
     def add_param(self, name, value):
         """
