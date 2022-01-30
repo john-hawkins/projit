@@ -124,12 +124,15 @@ class Projit:
 
         :param params: Optional dictionary of parameters used in the experiment execution
         :type path: Dictionary, option
+
+        :return: id : The Execution ID
+        :rtype: String
         """
         if not self.experiment_exists(name):
             self.add_experiment(name, path)
 
-        startdt = datetime.now()
-        s = name + str(startdt)
+        startdt = str(datetime.now())
+        s = name + startdt
         id = hashlib.sha256(s.encode()).hexdigest()
         try:
             repo = git.Repo(search_parent_directories=True)
@@ -144,7 +147,7 @@ class Projit:
         exper_execs[id] = payload
         self.executions[name] = exper_execs 
         self.save()
-
+        return id
 
     def end_experiment(self, name, id, hyperparams={}):
         """
@@ -159,6 +162,9 @@ class Projit:
 
         :param hyperparams: Optional dictionary of hyperparameters used in the experiment execution
         :type path: Dictionary, option
+
+        :return: None
+        :rtype: None
         """
 
         if not self.experiment_exists(name):
@@ -174,8 +180,7 @@ class Projit:
         else:
             raise Exception(f"ERROR: Cannot end experiment: '{name}' -- Executions not started")
 
-        enddt = datetime.now()
-        payload['end'] = datetime.now()
+        payload['end'] = str(datetime.now())
         payload['hyperparams'] = hyperparams
         exper_execs[id] = payload
         self.executions[name] = exper_execs
@@ -194,6 +199,9 @@ class Projit:
 
         :param path: The path to the experiment.
         :type path: string, required
+
+        :return: None
+        :rtype: None
         """
         for elem in self.experiments: 
             if elem[0] == name:
@@ -204,6 +212,15 @@ class Projit:
 
 
     def experiment_exists(self, name):
+        """
+        Check if a given experiment is in the data structure
+
+        :param name: The experiment name
+        :type name: string, required
+
+        :return: exists
+        :rtype: Boolean
+        """
         for elem in self.experiments:
             if elem[0] == name:
                 return True
@@ -212,6 +229,12 @@ class Projit:
     def clean_experimental_results(self, name):
         """
         Remove all results for a given experiment
+
+        :param name: The experiment name
+        :type name: string, required
+
+        :return: None
+        :rtype: None
         """
         if name in self.results:
             del self.results[name]
@@ -228,6 +251,9 @@ class Projit:
 
         :param path: The path to the data set (either local path, URL or S3 Bucket)
         :type path: string, required
+
+        :return: None
+        :rtype: None
         """
         self.datasets[name] = path
         self.save()
@@ -238,6 +264,9 @@ class Projit:
 
         :param name: The dataset name (or '.' for all datasets)
         :type path: string, required
+
+        :return: None
+        :rtype: None
         """
         if name in self.datasets:
             del self.datasets[name] 
@@ -253,6 +282,9 @@ class Projit:
 
         :param name: The experiment name (or '.' for all experiments)
         :type path: string, required
+
+        :return: None
+        :rtype: None
         """
         if name==".":
             for elem in self.experiments:
@@ -276,6 +308,9 @@ class Projit:
 
         :param value: The value taken by that parameter
         :type value: Any
+
+        :return: None
+        :rtype: None
         """
         self.params[name] = value 
         self.save()
@@ -289,6 +324,9 @@ class Projit:
 
         :param value: The Dictionary of hyperparameters
         :type value: Dictionary
+
+        :return: None
+        :rtype: None
         """
         if self.experiment_exists(name):
             self.hyperparams[name] = value
