@@ -4,4 +4,3 @@ pandas
 fpdf
 datatest
 gitpython
-hashlib

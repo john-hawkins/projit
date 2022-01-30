@@ -1,5 +1,6 @@
 from datetime import datetime
 import pandas as pd
+import hashlib
 import git
 import json
 import re

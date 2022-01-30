@@ -18,7 +18,7 @@ setup(
     name = "projit",
     packages = ["projit"],
     license = "MIT",
-    install_requires = ['numpy', 'pyyaml', 'pandas', 'fpdf', 'gitpython', 'hashlib'],
+    install_requires = ['numpy', 'pyyaml', 'pandas', 'fpdf', 'gitpython'],
     entry_points = {
         "console_scripts": ['projit = projit.cli:main']
     },
