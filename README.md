@@ -1,7 +1,7 @@
 # Projit
 ### Project Integrator for Decoupled Data Science
 
-> Status: **Beta** Functional but incomplete. This project is a work in progress.
+> Status: **Beta** Functional.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests](https://github.com/john-hawkins/projit/actions/workflows/python-package.yml/badge.svg)](https://github.com/john-hawkins/projit/actions/workflows/python-package.yml)
@@ -10,13 +10,13 @@
 
 Projit is a utility to help data scientists manage projects that contain multiple experiments
 and components that need to interact in a de-coupled manner. 
-Use it define and manage project structure, properties, data, experiments & collaboration.
+Use it to define and manage project structure, properties, data, experiments & collaboration.
 
-The goal of this project is to data scientists and teams to work on projects in
+The goal of this project is to allow data scientists and teams to work on projects in
 a structured and standardized way. The projit utility allows you to establish a
 project with a centralised meta-data repository. This meta-data is used by the
 application and package to facilitate loosely coupled communication between
-scripts and experiments.
+scripts for experiments, to track results and parameters.
 
 For example, projit provides a python library that can be used inside
 experiments and scripts so references to training, evaluation and test data
@@ -30,9 +30,9 @@ This project was inspired by a combination of other projects:
 * [The Python CookieCutter Application](https://cookiecutter.readthedocs.io/)
 * [The Git Source Control Utility]()
 
-To be released and distributed via setuptools/PyPI/pip for Python 3.
+Released and distributed via setuptools/PyPI/pip for Python 3.
 
-Additional detail available in the [documentation](https://projit.readthedocs.io)
+Additional details and usage instructions available in the [documentation](https://projit.readthedocs.io)
 
 
 ## Notes
