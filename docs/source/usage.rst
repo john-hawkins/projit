@@ -12,12 +12,10 @@ Initialise a project as follows
 
     >projit init <Project-Name>
 
-This command will prompt you to provide a project deascription and then
-create the projit configuration folder then write the project properties
-file.
+This command will create the projit configuration folder then write the project properties file.
 
-If you would like the initialisation process to create a set of 
-directories you can add an additional parameter for the template to use.
+If you would like the initialisation process to create a set of directories you can add an 
+additional parameter for the template to use.
 For example:
 
 .. code-block:: bash
@@ -40,6 +38,7 @@ You can then update these properties as follows:
     >projit update
 
 This will show you the current values and prompt for an update
+
 
 Manage Data Sets
 ^^^^^^^^^^^^^^^^^^^^

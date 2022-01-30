@@ -30,8 +30,9 @@ def task_init(name, template=''):
     if config_file != "":
         print("ERROR: Projit Project already exists. Run `projit update` to change details.")
         exit(1)
-    print("Please enter a description for your project (or Press Enter to Cancel)")
-    descrip = input(">")
+#    print("Please enter a description for your project (or Press Enter to Cancel)")
+#    descrip = input(">")
+    descrip = ""
     if len(template)>9:
         if template[0:9]=="template=":
             template=template[9:]

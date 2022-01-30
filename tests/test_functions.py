@@ -182,6 +182,18 @@ def test_experiment_remove_all():
     shutil.rmtree(testdir)
 
 #################################################################
+def test_experiment_execution():
+    testdir = "temp_test_dir_xyz"
+    os.mkdir(testdir)
+    os.chdir(testdir)
+    project = proj.init("default", "test execution", "execution test")
+    exec_id = project.start_experiment("Initial Exp", "experiments/exp_one.py", params={})
+    project.end_experiment("Initial Exp", exec_id, hyperparams={})
+    assert len(project.executions['Initial Exp']) == 1
+    os.chdir("../")
+    shutil.rmtree(testdir)
+
+#################################################################
 def test_project_params():
     testdir = "temp_test_dir_xyz"
     os.mkdir(testdir)
