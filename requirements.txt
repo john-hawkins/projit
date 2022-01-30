@@ -3,3 +3,4 @@ pyyaml
 pandas
 fpdf
 datatest
+gitpython

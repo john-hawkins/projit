@@ -63,6 +63,21 @@ Note that the following syntax will work regardless of where in the directory st
 script is extected. The projit Project determines the path to the data with the condition that
 when you record the data it must be given a path relative to the root directory of the project.
 
+You can modify a dataset by simply adding it again. This will overwrite any previous path.
+
+You can remove a dataset with the 'rm' command
+
+.. code-block:: bash
+
+    >projit rm dataset train
+
+You can also remove all datasets use the '.' wildcard:
+
+
+.. code-block:: bash
+
+    >projit rm dataset .
+
 
 Manage Experiments
 ^^^^^^^^^^^^^^^^^^^^^
@@ -85,6 +100,41 @@ This can also be done inside the experiment script itself:
 Note: The path to the experiment should be relative to the root directory.
 TODO: Automate the resolution of these paths.
 ```
+You can modify an experiment by simply adding it again. This will overwrite any previous path.
+
+You can remove an experiment with the 'rm' command
+
+.. code-block:: bash
+
+    >projit rm experiment "Initial Exp"
+
+You can also remove all experiments use the '.' wildcard:
+
+.. code-block:: bash
+
+    >projit rm experiment .
+
+
+You can alternatively manage experiments through the start and end functions.
+These enable you to track executions of your project over time, including
+the time elapsed in execution, different parameters and hyperparameters used
+over each iteration.
+
+.. code-block:: python
+
+    import projit as pit
+    project = pit.projit_load()
+    exec_id = project.start_experiment("Initial Exp", "experiments/exp_one.py", params={})
+    #
+    # INSERT ALL EXPERIMENT CODE HERE
+    #
+    project.end_experiment("Initial Exp", exec_id, hyperparams={})
+
+This will add the experiment if it is not already registered.
+It will then create an execution record for the first and all subsequent executions of the script.
+The execution record with contain start and end times, the git hash (if present) of the codebase
+and any optional parameters or hyperparameters you wish to record.
+
 
 Manage Results
 ^^^^^^^^^^^^^^^^^^^^^

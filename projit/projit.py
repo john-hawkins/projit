@@ -1,9 +1,12 @@
+from datetime import datetime
 import pandas as pd
+import git
 import json
 import re
 import os
 
 from .config import config_file
+from .config import execution_file
 from .config import config_folder
 from .template import load_template
 from .utils import locate_projit_config
@@ -29,7 +32,8 @@ class Projit:
                  results={}, 
                  params={},
                  hyperparams={},
-                 dataresults={}):
+                 dataresults={},
+                 executions={}):
         """
         Initialise a projit project object.
         This class will be used for storing and retrieving all data about the project,
@@ -68,6 +72,21 @@ class Projit:
                             Structure: {'dataset':{'experiment':{'metric':'value'}}}
         :type dataresults: Dictionary of Dictionary of Dictionary, optional
 
+        :param executions: The dictionary of experiment executions.
+                            This structure is used to store all experimental runs.
+                            The ID is a HASH of experiment_name and 
+                            Structure: {'experiment_name':{
+                                             'ID':{ 
+                                                 'start':DATETIME, 
+                                                 'end':DATETIME,
+                                                 'githash':STRING, 
+                                                 'params':DICT,
+                                                 'hyperparams':DICT
+                                              }
+                                           }
+                                       }
+        :type executions: Dictionary of Dictionary of Dictionary, optional
+
         :return: None 
         :rtype: None 
         """
@@ -80,6 +99,7 @@ class Projit:
         self.params = params
         self.hyperparams = hyperparams
         self.dataresults = dataresults
+        self.executions = executions
 
 
     def get_root_path(self):
@@ -87,6 +107,78 @@ class Projit:
         Get the path to where the project folder is located
         """
         return self.path[0:len(self.path) - len(config_folder)]
+
+    def start_experiment(self, name, path, params={}):
+        """
+        Start an experiment execution.
+        This function will create a new experiment if this is the first execution
+        otherwise it will simply add a new execution record.
+         It returns an identifer for the execution (needed to end the execution)
+
+        :param name: The experiment name (Unique Identifer)
+        :type name: string, required
+
+        :param path: The path to the experiment script being executed
+        :type path: string, required
+
+        :param params: Optional dictionary of parameters used in the experiment execution
+        :type path: Dictionary, option
+        """
+        if not self.experiment_exists(name):
+            self.add_experiment(name, path)
+
+        startdt = datetime.now()
+        s = name + str(startdt)
+        id = hashlib.sha256(s.encode()).hexdigest()
+        try:
+            repo = git.Repo(search_parent_directories=True)
+            ghash = repo.head.object.hexsha
+        except git.exc.InvalidGitRepositoryError:
+            ghash = ""
+        payload = {'start':startdt, 'end':"", 'githash':ghash, 'params':params}
+        exper_execs = {}
+        if name in self.executions:
+            exper_execs = self.executions[name]
+
+        exper_execs[id] = payload
+        self.executions[name] = exper_execs 
+        self.save()
+
+
+    def end_experiment(self, name, id, hyperparams={}):
+        """
+        End an experiment execution.
+        This function require both the experiment name and the hash ID of the previously started execution
+
+        :param name: The experiment name (Unique Identifer)
+        :type name: string, required
+
+        :param id: The execution hash ID returned by the function: start_experiment 
+        :type id: string, required
+
+        :param hyperparams: Optional dictionary of hyperparameters used in the experiment execution
+        :type path: Dictionary, option
+        """
+
+        if not self.experiment_exists(name):
+            raise Exception(f"ERROR: Cannot end experiment: '{name}' -- Experiment not registered")
+            
+        if name in self.executions:
+            exper_execs = self.executions[name]
+        else:
+            raise Exception(f"ERROR: Cannot end experiment: '{name}' -- Executions not started")
+
+        if id in exper_execs:
+            payload = exper_execs[id]
+        else:
+            raise Exception(f"ERROR: Cannot end experiment: '{name}' -- Executions not started")
+
+        enddt = datetime.now()
+        payload['end'] = datetime.now()
+        payload['hyperparams'] = hyperparams
+        exper_execs[id] = payload
+        self.executions[name] = exper_execs
+        self.save()
 
 
     def add_experiment(self, name, path):
@@ -331,11 +423,17 @@ class Projit:
 
     def save(self):
         """
-        Save your projit project. 
+        Save your projit project into config files within the projit config dir
         """
+        core_props = self.__dict__.copy()
+        del core_props['executions']
         path_to_json = self.path + "/" + config_file
         with open(path_to_json, 'w') as outfile:
-            json.dump(self.__dict__, outfile, indent=0)
+            json.dump(core_props, outfile, indent=0)
+
+        path_to_json = self.path + "/" + execution_file
+        with open(path_to_json, 'w') as outfile:
+            json.dump(self.executions, outfile, indent=0)
 
     def render(self, path):
         results = self.get_results()
@@ -361,10 +459,19 @@ def load(config_path):
     :return: Projit Object
     :rtype: Projit
     """
+    _dict = {}
     path_to_json = config_path + "/" + config_file
-    with open(path_to_json) as f:
-        _dict = json.load(f)
-    _object = Projit(**_dict)
+    if os.path.exists(path_to_json):
+        with open(path_to_json) as f:
+            _dict = json.load(f)
+
+    _execs = {}
+    path_to_execs = config_path + "/" + execution_file
+    if os.path.exists(path_to_execs):
+        with open(path_to_execs) as f:
+            _execs['executions'] = json.load(f)
+
+    _object = Projit(**_dict, **_execs )
     _object.path = config_path
     return _object
 
