@@ -194,8 +194,11 @@ class Projit:
         Return the execution statistics
         """
         if name in self.executions:
-            mean_exec_time = self.get_mean_execution_time(name)
-            return len(self.executions[name]), mean_exec_time
+            exec_times = self.get_execution_times(name)
+            if len(exec_times) > 0:
+                return len(exec_times), np.mean(exec_times)
+            else:
+                return 0, 0
         else:
             return 0, 0
 
@@ -210,10 +213,11 @@ class Projit:
         if name in self.executions:
             exec_times = []
             for execid, exec in self.executions[name].items():
-                a = datetime.strptime(exec["start"], '%Y-%m-%d %H:%M:%S.%f')
-                b = datetime.strptime(exec["end"], '%Y-%m-%d %H:%M:%S.%f')
-                diff = (b-a).seconds
-                exec_times.append(diff)
+                if exec["end"] != "":
+                    a = datetime.strptime(exec["start"], '%Y-%m-%d %H:%M:%S.%f')
+                    b = datetime.strptime(exec["end"], '%Y-%m-%d %H:%M:%S.%f')
+                    diff = (b-a).seconds
+                    exec_times.append(diff)
             return exec_times
         else:
             return []

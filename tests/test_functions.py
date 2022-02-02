@@ -195,6 +195,8 @@ def test_experiment_executions():
     exec_id = project.start_experiment("Initial Exp", "experiments/exp_one.py", params={})
     time.sleep(6)
     project.end_experiment("Initial Exp", exec_id, hyperparams={})
+    #Start an additioning hanging execution - ensure it is excluded from stats
+    exec_id = project.start_experiment("Initial Exp", "experiments/exp_one.py", params={})
     execs, mean_time = project.get_experiment_execution_stats("Initial Exp")
     assert execs == 2
     assert mean_time == pytest.approx(4, 1.0)
