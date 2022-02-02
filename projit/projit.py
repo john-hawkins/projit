@@ -1,5 +1,6 @@
 from datetime import datetime
 import pandas as pd
+import numpy as np
 import hashlib
 import git
 import json
@@ -186,6 +187,36 @@ class Projit:
         self.executions[name] = exper_execs
         self.save()
 
+
+    def get_experiment_execution_stats(self, name):
+        """
+        Given an experiment name
+        Return the execution statistics
+        """
+        if name in self.executions:
+            mean_exec_time = self.get_mean_execution_time(name)
+            return len(self.executions[name]), mean_exec_time
+        else:
+            return 0, 0
+
+    def get_mean_execution_time(self, name):
+        exec_times = self.get_execution_times(name)
+        if len(exec_times) > 0:
+            return np.mean(exec_times)
+        else:
+            return 0
+
+    def get_execution_times(self, name):
+        if name in self.executions:
+            exec_times = []
+            for execid, exec in self.executions[name].items():
+                a = datetime.strptime(exec["start"], '%Y-%m-%d %H:%M:%S.%f')
+                b = datetime.strptime(exec["end"], '%Y-%m-%d %H:%M:%S.%f')
+                diff = (b-a).seconds
+                exec_times.append(diff)
+            return exec_times
+        else:
+            return []
 
     def add_experiment(self, name, path):
         """
@@ -405,8 +436,7 @@ class Projit:
             else:
                 rez = {}
             rez['experiment'] = key
-            df = df.append(rez, ignore_index=True)
-
+            df = pd.concat([df, pd.DataFrame(rez, index=[0])], ignore_index=True)
         # Ensure that the first column in the results is "experiments"
         cols = ["experiment"]
         rest = df.columns.to_list()

@@ -17,6 +17,7 @@ from .utils import get_properties
 from .utils import write_properties
 from .projit import load as projit_load
 from .projit import init as projit_init
+from .ascii_plot import ascii_plot
 
 from projit import __version__
 
@@ -30,8 +31,6 @@ def task_init(name, template=''):
     if config_file != "":
         print("ERROR: Projit Project already exists. Run `projit update` to change details.")
         exit(1)
-#    print("Please enter a description for your project (or Press Enter to Cancel)")
-#    descrip = input(">")
     descrip = ""
     if len(template)>9:
         if template[0:9]=="template=":
@@ -66,25 +65,49 @@ def task_status(project):
     print("")
 
 ##########################################################################################
+def filler(current, max_len, content=" "):
+    return content * (max_len - current)
+
+##########################################################################################
+def print_header(header):
+    full_header = header + ("_" * (80-len(header)))
+    print(full_header)
+
+##########################################################################################
 def task_list(subcmd, project, dataset, markdown):
     """
     List content of a project from the command line
     """
+    print()
     if subcmd == "datasets":
-        print(" ___Datasets________________________________________")
+        print_header("__Datasets")
         if len(project.datasets.keys()) > 0:
             long_key = max([len(k) for k in project.datasets.keys()])
+            myhead = "__Name" + filler(len("Name"), long_key+3, "_") + "Path_"
+            print_header(myhead)
             for ds in project.datasets:
-                print(" ", ds, filler(len(ds), long_key+1 ), project.datasets[ds] )
+                print("  ", ds, filler(len(ds), long_key+3 ), project.datasets[ds], sep="" )
         else:
             print(" NONE")
         print("")
     elif subcmd == "experiments":
-        print(" ___Experiments_____________________________________")
+        print_header("__Experiments")
         if len(project.experiments) > 0:
             long_key = max([len(k[0]) for k in project.experiments])
+            myhead = "__Name__" + filler(len("Name__"), long_key+3, "_") + "Runs__" + "MeanTime____" + "Path"
+            print_header(myhead)
             for exp in project.experiments:
-                print(" ", exp[0], filler(len(exp[0]), long_key+1 ), exp[1] )
+                execs, mean_time = project.get_experiment_execution_stats(exp[0])
+                mins, secs = divmod(mean_time, 60)
+                if mins>0:
+                    mytime = f"{int(mins)}M {int(secs)}s"
+                else:
+                    mytime = f"{int(secs)}s"
+                print("  ", exp[0], filler(len(exp[0]), long_key+3), 
+                           execs, filler(len(str(execs)), 6), 
+                           mytime, filler(len(str(mytime)), 12), 
+                           exp[1], sep=""  
+                )
         else:
             print(" NONE")
         print("")
@@ -99,11 +122,11 @@ def task_list(subcmd, project, dataset, markdown):
         if markdown:
             print_results_markdown(title, rez)
         else:
-            print(" ___Results__________________________________[ %s ]___" % dataset)
+            print_header(f"__Results__[{dataset}]")
             pd.set_option('expand_frame_repr', False)
             pd.set_option('display.max_columns', 999)
             print(rez)
-
+            print()
     else:
         print(" ERROR: List received an unrecognised sub-command: %s" % subcmd)
         exit(1)
@@ -117,9 +140,6 @@ def task_render(project, path):
     """
     project.render(path)
 
-##########################################################################################
-def filler(current, max_len):
-    return " " * (max_len - current)
 
 ##########################################################################################
 
@@ -175,7 +195,7 @@ def print_results_markdown(title, df):
             rowcontent += "| %s%s "%( " "*(colwidth-len(content)-2), content )
         rowcontent += "|"
         print(rowcontent)
-    print("\n")
+    print()
 
 ##########################################################################################
 def task_add(project, asset, name, path):
@@ -215,6 +235,32 @@ def task_rm(project, asset, name):
         print(f"** Remove command for {asset} named {name} cancelled ** ")
 
 ##########################################################################################
+def task_plot(project, experiment, property, metric):
+    if property == "execution":
+        print()
+        print_header(f"__Experiment_[{experiment}]_execution_time_")
+        values = project.get_execution_times(experiment)
+        print(ascii_plot(values, xlabel='Iteration', ylabel='Seconds',  width=70, height=12)) 
+        print()
+    elif property == "hyperparam":
+        print()
+        print_header(f"__Experiment_[{experiment}]_hyperparameter_[{metric}]_")
+        print("  TODO")
+        print()
+        #print(ascii_plot([50,90,130,70,60,0,80,120,100], xlabel='Iteration', ylabel=metric, width=70, height=12)) 
+    elif property == "result":
+        print()
+        print_header(f"__Experiment_[{experiment}]_result_[{metric}]_")
+        print("  TODO")
+        print()
+        #print(ascii_plot([50,90,130,70,60,0,80,120,100], xlabel='Iteration', ylabel=metric, width=70, height=12)) 
+    else:
+        print()
+        print(f"\nUnrecognized Experiment Property [{property}] -- Valid Options [execution,hyperparam,result]")
+        print()
+
+
+##########################################################################################
 def print_usage(prog):
     """ Command line application usage instrutions. """
     print(" USAGE ")
@@ -236,7 +282,11 @@ def print_usage(prog):
     print("   ", prog, "list datasets                           # List the available datasets")
     print("   ", prog, "list experiments                        # List the registered experiments")
     print("   ", prog, "list results                            # List the registered results ")
-    print("   ", prog, "-m list results test                    # List results on test data in markdown")
+    print("   ", prog, "list results test                       # List the registered results on dataset 'test' ")
+    print("   ", prog, "plot initial execution                  # Plot the execution times for the experiment named 'initial'")
+    print("   ", prog, "plot initial hyperparam alpha           # Plot the change in hyperparam 'alpha' for the experiment named 'initial'")
+    print("   ", prog, "plot initial result MSE                 # Plot the change in result 'MSE' for the experiment named 'initial'")
+    print("   ", prog, "-m list results test                    # List results on 'test' data in markdown")
     print("   ", prog, "rm experiment explore                   # Remove the experiment explore (requires confirmation)")
     print("   ", prog, "rm experiment .                         # Remove all experiments (requires confirmation)")
     print("")
@@ -266,6 +316,10 @@ def main():
    list_parser.add_argument('subcmd')
    list_parser.add_argument('dataset', nargs='?', default="")
 
+   plot_parser = subparsers.add_parser('plot')
+   plot_parser.add_argument('experiment')
+   plot_parser.add_argument('property')
+   plot_parser.add_argument('metric', nargs='?', default="")
 
    rm_parser = subparsers.add_parser('rm')
    rm_parser.add_argument('asset')
@@ -310,6 +364,9 @@ def main():
 
    if args.cmd == 'rm':
       task_rm(project, args.asset, args.name)
+
+   if args.cmd == 'plot':
+      task_plot(project, args.experiment, args.property, args.metric)
 
    if args.cmd == 'update':
       task_update(project)

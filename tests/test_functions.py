@@ -1,6 +1,7 @@
 import os
 import pytest
 import shutil
+import time
 from os import path
 import pandas as pd
 import datatest as dt
@@ -181,17 +182,26 @@ def test_experiment_remove_all():
     os.chdir("../")
     shutil.rmtree(testdir)
 
+
 #################################################################
-def test_experiment_execution():
+def test_experiment_executions():
     testdir = "temp_test_dir_xyz"
     os.mkdir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "test execution", "execution test")
     exec_id = project.start_experiment("Initial Exp", "experiments/exp_one.py", params={})
+    time.sleep(2)
     project.end_experiment("Initial Exp", exec_id, hyperparams={})
-    assert len(project.executions['Initial Exp']) == 1
-    os.chdir("../")
+    exec_id = project.start_experiment("Initial Exp", "experiments/exp_one.py", params={})
+    time.sleep(6)
+    project.end_experiment("Initial Exp", exec_id, hyperparams={})
+    execs, mean_time = project.get_experiment_execution_stats("Initial Exp")
+    assert execs == 2
+    assert mean_time == pytest.approx(4, 1.0)
+    os.chdir("../") 
     shutil.rmtree(testdir)
+
+
 
 #################################################################
 def test_project_params():
