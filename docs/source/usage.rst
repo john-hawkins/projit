@@ -135,6 +135,49 @@ The execution record with contain start and end times, the git hash (if present)
 and any optional parameters or hyperparameters you wish to record.
 
 
+You can list the experiments you have registered and executed using the CLI:
+
+.. code-block:: bash
+
+    >projit list experiments
+
+    __Experiments___________________________________________________________________
+    __Name_____________Runs__MeanTime____Path_______________________________________
+      Initial Exp      4     42s         experiments/exp_one.py
+      Second Exp       2     19s         experiments/exp_two.py
+
+
+This will produce a table that includes a count of the executions and the mean execution time.
+
+You can also produce a simple ascii plot of the execution time over all iterations of a particular experiment.
+
+.. code-block:: bash
+
+    >projit plot "Initial Exp" execution
+
+    __Experiment_[Initial Exp]_execution_time____________________________________
+    Seconds
+    84.0   +
+           |                                                                       
+           |o                                                                      
+           |                                                                       
+           |                                                                       
+           |                                                                       
+    57.3333+                                                                       
+           |                                                                       
+           |                                                                       
+           |                                                                      o
+           |                                                                       
+    30.6667+                       o                                               
+           |                                                                       
+           |                                               o                       
+         0 +---------+---------+---------+---------+---------+---------+---------+
+           1.0       1.428571  1.857143  2.285714  2.714286  3.142857  3.571429  4.0       
+                                         Iteration                               
+
+
+
+
 Manage Results
 ^^^^^^^^^^^^^^^^^^^^^
 
