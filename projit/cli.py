@@ -74,6 +74,35 @@ def print_header(header):
     print(full_header)
 
 ##########################################################################################
+def task_compare(project, datasets, metric, markdown):
+   """
+   Compare results across muliple datasets.
+   This command loads the results for each dataset and extarcts just the records
+   for the specified metric to compile the comparison dataset to display.
+   """
+   title = "Compare Results" 
+   results = None
+   for dataset in datasets: 
+       rez = project.get_results(dataset)
+       if metric not in rez.columns:
+           rez[metric] = np.nan
+       rez = rez.loc[:,['experiment',metric]]
+       rez.columns = ['experiment', dataset]
+       if results is None:
+           results = rez
+       else:
+           results = pd.merge(result,rez,on="experiment")
+           
+   if markdown:
+        print_results_markdown(title, results)
+   else:
+        print(" ___" + title + "__________________________________[ %s ]___" % metric)
+        pd.set_option('expand_frame_repr', False)
+        pd.set_option('display.max_columns', 999)
+        print(results)
+
+
+##########################################################################################
 def task_list(subcmd, project, dataset, markdown):
     """
     List content of a project from the command line
@@ -265,7 +294,7 @@ def print_usage(prog):
     """ Command line application usage instrutions. """
     print(" USAGE ")
     print(" ", prog, "[OPTIONS] <COMMAND> [<ASSET>] [<PARAMS>*]")
-    print("   <COMMAND>     - CORE TASK TO PERFORM: [init | upate | rm | status | add | list | render]")
+    print("   <COMMAND>     - CORE TASK TO PERFORM: [init | upate | rm | status | add | list | compare | render]")
     print("   <ASSET>       - (OPTIONAL) Dependant on COMMAND: [dataset | experiment | results]")
     print("   <PARAMS>      - (OPTIONAL) Dependant on COMMAND: Usually names and paths")
     print("   [OPTIONS]")
@@ -289,6 +318,8 @@ def print_usage(prog):
     print("   ", prog, "-m list results test                    # List results on 'test' data in markdown")
     print("   ", prog, "rm experiment explore                   # Remove the experiment explore (requires confirmation)")
     print("   ", prog, "rm experiment .                         # Remove all experiments (requires confirmation)")
+    print("   ", prog, "-m list results test                    # List results on test data in markdown")
+    print("   ", prog, "compare dataone,datatwo MAE             # Compare results over datasets using metric MAE")
     print("")
 
 
@@ -325,6 +356,10 @@ def main():
    rm_parser.add_argument('asset')
    rm_parser.add_argument('name')
 
+   comp_parser = subparsers.add_parser('compare')
+   comp_parser.add_argument('datasets')
+   comp_parser.add_argument('metric')
+
    ren_parser = subparsers.add_parser('render')
    ren_parser.add_argument('path')
 
@@ -358,6 +393,10 @@ def main():
 
    if args.cmd == 'list':
       task_list(args.subcmd, project, args.dataset, args.markdown)
+
+   if args.cmd == 'list':
+      datasets = args.datasets.split(",")
+      task_compare(project, datasets, args.metric, args.markdown)
 
    if args.cmd == 'add':
       task_add(project, args.asset, args.name, args.path)
