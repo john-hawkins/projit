@@ -169,17 +169,17 @@ class Projit:
         """
 
         if not self.experiment_exists(name):
-            raise Exception(f"ERROR: Cannot end experiment: '{name}' -- Experiment not registered")
+            raise Exception(f"Projit Experiment Exception: Cannot end experiment: '{name}' -- Experiment not registered")
             
         if name in self.executions:
             exper_execs = self.executions[name]
         else:
-            raise Exception(f"ERROR: Cannot end experiment: '{name}' -- Executions not started")
+            raise Exception(f"Projit Experiment Exception: Cannot end experiment: '{name}' -- Executions not started")
 
         if id in exper_execs:
             payload = exper_execs[id]
         else:
-            raise Exception(f"ERROR: Cannot end experiment: '{name}' -- Executions not started")
+            raise Exception(f"Projit Experiment Exception: Cannot end experiment: '{name}' -- Executions not started")
 
         payload['end'] = str(datetime.now())
         payload['hyperparams'] = hyperparams
@@ -367,7 +367,7 @@ class Projit:
             self.hyperparams[name] = value
             self.save()
         else:
-            raise Exception("ERROR: No experiment called: '%s' -- Register your experiment first." % name)
+            raise Exception("Projit Experiment Exception: No experiment called: '%s' -- Register your experiment first." % name)
 
     def add_result(self, experiment, metric, value, dataset=None):
         """
@@ -432,7 +432,7 @@ class Projit:
             if dataset in self.dataresults:
                 myresults = self.dataresults[dataset]
             else:
-                raise Exception("ERROR: No results for dataset: %s " % dataset)
+                raise Exception("Projit Dataset Exception: No results for dataset: %s " % dataset)
         for exp in self.experiments:
             key = exp[0]
             if key in myresults:
@@ -461,19 +461,19 @@ class Projit:
         if name in self.datasets:
             return self.datasets[name]
         else:
-            raise Exception("ERROR: Named dataset '%s' not available:" % name)
+            raise Exception("Projit Dataset Exception: Named dataset '%s' not available. Register your dataset" % name)
 
     def get_param(self, name):
         if name in self.params:
             return self.params[name]
         else:
-            raise Exception("ERROR: Named parameter '%s' is not available:" % name)
+            raise Exception("Projit Parameter Exception: Named parameter '%s' is not available:" % name)
 
     def get_hyperparam(self, name):
         if name in self.hyperparams:
             return self.hyperparams[name]
         else:
-            raise Exception("ERROR: Hyper parameters for experiemnt '%s' are not available:" % name)
+            raise Exception("Projit Parameter Exception: Hyper parameters for experiemnt '%s' are not available:" % name)
 
     def get_path_to_dataset(self, name):
         ds = self.get_dataset(name)

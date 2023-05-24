@@ -230,7 +230,23 @@ You can then list the results just for that specific dataset:
 
 
 
+Compare Results
+^^^^^^^^^^^^^^^^^^^^^
 
+You can compare results across dataset using a simple CLI option.
+The syntax requires that you provide a comma separates list of datasets as well as the metric you want to 
+use for the comparison. If you want to compare multiple metrics you will need to create multiple tables.
+
+For example
+
+.. code-block:: bash
+
+    >projit compare dataset1,dataset2,dataset3 RMSE
+
+
+Will produce a table where each row corresponds to a specific experiment, and each column will correspond 
+to one of the three specfied datasets. Within the table each cell will contain the RMSE of the experiment
+on that dataset.
 
 
 

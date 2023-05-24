@@ -1,5 +1,6 @@
 import argparse
 import pandas as pd
+import numpy as np
 import sys
 import os
 
@@ -81,18 +82,24 @@ def task_compare(project, datasets, metric, markdown):
    for the specified metric to compile the comparison dataset to display.
    """
    title = "Compare Results" 
+   warning = ""
    results = None
    for dataset in datasets: 
        rez = project.get_results(dataset)
        if metric not in rez.columns:
            rez[metric] = np.nan
+           warning += f"Metric '{metric}' not present for dataset '{dataset}'\n"
        rez = rez.loc[:,['experiment',metric]]
        rez.columns = ['experiment', dataset]
        if results is None:
            results = rez
        else:
-           results = pd.merge(result,rez,on="experiment")
+           results = pd.merge(results,rez,on="experiment")
            
+   if len(warning) > 0:
+       print("*** WARNINGS ***")
+       print(warning)
+
    if markdown:
         print_results_markdown(title, results)
    else:
@@ -323,9 +330,16 @@ def print_usage(prog):
     print("")
 
 
-
 ##########################################################################################
 def main():
+    try:
+        cli_main()
+    except Exception as e:
+        print("*** Projit CLI Error ***")
+        print(e)
+
+##########################################################################################
+def cli_main():
    parser = argparse.ArgumentParser()
    parser.add_argument('-v', '--version', help='Print Version', action='store_true')
    parser.add_argument('-m', '--markdown', help='Use markdown for output', action='store_true')
@@ -394,7 +408,7 @@ def main():
    if args.cmd == 'list':
       task_list(args.subcmd, project, args.dataset, args.markdown)
 
-   if args.cmd == 'list':
+   if args.cmd == 'compare':
       datasets = args.datasets.split(",")
       task_compare(project, datasets, args.metric, args.markdown)
 
