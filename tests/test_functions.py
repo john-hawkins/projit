@@ -118,6 +118,23 @@ def test_project_update():
     shutil.rmtree(testdir)
 
 #################################################################
+def test_project_update_lock():
+    testdir = "temp_test_dir_xyz"
+    os.mkdir(testdir)
+    os.chdir(testdir)
+    project = proj.init("default", "exp", "exp test")
+    # MODIFY THE PROJECT JSON FILE THEN TEST THAT THE
+    # - NEW VALUES ARE LOADED BEFORE THE SAVE
+    project.params = {"TEST":"TEST"}
+    project.save()
+    project.update_name_description("Name", "DESC")
+    assert len(project.params) == 1
+    assert project.name == "Name"
+    assert project.desc == "DESC"
+    os.chdir("../")
+    shutil.rmtree(testdir)
+
+#################################################################
 def test_dataset_add_remove():
     testdir = "temp_test_dir_xyz"
     os.mkdir(testdir)
