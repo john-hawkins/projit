@@ -105,6 +105,19 @@ def test_template_results():
     shutil.rmtree(testdir)
 
 #################################################################
+def test_project_update():
+    testdir = "temp_test_dir_xyz"
+    os.mkdir(testdir)
+    os.chdir(testdir)
+    project = proj.init("default", "exp", "exp test")
+    project.update_name_description("Name", "DESC")
+    assert len(project.name) == 4
+    assert project.name == "Name"
+    assert project.desc == "DESC"
+    os.chdir("../")
+    shutil.rmtree(testdir)
+
+#################################################################
 def test_dataset_add_remove():
     testdir = "temp_test_dir_xyz"
     os.mkdir(testdir)

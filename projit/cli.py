@@ -22,6 +22,8 @@ from .ascii_plot import ascii_plot
 
 from projit import __version__
 
+project = None
+
 ##########################################################################################
 def task_init(name, template=''):
     """
@@ -50,11 +52,11 @@ def task_update(project):
     print("Current Description: ", project.desc)
     print("Enter an alternative description (or press enter to keep)")
     descrip = input(">")
-    if name != "":
-        project.name = name
-    if descrip != "":
-        project.desc = descrip
-    project.save()
+    if name == "":
+        name = project.name
+    if descrip == "":
+        descrip = project.desc
+    project.update_name_description(name, descrip)
 
 ##########################################################################################
 def task_status(project):
@@ -337,6 +339,10 @@ def main():
     except Exception as e:
         print("*** Projit CLI Error ***")
         print(e)
+    finally:
+        if project is not None:
+            project.release_lock()
+
 
 ##########################################################################################
 def cli_main():

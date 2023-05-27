@@ -2,11 +2,13 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 import hashlib
-import git
+import time
 import json
+import git
 import re
 import os
 
+from .config import lock_file
 from .config import config_file
 from .config import execution_file
 from .config import config_folder
@@ -142,12 +144,15 @@ class Projit:
             ghash = ""
         payload = {'start':startdt, 'end':"", 'githash':ghash, 'params':params}
         exper_execs = {}
+
+        self.initiate_lock()
+        self.reload()
         if name in self.executions:
             exper_execs = self.executions[name]
-
         exper_execs[id] = payload
         self.executions[name] = exper_execs 
         self.save()
+        self.release_lock()
         return id
 
     def end_experiment(self, name, id, hyperparams={}):
@@ -170,7 +175,9 @@ class Projit:
 
         if not self.experiment_exists(name):
             raise Exception(f"Projit Experiment Exception: Cannot end experiment: '{name}' -- Experiment not registered")
-            
+        
+        self.initiate_lock()
+        self.reload()
         if name in self.executions:
             exper_execs = self.executions[name]
         else:
@@ -186,6 +193,7 @@ class Projit:
         exper_execs[id] = payload
         self.executions[name] = exper_execs
         self.save()
+        self.release_lock()    
 
 
     def get_experiment_execution_stats(self, name):
@@ -238,13 +246,26 @@ class Projit:
         :return: None
         :rtype: None
         """
+        self.initiate_lock()
+        self.reload()
         for elem in self.experiments: 
             if elem[0] == name:
                 self.experiments.remove(elem)
                 self.clean_experimental_results(name)
         self.experiments.append( (name, path) )
         self.save()
-
+        self.release_lock()
+ 
+    def update_name_description(self, name, descrip):
+        """
+        Update the core values name and description
+        """
+        self.initiate_lock()
+        self.reload()
+        self.name = name
+        self.desc = descrip
+        self.save()
+        self.release_lock()
 
     def experiment_exists(self, name):
         """
@@ -290,8 +311,11 @@ class Projit:
         :return: None
         :rtype: None
         """
+        self.initiate_lock()
+        self.reload()
         self.datasets[name] = path
         self.save()
+        self.release_lock()
 
     def rm_dataset(self, name):
         """
@@ -303,6 +327,8 @@ class Projit:
         :return: None
         :rtype: None
         """
+        self.initiate_lock()
+        self.reload()
         if name in self.datasets:
             del self.datasets[name] 
             self.save()
@@ -310,6 +336,7 @@ class Projit:
             del self.datasets
             self.datasets = {}
             self.save()
+        self.release_lock()
 
     def rm_experiment(self, name):
         """
@@ -321,6 +348,8 @@ class Projit:
         :return: None
         :rtype: None
         """
+        self.initiate_lock()
+        self.reload()
         if name==".":
             for elem in self.experiments:
                 self.clean_experimental_results(elem[0])
@@ -332,6 +361,7 @@ class Projit:
                     self.experiments.remove(elem)
                     self.clean_experimental_results(name)
             self.save()
+        self.release_lock()
 
 
     def add_param(self, name, value):
@@ -347,8 +377,11 @@ class Projit:
         :return: None
         :rtype: None
         """
+        self.initiate_lock()
+        self.reload()
         self.params[name] = value 
         self.save()
+        self.release_lock()
 
     def add_hyperparam(self, name, value):
         """
@@ -364,8 +397,11 @@ class Projit:
         :rtype: None
         """
         if self.experiment_exists(name):
+            self.initiate_lock()
+            self.reload()
             self.hyperparams[name] = value
             self.save()
+            self.release_lock()
         else:
             raise Exception("Projit Experiment Exception: No experiment called: '%s' -- Register your experiment first." % name)
 
@@ -391,6 +427,8 @@ class Projit:
         :rtype: None
         """
 
+        self.initiate_lock()
+        self.reload()
         if dataset==None:
             if experiment in self.results:
                 rez = self.results[experiment]
@@ -411,6 +449,7 @@ class Projit:
             rez[experiment] = rez2
             self.dataresults[dataset] = rez
         self.save()
+        self.release_lock()
 
     def get_results(self, dataset=None):
         """
@@ -494,6 +533,35 @@ class Projit:
     def create_local_path(self, ds):
         return self.get_root_path() + ds
 
+
+    def initiate_lock(self):
+        """
+        Lock files are used during processes that modify the project
+        so that we get consistent state across parallel executions.
+        """
+        path_to_lock = self.path + "/" + lock_file
+        lock_exists = True
+        while lock_exists:
+            if os.path.isfile(path_to_lock):
+                time.sleep(5)
+            else:
+                lock_exists = False
+
+        lock_content = {}
+        with open(path_to_lock, 'w') as outfile:
+            json.dump(lock_content, outfile, indent=0)
+
+    def release_lock(self):
+        """
+        Lock files are used during processes that modify the project
+        so that we get consistent state across parallel executions.
+        Release the lock by deleting the lock file
+        """
+        path_to_lock = self.path + "/" + lock_file
+        if os.path.isfile(path_to_lock):
+            os.remove(path_to_lock)
+
+
     def save(self):
         """
         Save your projit project into config files within the projit config dir
@@ -507,6 +575,26 @@ class Projit:
         path_to_json = self.path + "/" + execution_file
         with open(path_to_json, 'w') as outfile:
             json.dump(self.executions, outfile, indent=0)
+
+    def reload(self):
+        """
+        Sometimes we reload the project from disk. Necessary when multiple processes are running
+        experiments in the same project.
+        """
+        path_to_config = self.path + "/" + config_file
+        path_to_execs = self.path + "/" + execution_file
+        _dict = {}
+        if os.path.exists(path_to_config):
+            with open(path_to_config) as f:
+                _dict = json.load(f)
+        for key in _dict.keys():
+            setattr(self, key, _dict[key])
+
+        _execs = {}
+        if os.path.exists(path_to_execs):
+            with open(path_to_execs) as f:
+                _execs = json.load(f)
+                setattr(self, "executions", _execs)
 
     def render(self, path):
         results = self.get_results()
