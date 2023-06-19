@@ -1,0 +1,64 @@
+<mxfile host="app.diagrams.net" modified="2023-06-19T05:01:32.105Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36" etag="UbwSm0jIV6gPaTxYB8mX" version="21.5.0" type="device">
+  <diagram name="Page-1" id="1oxovvhrkwaGEaMZ6Zkm">
+    <mxGraphModel dx="891" dy="623" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="XCQ5zsaXB3w69v--F8P7-1" value="External Sources" style="shape=datastore;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="11" y="20" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="XCQ5zsaXB3w69v--F8P7-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.15;entryY=0.95;entryDx=0;entryDy=0;entryPerimeter=0;strokeColor=#7EA6E0;strokeWidth=5;exitX=1;exitY=0.25;exitDx=0;exitDy=0;" edge="1" parent="1" source="XCQ5zsaXB3w69v--F8P7-2" target="XCQ5zsaXB3w69v--F8P7-4">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="331" y="133" as="sourcePoint" />
+            <mxPoint x="429" y="50" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="XCQ5zsaXB3w69v--F8P7-2" value="Data Prepation" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="21" y="120" width="300" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="XCQ5zsaXB3w69v--F8P7-10" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;fillColor=#9AC7BF;fillStyle=solid;" edge="1" parent="XCQ5zsaXB3w69v--F8P7-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="59.5" y="-40" as="sourcePoint" />
+            <mxPoint x="60" y="30" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="XCQ5zsaXB3w69v--F8P7-11" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;fillColor=#9AC7BF;fillStyle=solid;" edge="1" parent="XCQ5zsaXB3w69v--F8P7-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="260" y="30" as="sourcePoint" />
+            <mxPoint x="259.5" y="-40" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="XCQ5zsaXB3w69v--F8P7-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=#B5739D;strokeWidth=5;dashed=1;" edge="1" parent="1" source="XCQ5zsaXB3w69v--F8P7-4" target="XCQ5zsaXB3w69v--F8P7-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="XCQ5zsaXB3w69v--F8P7-4" value="Projit Metadata" style="shape=datastore;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="360" y="20" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="XCQ5zsaXB3w69v--F8P7-5" value="Processed Data" style="shape=datastore;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="211" y="20" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="XCQ5zsaXB3w69v--F8P7-7" value="Experimentation" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="21" y="240" width="300" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="XCQ5zsaXB3w69v--F8P7-8" value="Analysis of Results" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="21" y="360" width="300" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="XCQ5zsaXB3w69v--F8P7-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;strokeColor=#7EA6E0;strokeWidth=5;startArrow=classic;startFill=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;" edge="1" parent="1" source="XCQ5zsaXB3w69v--F8P7-7" target="XCQ5zsaXB3w69v--F8P7-4">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="331" y="256" as="sourcePoint" />
+            <mxPoint x="429" y="200" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="XCQ5zsaXB3w69v--F8P7-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.85;entryY=0.95;entryDx=0;entryDy=0;strokeColor=#7EA6E0;strokeWidth=5;entryPerimeter=0;startArrow=classic;startFill=0;exitX=1;exitY=0.25;exitDx=0;exitDy=0;" edge="1" parent="1" source="XCQ5zsaXB3w69v--F8P7-8" target="XCQ5zsaXB3w69v--F8P7-4">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="331" y="376" as="sourcePoint" />
+            <mxPoint x="471" y="200" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="XCQ5zsaXB3w69v--F8P7-14" value="Meta-Analysis" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="300" width="280" height="80" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

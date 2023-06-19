@@ -4,6 +4,14 @@ projit package
 Submodules
 ----------
 
+projit.ascii\_plot module
+-------------------------
+
+.. automodule:: projit.ascii_plot
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 projit.cli module
 -----------------
 
@@ -16,6 +24,14 @@ projit.config module
 --------------------
 
 .. automodule:: projit.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+projit.pdf module
+-----------------
+
+.. automodule:: projit.pdf
    :members:
    :undoc-members:
    :show-inheritance:
