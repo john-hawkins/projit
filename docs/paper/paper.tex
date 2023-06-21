@@ -149,10 +149,23 @@ To do so they are often constructed for specific combinations of technology. Thi
 to enable efficiency, but has the effect of limiting general applicability.
 Many other eScience frameworks focus on the lineage and management of data, referred to as 
 the so-called provenance problem \cite{Sahoo:2008,Conquest:2021}
-The goal of the provenance frameworks is sufficient auditibiliy of data sources that will 
-render eScience transparent and repeatable.
+The goal of the provenance frameworks is sufficient auditibiliy of data that will 
+render eScience transparent and repeatable. This can be auditing of data from multiple source systems,
+or it can be auditing of logs generated during data processing\cite{Ferdous2020}. Regardless of the
+specific data to be audited, these frameworks focus on developing unified systems and processes so
+that auditing can be easily performed over many projects.
 
-Other frameworks and approaches focus on understanding how to do large scale collaborative science, or
+In addition to systems for storage of data, eScience application may include facilities for orchestration
+of data processes and services\cite{Subramanian2013}, analysis of results, generation of insights
+and documentation. 
+
+Frameworks for eScience will typically need to take a position on the extent to which they are domain
+specific, versus general purpose. A domain specific approach that integrates multiple data sources in
+a domain aware fashion can faciliate automated or assisted scientific discover\cite{Howe2008}. On the
+other hand a general purpose framework facilitates multi-disciplinary collaboration and permits meta-analysis
+that transcends the boundaries of disciplines.
+
+Other frameworks and approaches in eScience focus on understanding how to do large scale collaborative science, or
 facilitate meta-level learning of various kinds\cite{Hunter:2005,Liu:2023}. The better we track the
 process of science as a whole, the better we can understand both how to improve scientific processes
 as well as data mine the history of science for phenomena that were difficult to detect.
@@ -174,21 +187,31 @@ The key elements are as follows:
  \item Tracking: Tracking of Experiments and outputs
  \item Results: Comparison of Methods and Results
  \item Documentation: Generation of Documentation
- \item Reproduction: Reproducibility of Projects
+ \item Reproducibility: Facilitate reproduction of results
  \item Meta-Analysis: Facilitation of Meta-Analysis
 \end{itemize}
 
 The elements in this list are organised in an approximately sequential manner. However, as we discuss
 them below it should be apparent that there are many ways in which these elements support each other.
-Firstly, and foremost, aata driven projects
-require a method of accessing the required \textbf{source} data and will need to maintain records 
-of this data provenance. There will typically be \textbf{processing} applied to these datasets to 
+
+First and foremost, data driven projects require a access to the required \textbf{source} data 
+and need to maintain records of this data provenance for \textbf{reproducibility}. 
+There will typically be \textbf{processing} applied to these datasets to 
 render them applicable to experimentation and analysis. An ideal tool will track the sequential 
-nature of this processing as well as store information about the location of each resulting dataset.
+nature of this \textbf{processing} as well as store information about the location of each resulting dataset.
 The data processed in this way is then available for \textbf{reuse} across experiments and analysis,
-making \textbf{results} comparable and facilitating \textbf{meta-analysis}. 
+making \textbf{results} comparable.
 
-
+The centralised storage of data in a unified format allows for scripted generation of \textbf{documentation},
+and facilitates easy \textbf{meta-analysis}. If the product metadata is stored in a public or open source
+repository then it is possible to build tools that extract and process the data from multiple projects. It
+will permit the emgergence of an ecosystem of tools that mine the history of experiments conducted on the
+same or similar source data, evaluate experimental protocols or algorithms across projects and potentially
+automate some forms of \textbf{meta-analysis}.
+ 
+To achieve these advantages we require a uniform system for storing all necessary data that are inputs and outputs 
+for each stage of a data science experiment. The central store permits decoupling of processes by allowing each
+element of the process to be implemented and executed independently of the others.
 
 \subsection{Projit Process}
 
@@ -208,12 +231,29 @@ In Figure \ref{fig:projit} we see that the core steps of data preparation, exper
 and analysis of results all happen independently. Each of them accesses the projit store for
 the information they need, storing information 
 
-\subsection{Application}
+\subsection{Implementation}
 
+Projit has been implemented as python package that functions as both a command line application
+and library that can be included inside other scripts and applications. The command line application
+can be used to query the project metadata in much the same way that the git application can be used.
+A user can add, modify and list the collection of data assets in the project: datasets, experiments 
+and results are all accessible from the command line application.
 
+The python package can be included in a script so that the script can access the project metadata store.
+This allows the script to find the location of common datasets, register themselves as an experiment
+and store results once the script is complete. Programmatic interaction with the project data through
+the projit API is what permits the scripts of a project to be decoupled and contribute to the project
+without being aware of how any other element is structured or implemented.
 
-\section{Results}
+\section{Case Study}
 
+We have utilised the projit application across multiple data science projects to store reusable datasets
+and the results of all experiments. Additionally, the metadata store contains infomation about the number
+of times each experiment has been executed, and the execution time utilised on each run. This allows us
+to generate an ad hoc script that can compare projects in terms of the data used, the number of experiments
+conducted and the total execution time. This script is constructed for illustrative purposes to show that
+the projit tool can permit arbitrary meta-analysis of projects through the standardised metadata stored across
+git repositories.
 
 
 \section{Conclusion}
