@@ -151,26 +151,47 @@ Many other eScience frameworks focus on the lineage and management of data, refe
 the so-called provenance problem \cite{Sahoo:2008,Conquest:2021}
 The goal of the provenance frameworks is sufficient auditibiliy of data that will 
 render eScience transparent and repeatable. This can be auditing of data from multiple source systems,
-or it can be auditing of logs generated during data processing\cite{Ferdous2020}. Regardless of the
+auditing of logs generated during data processing\cite{Ferdous2020}. At the extreme we can seek to
+quantify every transformation that happens to data in the course of processing\cite{Sahoo2009}. 
+Regardless of the
 specific data to be audited, these frameworks focus on developing unified systems and processes so
 that auditing can be easily performed over many projects.
 
 In addition to systems for storage of data, eScience application may include facilities for orchestration
-of data processes and services\cite{Subramanian2013}, analysis of results, generation of insights
-and documentation. 
+of data processes and external services\cite{Subramanian2013}, requests for experiments with specific 
+parameters\cite{Hunter:2005}, or integrated analysis of results, generation of insights and documentation. 
+Other frameworks and approaches in eScience focus on understanding how to do large scale collaborative science, or
+facilitate meta-level learning of various kinds\cite{Hunter:2005,Liu:2023}. The better we track the
+process of science as a whole, the better we can understand both how to improve scientific processes
+as well as data mine the history of experimental results for phenomena that were difficult to detect.
 
 Frameworks for eScience will typically need to take a position on the extent to which they are domain
 specific, versus general purpose. A domain specific approach that integrates multiple data sources in
 a domain aware fashion can faciliate automated or assisted scientific discover\cite{Howe2008}. On the
 other hand a general purpose framework facilitates multi-disciplinary collaboration and permits meta-analysis
-that transcends the boundaries of disciplines.
+that transcends the boundaries of disciplines. The other key dimension for a decision is the extent to
+which an eScience application depends on specific technologies, many machine learning science platforms
+can provide efficiency gains, but only when using specfic libraries and frameworks\cite{Alberti:2018,MolnerDomenech:2020}.
+Similarly, other empirical science platforms are built on specific database, webserver or application
+frameworks, which make them less extensible and harder to integrate.
 
-Other frameworks and approaches in eScience focus on understanding how to do large scale collaborative science, or
-facilitate meta-level learning of various kinds\cite{Hunter:2005,Liu:2023}. The better we track the
-process of science as a whole, the better we can understand both how to improve scientific processes
-as well as data mine the history of science for phenomena that were difficult to detect.
+In this work we argue for development of data science frameworks that are minimal in expectations, both in
+terms of appplication domains and underlying technologies. We present a design framework for building
+decoupled data science tools that can improve efficiency and replication through standardisation, without
+unreasonable impositions on design decisions. We describe the design of a open source project integration
+tool (\textit{projit}) that can be used either as a CLI or python API. Internally \textit{projit} depends 
+only on a metadata store that uses the general purpose JSON format. 
+As such it is trivial for developers to build interfaces in other
+languages, or devise web service APIs for decentralised versions. We explore a case study of comparing results
+across multiple projects for which we have used the \textit{projit} application to manage our metadata.
 
 \section{Methodology}
+
+\begin{figure*}
+\includegraphics[scale=0.6]{./Projit_decoupled_process.drawio.png}
+\caption{Projit Process for Decoupled Data Science}
+\label{fig:projit}
+\end{figure*}
 
 We begin by discussing all desirable elements required of an open science framework. These are drawn
 from observations of both how collaborative science works and the successful components of distributed
@@ -221,15 +242,22 @@ data science work can be allowed to proceed without awareness of the structure o
 any other element as long as it can access the information it requires through this
 metadata store.
 
-\begin{figure*}
-\includegraphics[scale=0.6]{./Projit_decoupled_process.drawio.png}
-\caption{Projit Process for Decoupled Data Science}
-\label{fig:projit}
-\end{figure*}
-
 In Figure \ref{fig:projit} we see that the core steps of data preparation, experimentation
-and analysis of results all happen independently. Each of them accesses the projit store for
-the information they need, storing information 
+and analysis of results all happen independently. Each of them accesses the projit metadata 
+store for the information they need, and subsequently store information and results once complete.
+This process means that in principle the location of an underlying dataset could change without
+modifying other elements of the project. Similarly, we might change the parameters or an experiment
+or the set of metrics we calculate. Each experiment and analysis task operates independently of the
+others, and all that suffers when changes are made is the potential for comparison across equal
+dimensions of variation.
+
+In addition to the dominant requirements of experimentation (parameter and results) we store the results
+of each experimental execution as well as the experiment duration, measured from the time of initiation
+to completion. These records are particularly important in data science and machine learning where we
+may want to trade off performance with computational requirements. But these values could be used to store
+information about real world experimtal execution, or the time required to marshal and sequence a series
+of independent web services. 
+
 
 \subsection{Implementation}
 
