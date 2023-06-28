@@ -65,6 +65,7 @@ def task_status(project):
     print("  Description: %s" % project.desc)
     print("  Datasets: %i" % len(project.datasets))
     print("  Experiments: %i" % len(project.experiments))
+    print("  Executions: %i" % len(project.executions))
     print("")
 
 ##########################################################################################
@@ -73,7 +74,7 @@ def filler(current, max_len, content=" "):
 
 ##########################################################################################
 def print_header(header):
-    full_header = header + ("_" * (80-len(header)))
+    full_header = header + ("_" * (90-len(header)))
     print(full_header)
 
 ##########################################################################################
@@ -111,38 +112,112 @@ def task_compare(project, datasets, metric, markdown):
         print(results)
 
 
+def extract_max_tags_lengths(project, asset, tags):
+    if asset in project.tags:
+        tagset = project.tags[asset]
+        max_tag_lengths = []
+        for t in tags:
+            temp = []
+            for a in tagset:
+                if t in tagset[a]:
+                    temp.append(len(tagset[a][t]))
+                else:
+                    temp.append(0)
+            max_val = max(temp)
+            if max_val<len(t):
+               max_val = len(t)
+            max_tag_lengths.append(max_val)
+        return max_tag_lengths
+    else:
+        return [0 for x in tags]
+
+
 ##########################################################################################
-def task_list(subcmd, project, dataset, markdown):
+def task_list(subcmd, project, dataset, markdown, tags):
     """
     List content of a project from the command line
     """
+    if len(tags) > 0:
+        tags_max_len = max([len(x) for x in tags])
+    else:
+        tags = []
+        tags_max_len = 0
+
     print()
     if subcmd == "datasets":
         print_header("__Datasets")
         if len(project.datasets.keys()) > 0:
+            tag_header = ""
+            if len(tags)>0:
+               tag_max_lengths = extract_max_tags_lengths(project, "dataset", tags)
+               for tag,tag_len in zip(tags,tag_max_lengths):
+                   tag_header = tag_header + tag + filler(len(tag), tag_len+3, "_")
+                
             long_key = max([len(k) for k in project.datasets.keys()])
-            myhead = "__Name" + filler(len("Name"), long_key+3, "_") + "Path_"
+            myhead = "__Name" + filler(len("Name"), long_key+3, "_") + tag_header + "Path_________"
             print_header(myhead)
             for ds in project.datasets:
-                print("  ", ds, filler(len(ds), long_key+3 ), project.datasets[ds], sep="" )
+                tag_output = ""
+                if len(tags)>0:
+                    tag_vals = project.get_tags("dataset", ds, tags)                
+                    for tag,tag_len in zip(tag_vals,tag_max_lengths):
+                        tag_output = tag_output + tag + filler(len(tag), tag_len+3, " ")
+                print("  ", ds, filler(len(ds), long_key+3 ), tag_output, project.datasets[ds], sep="" )
         else:
             print(" NONE")
         print("")
     elif subcmd == "experiments":
         print_header("__Experiments")
         if len(project.experiments) > 0:
+            tag_header = ""
+            if len(tags)>0:
+               tag_max_lengths = extract_max_tags_lengths(project, "experiment", tags)
+               for tag,tag_len in zip(tags,tag_max_lengths):
+                   tag_header = tag_header + tag + filler(len(tag), tag_len+3, "_")
+
             long_key = max([len(k[0]) for k in project.experiments])
-            myhead = "__Name__" + filler(len("Name__"), long_key+3, "_") + "Runs__" + "MeanTime____" + "Path"
+            myhead = "__Name__" + filler(len("Name__"), long_key+3, "_") + tag_header + "Runs__" + "MeanRunTime___" + "Path______"
             print_header(myhead)
             for exp in project.experiments:
+                tag_output = ""
+                if len(tags)>0:
+                    tag_vals = project.get_tags("experiment", exp[0], tags)
+                    for tag,tag_len in zip(tag_vals,tag_max_lengths):
+                        tag_output = tag_output + tag + filler(len(tag), tag_len+3, " ")
                 execs, mean_time = project.get_experiment_execution_stats(exp[0])
                 mins, secs = divmod(mean_time, 60)
-                if mins>0:
-                    mytime = f"{int(mins)}M {int(secs)}s"
+                if mins>60:
+                    hours, mins = divmod(mins, 60)
                 else:
-                    mytime = f"{int(secs)}s"
-                print("  ", exp[0], filler(len(exp[0]), long_key+3), 
-                           execs, filler(len(str(execs)), 6), 
+                    hours = 0
+                hours = int(hours)
+                mins = int(mins)
+                secs = int(secs)
+                if hours>9:
+                    h_str = f"{hours}h"
+                elif hours==0:
+                    h_str = f"   "
+                else:
+                    h_str = f" {hours}h"
+
+                if mins>9:
+                    m_str = f"{mins}m"
+                elif mins==0:
+                    m_str = f"   "
+                else:
+                    m_str = f" {mins}m"
+
+                if secs>9:
+                    s_str = f"{secs}s"
+                elif mins==0:
+                    s_str = f"   "
+                else:
+                    s_str = f" {secs}s"
+
+                mytime = f" {h_str} {m_str} {s_str}  "
+
+                print("  ", exp[0], filler(len(exp[0]), long_key+3), tag_output, 
+                           filler(len(str(execs)), 4), execs, "  ", 
                            mytime, filler(len(str(mytime)), 12), 
                            exp[1], sep=""  
                 )
@@ -247,6 +322,20 @@ def task_add(project, asset, name, path):
     else:
         print("ERROR: Request to add unrecognised asset type: %s" % asset)
         exit(1)
+
+##########################################################################################
+def task_tag(project, asset, name, values):
+    """
+    Add tags to an asset in the project from the command line
+    """
+    vals = values.split(",")
+    #print(f"Tagging {asset}:{name} with {vals}" )
+    if project.validate_asset(asset, name):
+        project.add_tags(asset, name, vals)
+    else: 
+        print(f"ERROR: Invalid request to tag asset {name} of type {asset} - please check available assets")
+        exit(1)
+
 
 ##########################################################################################
 def task_rm(project, asset, name):
@@ -363,9 +452,15 @@ def cli_main():
    add_parser.add_argument('name')
    add_parser.add_argument('path')
 
+   add_parser = subparsers.add_parser('tag')
+   add_parser.add_argument('asset')
+   add_parser.add_argument('name')
+   add_parser.add_argument('values')
+
    list_parser = subparsers.add_parser('list')
    list_parser.add_argument('subcmd')
    list_parser.add_argument('dataset', nargs='?', default="")
+   list_parser.add_argument('--tags', nargs='+', default="")
 
    plot_parser = subparsers.add_parser('plot')
    plot_parser.add_argument('experiment')
@@ -412,7 +507,7 @@ def cli_main():
    project = projit_load(config_path)
 
    if args.cmd == 'list':
-      task_list(args.subcmd, project, args.dataset, args.markdown)
+      task_list(args.subcmd, project, args.dataset, args.markdown, args.tags)
 
    if args.cmd == 'compare':
       datasets = args.datasets.split(",")
@@ -420,6 +515,9 @@ def cli_main():
 
    if args.cmd == 'add':
       task_add(project, args.asset, args.name, args.path)
+
+   if args.cmd == 'tag':
+      task_tag(project, args.asset, args.name, args.values)
 
    if args.cmd == 'rm':
       task_rm(project, args.asset, args.name)

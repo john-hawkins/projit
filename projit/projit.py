@@ -11,6 +11,7 @@ import os
 from .config import lock_file
 from .config import config_file
 from .config import execution_file
+from .config import tag_file
 from .config import config_folder
 from .template import load_template
 from .utils import locate_projit_config
@@ -37,7 +38,9 @@ class Projit:
                  params={},
                  hyperparams={},
                  dataresults={},
-                 executions={}):
+                 executions={},
+                 tags={}
+    ):
         """
         Initialise a projit project object.
         This class will be used for storing and retrieving all data about the project,
@@ -90,6 +93,9 @@ class Projit:
                                            }
                                        }
         :type executions: Dictionary of Dictionary of Dictionary, optional
+ 
+        :param tags: The dictionary of tags for project assets.
+        :type tags: Dictionary of Dictionary of Dictionary, optional
 
         :return: None 
         :rtype: None 
@@ -104,7 +110,7 @@ class Projit:
         self.hyperparams = hyperparams
         self.dataresults = dataresults
         self.executions = executions
-
+        self.tags = tags
 
     def get_root_path(self):
         """
@@ -267,6 +273,21 @@ class Projit:
         self.save()
         self.release_lock()
 
+    def dataset_exists(self, name):
+        """
+        Check if a given dataset is in the data structure
+
+        :param name: The dataset name
+        :type name: string, required
+
+        :return: exists
+        :rtype: Boolean
+        """
+        for elem in self.datasets:
+            if elem == name:
+                return True
+        return False
+
     def experiment_exists(self, name):
         """
         Check if a given experiment is in the data structure
@@ -281,6 +302,48 @@ class Projit:
             if elem[0] == name:
                 return True
         return False
+ 
+    def validate_asset(self, asset, name):
+        if asset=="experiment":
+            return self.experiment_exists(name)
+        elif asset=="dataset":
+            return self.dataset_exists(name)
+        else:
+            return False
+
+    def add_tags(self, asset, name, vals):
+        self.initiate_lock()
+        self.reload()
+        assets = {}
+        assets[name] = {}
+        if asset in self.tags:
+            assets = self.tags[asset]
+            if name not in assets:
+                assets[name] = {}
+        for val in vals:
+            split = val.split("=")
+            assets[name][split[0]] = split[1]
+
+        self.tags[asset] = assets
+        self.save()
+        self.release_lock()
+
+    def get_tags(self, asset, name, tags):
+        if asset in self.tags:
+            assets = self.tags[asset]
+            if name not in assets:
+                return ["" for t in tags]
+            else:
+                my_asset = assets[name]
+                tag_set = []
+                for t in tags:
+                    if t in my_asset:
+                        tag_set.append(my_asset[t])
+                    else:
+                        tag_set.append("")
+                return tag_set
+        else:
+            return ["" for t in tags]
 
     def clean_experimental_results(self, name):
         """
@@ -568,6 +631,7 @@ class Projit:
         """
         core_props = self.__dict__.copy()
         del core_props['executions']
+        del core_props['tags']
         path_to_json = self.path + "/" + config_file
         with open(path_to_json, 'w') as outfile:
             json.dump(core_props, outfile, indent=0)
@@ -576,6 +640,11 @@ class Projit:
         with open(path_to_json, 'w') as outfile:
             json.dump(self.executions, outfile, indent=0)
 
+        path_to_json = self.path + "/" + tag_file
+        with open(path_to_json, 'w') as outfile:
+            json.dump(self.tags, outfile, indent=0)
+
+
     def reload(self):
         """
         Sometimes we reload the project from disk. Necessary when multiple processes are running
@@ -583,6 +652,7 @@ class Projit:
         """
         path_to_config = self.path + "/" + config_file
         path_to_execs = self.path + "/" + execution_file
+        path_to_tags = self.path + "/" + tag_file
         _dict = {}
         if os.path.exists(path_to_config):
             with open(path_to_config) as f:
@@ -595,6 +665,13 @@ class Projit:
             with open(path_to_execs) as f:
                 _execs = json.load(f)
                 setattr(self, "executions", _execs)
+
+        _tags = {}
+        if os.path.exists(path_to_tags):
+            with open(path_to_tags) as f:
+                _tags = json.load(f)
+                setattr(self, "tags", _tags)
+
 
     def render(self, path):
         results = self.get_results()
@@ -632,7 +709,13 @@ def load(config_path):
         with open(path_to_execs) as f:
             _execs['executions'] = json.load(f)
 
-    _object = Projit(**_dict, **_execs )
+    _tags = {}
+    path_to_tags = config_path + "/" + tag_file
+    if os.path.exists(path_to_tags):
+        with open(path_to_tags) as f:
+            _tags["tags"] = json.load(f)
+
+    _object = Projit(**_dict, **_execs, **_tags )
     _object.path = config_path
     return _object
 
