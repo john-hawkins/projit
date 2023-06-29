@@ -11,6 +11,7 @@ data sets, experiments and documentation.
    introduction
    installation
    usage
+   tags
    api
    license
 
