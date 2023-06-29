@@ -112,13 +112,15 @@ class Projit:
         self.executions = executions
         self.tags = tags
 
+
     def get_root_path(self):
         """
         Get the path to where the project folder is located
         """
         return self.path[0:len(self.path) - len(config_folder)]
 
-    def start_experiment(self, name, path, params={}):
+
+    def start_experiment(self, name, path, params={}, tags={}):
         """
         Start an experiment execution.
         This function will create a new experiment if this is the first execution
@@ -132,11 +134,17 @@ class Projit:
         :type path: string, required
 
         :param params: Optional dictionary of parameters used in the experiment execution
-        :type path: Dictionary, option
+        :type params: Dictionary, optional
+
+        :param tags: Optional dictionary of tags to describe the experiment
+        :type tags: Dictionary, optional
 
         :return: id : The Execution ID
         :rtype: String
         """
+        self.initiate_lock()
+        self.reload()
+
         if not self.experiment_exists(name):
             self.add_experiment(name, path)
 
@@ -151,15 +159,18 @@ class Projit:
         payload = {'start':startdt, 'end':"", 'githash':ghash, 'params':params}
         exper_execs = {}
 
-        self.initiate_lock()
-        self.reload()
         if name in self.executions:
             exper_execs = self.executions[name]
         exper_execs[id] = payload
         self.executions[name] = exper_execs 
         self.save()
         self.release_lock()
+
+        if len(tags)>0:
+            self.add_tags("experiment", name, tags)
+
         return id
+
 
     def end_experiment(self, name, id, hyperparams={}):
         """
@@ -216,12 +227,14 @@ class Projit:
         else:
             return 0, 0
 
+
     def get_mean_execution_time(self, name):
         exec_times = self.get_execution_times(name)
         if len(exec_times) > 0:
             return np.mean(exec_times)
         else:
             return 0
+
 
     def get_execution_times(self, name):
         if name in self.executions:
@@ -235,6 +248,7 @@ class Projit:
             return exec_times
         else:
             return []
+
 
     def add_experiment(self, name, path):
         """
@@ -261,7 +275,8 @@ class Projit:
         self.experiments.append( (name, path) )
         self.save()
         self.release_lock()
- 
+
+
     def update_name_description(self, name, descrip):
         """
         Update the core values name and description
@@ -272,6 +287,7 @@ class Projit:
         self.desc = descrip
         self.save()
         self.release_lock()
+
 
     def dataset_exists(self, name):
         """
@@ -288,6 +304,7 @@ class Projit:
                 return True
         return False
 
+
     def experiment_exists(self, name):
         """
         Check if a given experiment is in the data structure
@@ -303,6 +320,7 @@ class Projit:
                 return True
         return False
  
+
     def validate_asset(self, asset, name):
         if asset=="experiment":
             return self.experiment_exists(name)
@@ -311,7 +329,8 @@ class Projit:
         else:
             return False
 
-    def add_tags(self, asset, name, vals):
+
+    def add_tags(self, asset, name, tags):
         self.initiate_lock()
         self.reload()
         assets = {}
@@ -320,13 +339,13 @@ class Projit:
             assets = self.tags[asset]
             if name not in assets:
                 assets[name] = {}
-        for val in vals:
-            split = val.split("=")
-            assets[name][split[0]] = split[1]
+        for tag in tags:
+            assets[name][tag] = tags[tag]
 
         self.tags[asset] = assets
         self.save()
         self.release_lock()
+
 
     def get_tags(self, asset, name, tags):
         if asset in self.tags:
@@ -345,6 +364,7 @@ class Projit:
         else:
             return ["" for t in tags]
 
+
     def clean_experimental_results(self, name):
         """
         Remove all results for a given experiment
@@ -360,6 +380,7 @@ class Projit:
         for dataset in self.dataresults:
             if name in self.dataresults[dataset]:
                 del self.dataresults[dataset][name]
+
 
     def add_dataset(self, name, path):
         """
@@ -379,6 +400,7 @@ class Projit:
         self.datasets[name] = path
         self.save()
         self.release_lock()
+
 
     def rm_dataset(self, name):
         """
@@ -400,6 +422,7 @@ class Projit:
             self.datasets = {}
             self.save()
         self.release_lock()
+
 
     def rm_experiment(self, name):
         """
@@ -446,6 +469,7 @@ class Projit:
         self.save()
         self.release_lock()
 
+
     def add_hyperparam(self, name, value):
         """
         Add a set of hyper parameters to the project.
@@ -467,6 +491,7 @@ class Projit:
             self.release_lock()
         else:
             raise Exception("Projit Experiment Exception: No experiment called: '%s' -- Register your experiment first." % name)
+
 
     def add_result(self, experiment, metric, value, dataset=None):
         """
@@ -514,6 +539,7 @@ class Projit:
         self.save()
         self.release_lock()
 
+
     def get_results(self, dataset=None):
         """
         Retrieve the experimental results as a DataFrame.
@@ -550,6 +576,7 @@ class Projit:
         cols.extend(rest)
         return df.loc[:,cols]
 
+
     def get_dataset(self, name):
         """
         Retrieve the dataset by name.
@@ -565,11 +592,13 @@ class Projit:
         else:
             raise Exception("Projit Dataset Exception: Named dataset '%s' not available. Register your dataset" % name)
 
+
     def get_param(self, name):
         if name in self.params:
             return self.params[name]
         else:
             raise Exception("Projit Parameter Exception: Named parameter '%s' is not available:" % name)
+
 
     def get_hyperparam(self, name):
         if name in self.hyperparams:
@@ -577,12 +606,14 @@ class Projit:
         else:
             raise Exception("Projit Parameter Exception: Hyper parameters for experiemnt '%s' are not available:" % name)
 
+
     def get_path_to_dataset(self, name):
         ds = self.get_dataset(name)
         if self.is_complete_path(ds):
             return ds
         else:
             return self.create_local_path(ds)
+
 
     def is_complete_path(self, path):
         if path[0:1] == "/":
@@ -592,6 +623,7 @@ class Projit:
         if path[0:4] == "http":
             return True
         return False
+
 
     def create_local_path(self, ds):
         return self.get_root_path() + ds
@@ -613,6 +645,7 @@ class Projit:
         lock_content = {}
         with open(path_to_lock, 'w') as outfile:
             json.dump(lock_content, outfile, indent=0)
+
 
     def release_lock(self):
         """
@@ -719,9 +752,11 @@ def load(config_path):
     _object.path = config_path
     return _object
 
+
 ##########################################################################################
 def projit_load():
     return load( locate_projit_config() )
+
 
 ##########################################################################################
 def init(template, name, desc=""):

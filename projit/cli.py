@@ -329,9 +329,13 @@ def task_tag(project, asset, name, values):
     Add tags to an asset in the project from the command line
     """
     vals = values.split(",")
-    #print(f"Tagging {asset}:{name} with {vals}" )
+    tags = {}
+    for val in vals:
+        temp = val.split("=")
+        tags[temp[0]] = temp[1]
+
     if project.validate_asset(asset, name):
-        project.add_tags(asset, name, vals)
+        project.add_tags(asset, name, tags)
     else: 
         print(f"ERROR: Invalid request to tag asset {name} of type {asset} - please check available assets")
         exit(1)
