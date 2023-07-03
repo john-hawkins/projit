@@ -1,5 +1,3 @@
 numpy>=1.22.2
 pandas>=1.2.5
-fpdf
 datatest>=0.11.1
-gitpython
