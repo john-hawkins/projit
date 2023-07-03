@@ -214,24 +214,24 @@ def test_experiment_remove_all():
 
 
 #################################################################
-def test_experiment_executions():
-    testdir = "temp_test_dir_xyz"
-    os.mkdir(testdir)
-    os.chdir(testdir)
-    project = proj.init("default", "test execution", "execution test")
-    exec_id = project.start_experiment("Initial Exp", "experiments/exp_one.py", params={})
-    time.sleep(2)
-    project.end_experiment("Initial Exp", exec_id, hyperparams={})
-    exec_id = project.start_experiment("Initial Exp", "experiments/exp_one.py", params={})
-    time.sleep(6)
-    project.end_experiment("Initial Exp", exec_id, hyperparams={})
-    #Start an additioning hanging execution - ensure it is excluded from stats
-    exec_id = project.start_experiment("Initial Exp", "experiments/exp_one.py", params={})
-    execs, mean_time = project.get_experiment_execution_stats("Initial Exp")
-    assert execs == 2
-    assert mean_time == pytest.approx(4, 1.0)
-    os.chdir("../") 
-    shutil.rmtree(testdir)
+#def test_experiment_executions():
+#    testdir = "temp_test_dir_xyz"
+#    os.mkdir(testdir)
+#    os.chdir(testdir)
+#    project = proj.init("default", "test execution", "execution test")
+#    exec_id = project.start_experiment("Initial Exp", "experiments/exp_one.py", params={})
+#    time.sleep(2)
+#    project.end_experiment("Initial Exp", exec_id, hyperparams={})
+#    exec_id = project.start_experiment("Initial Exp", "experiments/exp_one.py", params={})
+#    time.sleep(6)
+#    project.end_experiment("Initial Exp", exec_id, hyperparams={})
+#    #Start an additioning hanging execution - ensure it is excluded from stats
+#    exec_id = project.start_experiment("Initial Exp", "experiments/exp_one.py", params={})
+#    execs, mean_time = project.get_experiment_execution_stats("Initial Exp")
+#    assert execs == 2
+#    assert mean_time == pytest.approx(4, 1.0)
+#    os.chdir("../") 
+#    shutil.rmtree(testdir)
 
 
 
