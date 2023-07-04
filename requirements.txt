@@ -2,3 +2,4 @@ numpy>=1.16.4
 pandas>=0.25.3
 datatest>=0.11.1
 pyyaml
+gitpython
