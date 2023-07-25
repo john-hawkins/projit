@@ -124,8 +124,8 @@ large scale data processing and advanced analytical methods. These shifts have d
 methods of implementing and recording the details of scientific projects. Monolothic applications
 have the advantage of a single and consistent design, however they impede the ability of users to
 innovate and incrementally improve processes. We discuss the qualities of an ideal eScience framework
-for building multi-stage collaboration scinetific workflows and present an open source implementation
-for managing scientific processes in a decoupled fashion that permits both flexible implementation of
+for building multi-stage collaboration scientific workflows and present an open source implementation
+for managing data science processes in a decoupled fashion that permits both flexible implementation of
 any stage of processing, and greater ease of meta-data analysis.
 \end{abstract}
 
@@ -140,8 +140,9 @@ Progress in scientific research depends heavily on accurate record keeping of pr
 experimental approaches and results. Failure to maintain these records impedes progress
 by making it difficult to reproduce work, or imposing the costs of repeatedly testing 
 failed lines of experimentation. This cost becomes particularly high in the age of the
-reproducibility crisis, as a many teams running the same experiments in parallel, without
-knowledge of each others work, has produced a factory line of un-reproducible results.
+reproducibility crisis where many teams are running the same experiments in parallel, without
+knowledge of each others work, and producing a factory line of un-reproducible results 
+\cite{Ioannidis2005}.
  
 Many Machine Learning experimentation frameworks focus on the task of making experiments
 easier to execute and deploy into production systems\cite{Alberti:2018,MolnerDomenech:2020}. 
@@ -264,14 +265,18 @@ of independent web services.
 Projit has been implemented as python package that functions as both a command line application
 and library that can be included inside other scripts and applications. The command line application
 can be used to query the project metadata in much the same way that the git application can be used.
-A user can add, modify and list the collection of data assets in the project: datasets, experiments 
-and results are all accessible from the command line application.
+A user can add, modify and list the collection of analytical assets in the project: datasets, experiments 
+parameters, tags and results are all accessible from the command line application.
 
 The python package can be included in a script so that the script can access the project metadata store.
 This allows the script to find the location of common datasets, register themselves as an experiment
 and store results once the script is complete. Programmatic interaction with the project data through
 the projit API is what permits the scripts of a project to be decoupled and contribute to the project
-without being aware of how any other element is structured or implemented.
+without being aware of how any other element is structured or implemented. Furthermore, as the metadata
+is stored locally in standard JSON files, these can be stored inside a cloud repository and then contributed
+to by collaborators. This allows distributed data science teams to define their own lines of experimentation,
+but use a synchronised data set then continually contribute to a central meta-data store of project results.
+
 
 \section{Case Study}
 

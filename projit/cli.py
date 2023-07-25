@@ -417,10 +417,11 @@ def print_usage(prog):
     print("   ", prog, "plot initial execution                  # Plot the execution times for the experiment named 'initial'")
     print("   ", prog, "plot initial hyperparam alpha           # Plot the change in hyperparam 'alpha' for the experiment named 'initial'")
     print("   ", prog, "plot initial result MSE                 # Plot the change in result 'MSE' for the experiment named 'initial'")
-    print("   ", prog, "-m list results test                    # List results on 'test' data in markdown")
+    print("   ", prog, "render path_to_output.pdf               # Render a PDF document summarising the project")
+    print("   ", prog, "-m list results test                    # List results on 'test' data in Markdown format")
     print("   ", prog, "rm experiment explore                   # Remove the experiment explore (requires confirmation)")
     print("   ", prog, "rm experiment .                         # Remove all experiments (requires confirmation)")
-    print("   ", prog, "-m list results test                    # List results on test data in markdown")
+    print("   ", prog, "-m list results test                    # List results on test data in Markdown format")
     print("   ", prog, "compare dataone,datatwo MAE             # Compare results over datasets using metric MAE")
     print("")
 
@@ -442,6 +443,7 @@ def cli_main():
    parser = argparse.ArgumentParser()
    parser.add_argument('-v', '--version', help='Print Version', action='store_true')
    parser.add_argument('-m', '--markdown', help='Use markdown for output', action='store_true')
+   parser.add_argument('-u', '--usage', help='Print detailed usage instructions with examples', action='store_true')
 
    subparsers = parser.add_subparsers(dest="cmd") 
 
@@ -490,6 +492,10 @@ def cli_main():
        print(" Version:", __version__)
        exit(1)
 
+   if args.usage:
+       print_usage("projit")
+       exit(1)
+
    if args.cmd == None:
        print_usage("projit")
        exit(1)
@@ -536,7 +542,7 @@ def cli_main():
       task_status(project)
 
    if args.cmd == 'render':
-      task_render(project)
+      task_render(project, args.path)
 
 
 ##########################################################################################
