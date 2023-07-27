@@ -1,0 +1,8 @@
+Projit: An Open Source Tool for Data Science Project Management
+
+Data science projects often require multiple rounds of experimentation that involves careful discipline to prevent problems like over-fitting or p-hacking. Data science projects require management of data, models and results, but the management process needs to be flexible enough to enable rapid and agile experimentation. In this talk we will introduce 'projit,' an open source utility for managing data projects through loose coupling of components in a Git style command line interface.
+
+Projit allows you to register data sets, access them in your experiments through the projit package. You then programmatically register the experiments with an arbitrary list of results and hyper-parameters for each experimental run. All data is stored in a central meta-data repository. This repository can be queried with the command line utility and committed into a git repository such that it stores the meta-data history of your project.
+
+
+
