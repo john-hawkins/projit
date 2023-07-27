@@ -120,13 +120,15 @@
 
 \begin{abstract} 
 Scientific practice has expanded to become increasingly dependent of digitial technologies,
-large scale data processing and advanced analytical methods. These shifts have demanded new
-methods of implementing and recording the details of scientific projects. Monolothic applications
-have the advantage of a single and consistent design, however they impede the ability of users to
-innovate and incrementally improve processes. We discuss the qualities of an ideal eScience framework
-for building multi-stage collaboration scientific workflows and present an open source implementation
-for managing data science processes in a decoupled fashion that permits both flexible implementation of
-any stage of processing, and greater ease of meta-data analysis.
+large scale data processing and analytical methods for working with large data volumes. 
+These shifts have demanded new methods of implementing and recording the details of 
+scientific projects. Monolothic applications have the advantage of a single and 
+consistent design, however they impede the ability of users to innovate and 
+incrementally improve processes. We discuss the qualities of an ideal eScience 
+framework for building multi-stage collaboration scientific workflows and present 
+an open source implementation for managing scientific processes in a decoupled 
+fashion that permits both flexible implementation of any stage of processing, 
+and greater ease of meta-data analysis.
 \end{abstract}
 
 
@@ -146,45 +148,55 @@ knowledge of each others work, and producing a factory line of un-reproducible r
  
 Many Machine Learning experimentation frameworks focus on the task of making experiments
 easier to execute and deploy into production systems\cite{Alberti:2018,MolnerDomenech:2020}. 
-To do so they are often constructed for specific combinations of technology. This is a necessary limitation 
-to enable efficiency, but has the effect of limiting general applicability.
+To do so they are often constructed for specific combinations of technology. 
+This is often necessary limitation to either make a project feasible or enable efficiency, 
+but it has the side-effect of limiting general applicability.
 Many other eScience frameworks focus on the lineage and management of data, referred to as 
-the so-called provenance problem \cite{Sahoo:2008,Conquest:2021}
+the so-called provenance problem \cite{Sahoo:2008,Conquest:2021}.
 The goal of the provenance frameworks is sufficient auditibiliy of data that will 
-render eScience transparent and repeatable. This can be auditing of data from multiple source systems,
-auditing of logs generated during data processing\cite{Ferdous2020}. At the extreme we can seek to
-quantify every transformation that happens to data in the course of processing\cite{Sahoo2009}. 
-Regardless of the
-specific data to be audited, these frameworks focus on developing unified systems and processes so
-that auditing can be easily performed over many projects.
+render eScience transparent and repeatable. This can be auditing of data from multiple 
+source systems, or auditing of logs generated during data processing\cite{Ferdous2020}. 
+At the extreme we can seek to quantify every transformation that happens to data in 
+the course of processing\cite{Sahoo2009}. Regardless of the
+specific data to be audited, these frameworks focus on developing unified systems and 
+processes so that auditing can be easily performed over many projects.
 
-In addition to systems for storage of data, eScience application may include facilities for orchestration
-of data processes and external services\cite{Subramanian2013}, requests for experiments with specific 
-parameters\cite{Hunter:2005}, or integrated analysis of results, generation of insights and documentation. 
-Other frameworks and approaches in eScience focus on understanding how to do large scale collaborative science, or
-facilitate meta-level learning of various kinds\cite{Hunter:2005,Liu:2023}. The better we track the
-process of science as a whole, the better we can understand both how to improve scientific processes
-as well as data mine the history of experimental results for phenomena that were difficult to detect.
+In addition to systems for storage of data, eScience application may include facilities
+for orchestration of data processes and external services\cite{Subramanian2013}, 
+requests for experiments with specific parameters\cite{Hunter:2005}, 
+or integrated analysis of results, generation of insights and documentation. 
+Other frameworks and approaches in eScience focus on understanding how to do large 
+scale collaborative science, or facilitate meta-level learning of various 
+kinds\cite{Hunter:2005,Liu:2023}. The better we track the
+process of science as a whole, the better we can understand both how to improve 
+scientific processes as well as data mine the history of experimental results for 
+phenomena that are difficult to detect.
 
-Frameworks for eScience will typically need to take a position on the extent to which they are domain
-specific, versus general purpose. A domain specific approach that integrates multiple data sources in
-a domain aware fashion can faciliate automated or assisted scientific discover\cite{Howe2008}. On the
-other hand a general purpose framework facilitates multi-disciplinary collaboration and permits meta-analysis
-that transcends the boundaries of disciplines. The other key dimension for a decision is the extent to
-which an eScience application depends on specific technologies, many machine learning science platforms
-can provide efficiency gains, but only when using specfic libraries and frameworks\cite{Alberti:2018,MolnerDomenech:2020}.
-Similarly, other empirical science platforms are built on specific database, webserver or application
+Frameworks for eScience will typically need to take a position on the extent to which 
+they are domain specific versus general purpose. A domain specific approach can 
+integrate multiple data sources in a domain aware fashion that can faciliate 
+automated or assisted scientific discover\cite{Howe2008}. On the
+other hand a general purpose framework facilitates multi-disciplinary collaboration 
+and permits meta-analysis that transcends the boundaries of disciplines. 
+The other key dimension for a decision is the extent to which an eScience 
+application depends on specific technologies, many machine learning science platforms
+can provide efficiency gains, but only when using specfic libraries and 
+frameworks\cite{Alberti:2018,MolnerDomenech:2020}. Similarly, other empirical 
+science platforms are built on specific database, webservers or application
 frameworks, which make them less extensible and harder to integrate.
 
-In this work we argue for development of data science frameworks that are minimal in expectations, both in
-terms of appplication domains and underlying technologies. We present a design framework for building
-decoupled data science tools that can improve efficiency and replication through standardisation, without
-unreasonable impositions on design decisions. We describe the design of a open source project integration
-tool (\textit{projit}) that can be used either as a CLI or python API. Internally \textit{projit} depends 
+In this work we argue for development of data science frameworks that impose minimal 
+requirements, both in terms of appplication domains and underlying technologies. 
+We present a design framework for building decoupled data science tools that can 
+improve efficiency and replication through standardisation, without
+unreasonable impositions on design decisions. We describe the design of a open 
+source project integration tool (\textit{projit}) that can be used either as a 
+Command Line Application (CLI) or python API. Internally \textit{projit} depends 
 only on a metadata store that uses the general purpose JSON format. 
 As such it is trivial for developers to build interfaces in other
-languages, or devise web service APIs for decentralised versions. We explore a case study of comparing results
-across multiple projects for which we have used the \textit{projit} application to manage our metadata.
+languages, or devise web service APIs for decentralised versions. We explore a 
+case study of comparing results across multiple projects for which we have used 
+the \textit{projit} application to manage our metadata.
 
 \section{Methodology}
 
@@ -194,45 +206,51 @@ across multiple projects for which we have used the \textit{projit} application 
 \label{fig:projit}
 \end{figure*}
 
-We begin by discussing all desirable elements required of an open science framework. These are drawn
-from observations of both how collaborative science works and the successful components of distributed
-scientific endeavours. These requirements are drawn from both sciences that are typically dependent
-on computational frameworks (computer science, bioinformatics, physics) and those that generally are not
+We begin by discussing all desirable elements required of an open science framework. 
+These are drawn from observations of both how collaborative science works and the 
+successful components of distributed scientific endeavours. These requirements are 
+drawn from both sciences that are typically dependent on computational frameworks 
+(computer science, bioinformatics, physics) and those that generally are not
 (social science, psychology).
 
 The key elements are as follows:
 
 \begin{itemize}
  \item Sources: Provenance of Data Sources
- \item Processing: Record of Data Processing
- \item Reuse: Facilitating Reuse of Datasets
- \item Tracking: Tracking of Experiments and outputs
+ \item Processing: Records of Data Processing / Transformations
+ \item Reuse: Tooling to Facilitate Reuse of Datasets
+ \item Tracking: Tracking of Experiments and Outputs
  \item Results: Comparison of Methods and Results
- \item Documentation: Generation of Documentation
- \item Reproducibility: Facilitate reproduction of results
- \item Meta-Analysis: Facilitation of Meta-Analysis
+ \item Documentation: Generation of Project Documentation
+ \item Reproducibility: Facilitation of reproduction of results
+ \item Meta-Analysis: Facilitation of Multi-Project Meta-Analysis
 \end{itemize}
 
-The elements in this list are organised in an approximately sequential manner. However, as we discuss
-them below it should be apparent that there are many ways in which these elements support each other.
+The elements in this list are organised in an approximately sequential manner. 
+However, as we discuss them below it should be apparent that there are many ways 
+in which these elements support each other.
 
-First and foremost, data driven projects require a access to the required \textbf{source} data 
-and need to maintain records of this data provenance for \textbf{reproducibility}. 
+First and foremost, data driven projects require access to the required \textbf{source} data 
+and need to maintain records of the data provenance for \textbf{reproducibility}. 
 There will typically be \textbf{processing} applied to these datasets to 
-render them applicable to experimentation and analysis. An ideal tool will track the sequential 
-nature of this \textbf{processing} as well as store information about the location of each resulting dataset.
-The data processed in this way is then available for \textbf{reuse} across experiments and analysis,
+render them applicable to experimentation and analysis. An ideal tool will track the 
+sequential nature of this \textbf{processing} as well as store information about 
+the location of each resulting dataset. The data processed in this way is then 
+available for \textbf{reuse} across experiments and analysis,
 making \textbf{results} comparable.
 
-The centralised storage of data in a unified format allows for scripted generation of \textbf{documentation},
-and facilitates easy \textbf{meta-analysis}. If the product metadata is stored in a public or open source
-repository then it is possible to build tools that extract and process the data from multiple projects. It
-will permit the emgergence of an ecosystem of tools that mine the history of experiments conducted on the
-same or similar source data, evaluate experimental protocols or algorithms across projects and potentially
+The centralised storage of data in a unified format allows for scripted generation 
+of \textbf{documentation}, and facilitates easy \textbf{meta-analysis}. If the 
+product metadata is stored in a public or open source repository then it is 
+possible to build tools that extract and process the data from multiple projects. It
+will permit the emgergence of an ecosystem of tools that mine the history of 
+experiments conducted on the same or similar source data, evaluate experimental 
+protocols or algorithms across projects and potentially
 automate some forms of \textbf{meta-analysis}.
  
-To achieve these advantages we require a uniform system for storing all necessary data that are inputs and outputs 
-for each stage of a data science experiment. The central store permits decoupling of processes by allowing each
+To achieve these advantages we require a uniform system for storing all necessary 
+data that are inputs and outputs for each stage of a data science experiment. 
+The central store permits decoupling of processes by allowing each
 element of the process to be implemented and executed independently of the others.
 
 \subsection{Projit Process}
@@ -245,49 +263,62 @@ metadata store.
 
 In Figure \ref{fig:projit} we see that the core steps of data preparation, experimentation
 and analysis of results all happen independently. Each of them accesses the projit metadata 
-store for the information they need, and subsequently store information and results once complete.
-This process means that in principle the location of an underlying dataset could change without
-modifying other elements of the project. Similarly, we might change the parameters or an experiment
-or the set of metrics we calculate. Each experiment and analysis task operates independently of the
-others, and all that suffers when changes are made is the potential for comparison across equal
-dimensions of variation.
+store for the information they need, and subsequently store information and results once 
+complete. This process means that in principle the location of an underlying dataset 
+could change without modifying other elements of the project. Similarly, we might change 
+the parameters or an experiment or the set of metrics we calculate. Each experiment and 
+analysis task operates independently of the others, relying on the meta-data store for 
+dependencies rather than direct communication. When changes are made there might be a
+loss of synchronisation between elements, for example between test data and results. 
+This issue can only be addressed by extending the project with a dependency graph for 
+capturing, and potentially orchestrating, processing pipelines.
 
-In addition to the dominant requirements of experimentation (parameter and results) we store the results
-of each experimental execution as well as the experiment duration, measured from the time of initiation
-to completion. These records are particularly important in data science and machine learning where we
-may want to trade off performance with computational requirements. But these values could be used to store
-information about real world experimtal execution, or the time required to marshal and sequence a series
-of independent web services. 
+In addition to the dominant requirements of experimentation (parameters and results) we 
+store the results of each experimental execution as well as the experiment duration, 
+measured from the time of initiation to completion. These records are particularly 
+important in data science and machine learning where we may want to trade off 
+performance with computational requirements. But these values could be used to store
+information about real world experimental execution or the time required to marshall 
+and sequence a series of independent web services. 
 
+The project utilises a notion of key asset types: dataset, experiment and results. Each
+of these can be created independently with a reference between them in a loose coupling.
+In addition, a tagging system allows these assets to be labelled with an open ended number
+of tags that cen be used when extracting or tabulating project properties.
 
 \subsection{Implementation}
 
-Projit has been implemented as python package that functions as both a command line application
-and library that can be included inside other scripts and applications. The command line application
-can be used to query the project metadata in much the same way that the git application can be used.
-A user can add, modify and list the collection of analytical assets in the project: datasets, experiments 
-parameters, tags and results are all accessible from the command line application.
+Projit has been implemented as python package that functions as both a command line 
+application and library that can be included inside other scripts and applications. 
+The command line application can be used to query the project metadata in much the 
+same way that the git application can be used to manipulate a query a set of software
+source files. A user can add, modify and list the collection of assets in the 
+project: datasets, experiments and results are all accessible from the command line 
+application.
 
-The python package can be included in a script so that the script can access the project metadata store.
-This allows the script to find the location of common datasets, register themselves as an experiment
-and store results once the script is complete. Programmatic interaction with the project data through
-the projit API is what permits the scripts of a project to be decoupled and contribute to the project
-without being aware of how any other element is structured or implemented. Furthermore, as the metadata
-is stored locally in standard JSON files, these can be stored inside a cloud repository and then contributed
-to by collaborators. This allows distributed data science teams to define their own lines of experimentation,
-but use a synchronised data set then continually contribute to a central meta-data store of project results.
-
+The python package can be included in a script so that the script can access the 
+project metadata store. This allows the script to find the location of common 
+datasets, register themselves as an experiment or execution and store results once 
+the script is complete. Programmatic interaction with the project data through
+the projit API is what permits the scripts of a project to be decoupled and 
+contribute to the project without being aware of how any other element is 
+structured or implemented. Furthermore, as the metadata
+is stored locally in standard JSON files, these can be stored inside a cloud 
+repository and then contributed to by collaborators. 
+This allows distributed data science teams to define their own lines of experimentation,
+but use a synchronised data set then continually contribute to a central meta-data 
+store of project results.
 
 \section{Case Study}
 
-We have utilised the projit application across multiple data science projects to store reusable datasets
-and the results of all experiments. Additionally, the metadata store contains infomation about the number
-of times each experiment has been executed, and the execution time utilised on each run. This allows us
-to generate an ad hoc script that can compare projects in terms of the data used, the number of experiments
-conducted and the total execution time. This script is constructed for illustrative purposes to show that
-the projit tool can permit arbitrary meta-analysis of projects through the standardised metadata stored across
-git repositories.
-
+We have utilised the projit application across multiple data science projects to store 
+reusable datasets and the results of all experiments. Additionally, the metadata store 
+contains information about the number of times each experiment has been executed, 
+and the execution time utilised on each run. This allows us to generate an ad hoc 
+script that can compare projects in terms of the data used, the number of experiments
+conducted and the total execution time. This script is constructed for illustrative 
+purposes to show that the projit tool can permit arbitrary meta-analysis of projects 
+through the standardised metadata stored across git repositories.
 
 \section{Conclusion}
 
