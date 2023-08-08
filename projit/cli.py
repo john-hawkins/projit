@@ -19,6 +19,7 @@ from .utils import write_properties
 from .projit import load as projit_load
 from .projit import init as projit_init
 from .ascii_plot import ascii_plot
+from .latex_table import print_latex
 
 from projit import __version__
 
@@ -78,7 +79,7 @@ def print_header(header):
     print(full_header)
 
 ##########################################################################################
-def task_compare(project, datasets, metric, markdown):
+def task_compare(project, datasets, metric, format):
    """
    Compare results across muliple datasets.
    This command loads the results for each dataset and extarcts just the records
@@ -103,8 +104,10 @@ def task_compare(project, datasets, metric, markdown):
        print("*** WARNINGS ***")
        print(warning)
 
-   if markdown:
+   if format == 'markdown':
         print_results_markdown(title, results)
+   elif format == 'latex':
+        print_results_latex(title, results)
    else:
         print(" ___" + title + "__________________________________[ %s ]___" % metric)
         pd.set_option('expand_frame_repr', False)
@@ -133,7 +136,7 @@ def extract_max_tags_lengths(project, asset, tags):
 
 
 ##########################################################################################
-def task_list(subcmd, project, dataset, markdown, tags):
+def task_list(subcmd, project, dataset, format, tags):
     """
     List content of a project from the command line
     """
@@ -231,9 +234,11 @@ def task_list(subcmd, project, dataset, markdown, tags):
         else:
             rez = project.get_results(dataset)
             title += " on [%s]"%dataset
-        
-        if markdown:
+ 
+        if format == 'markdown':
             print_results_markdown(title, rez)
+        elif format == 'latex':
+            print_results_latex(title, rez)
         else:
             print_header(f"__Results__[{dataset}]")
             pd.set_option('expand_frame_repr', False)
@@ -253,6 +258,17 @@ def task_render(project, path):
     """
     project.render(path)
 
+
+##########################################################################################
+
+def print_results_latex(title, df):
+    """
+    Latex output - Putting this in a central function in case we change the functionality
+     or format in the future.
+    """
+    #output = df.to_latex()
+    #print(output)
+    print_latex(df, title)
 
 ##########################################################################################
 
@@ -402,7 +418,8 @@ def print_usage(prog):
     print("   [OPTIONS]")
     print("      -v, --version          - Print version")
     print("      -h, --help             - Get command help")
-    print("      -m, --markdown         - Print out with markdown")
+    print("      -m, --markdown         - Use markdown format when printing results")
+    print("      -l, --latex            - Use LaTeX format when printing results")
     print("")
     print("   COMMON USAGE PATTERNS")
     print("   ", prog, "init 'Project name'                     # Initialise project")
@@ -443,6 +460,7 @@ def cli_main():
    parser = argparse.ArgumentParser()
    parser.add_argument('-v', '--version', help='Print Version', action='store_true')
    parser.add_argument('-m', '--markdown', help='Use markdown for output', action='store_true')
+   parser.add_argument('-l', '--latex', help='Use LaTeX for output - overrides markdown', action='store_true')
    parser.add_argument('-u', '--usage', help='Print detailed usage instructions with examples', action='store_true')
 
    subparsers = parser.add_subparsers(dest="cmd") 
@@ -516,12 +534,18 @@ def cli_main():
 
    project = projit_load(config_path)
 
+   format = 'simple'
+   if args.markdown:
+       format = 'markdown'
+   if args.latex:
+       format = 'latex'
+
    if args.cmd == 'list':
-      task_list(args.subcmd, project, args.dataset, args.markdown, args.tags)
+      task_list(args.subcmd, project, args.dataset, format, args.tags)
 
    if args.cmd == 'compare':
       datasets = args.datasets.split(",")
-      task_compare(project, datasets, args.metric, args.markdown)
+      task_compare(project, datasets, args.metric, format)
 
    if args.cmd == 'add':
       task_add(project, args.asset, args.name, args.path)
