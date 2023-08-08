@@ -79,7 +79,7 @@ def print_header(header):
     print(full_header)
 
 ##########################################################################################
-def task_compare(project, datasets, metric, format):
+def task_compare(project, datasets, metric, format, precision):
    """
    Compare results across muliple datasets.
    This command loads the results for each dataset and extarcts just the records
@@ -103,6 +103,8 @@ def task_compare(project, datasets, metric, format):
    if len(warning) > 0:
        print("*** WARNINGS ***")
        print(warning)
+
+   results = results.round(precision)
 
    if format == 'markdown':
         print_results_markdown(title, results)
@@ -136,7 +138,7 @@ def extract_max_tags_lengths(project, asset, tags):
 
 
 ##########################################################################################
-def task_list(subcmd, project, dataset, format, tags):
+def task_list(subcmd, project, dataset, format, precision, tags):
     """
     List content of a project from the command line
     """
@@ -234,6 +236,8 @@ def task_list(subcmd, project, dataset, format, tags):
         else:
             rez = project.get_results(dataset)
             title += " on [%s]"%dataset
+
+        rez = rez.round(precision)
  
         if format == 'markdown':
             print_results_markdown(title, rez)
@@ -420,6 +424,7 @@ def print_usage(prog):
     print("      -h, --help             - Get command help")
     print("      -m, --markdown         - Use markdown format when printing results")
     print("      -l, --latex            - Use LaTeX format when printing results")
+    print("      -p, --precision <N>    - Set the numerical precision to <N>")
     print("")
     print("   COMMON USAGE PATTERNS")
     print("   ", prog, "init 'Project name'                     # Initialise project")
@@ -462,6 +467,7 @@ def cli_main():
    parser.add_argument('-m', '--markdown', help='Use markdown for output', action='store_true')
    parser.add_argument('-l', '--latex', help='Use LaTeX for output - overrides markdown', action='store_true')
    parser.add_argument('-u', '--usage', help='Print detailed usage instructions with examples', action='store_true')
+   parser.add_argument('-p', '--precision', help='Define numerical precision', type=int, default=3)
 
    subparsers = parser.add_subparsers(dest="cmd") 
 
@@ -541,11 +547,11 @@ def cli_main():
        format = 'latex'
 
    if args.cmd == 'list':
-      task_list(args.subcmd, project, args.dataset, format, args.tags)
+      task_list(args.subcmd, project, args.dataset, format, args.precision, args.tags)
 
    if args.cmd == 'compare':
       datasets = args.datasets.split(",")
-      task_compare(project, datasets, args.metric, format)
+      task_compare(project, datasets, args.metric, format, args.precision)
 
    if args.cmd == 'add':
       task_add(project, args.asset, args.name, args.path)
