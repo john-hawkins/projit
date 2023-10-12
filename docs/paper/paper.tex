@@ -37,11 +37,36 @@
 %% The first command in your LaTeX source must be the \documentclass command.
 \documentclass[sigconf]{acmart}
 
-%%
-%% \BibTeX command to typeset BibTeX logo in the docs
-\AtBeginDocument{%
-  \providecommand\BibTeX{{%
-    Bib\TeX}}}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{graphics}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{anyfontsize}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+\lstset{style=mystyle}
 
 %% Rights management information.  This information is sent to you
 %% when you complete the rights form.  These commands have SAMPLE
@@ -144,24 +169,28 @@ by making it difficult to reproduce work, or imposing the costs of repeatedly te
 failed lines of experimentation. This cost becomes particularly high in the age of the
 reproducibility crisis where many teams are running the same experiments in parallel, without
 knowledge of each others work, and producing a factory line of un-reproducible results 
-\cite{Ioannidis2005}.
- 
-Many Machine Learning experimentation frameworks focus on the task of making experiments
-easier to execute and deploy into production systems\cite{Alberti:2018,MolnerDomenech:2020}. 
-To do so they are often constructed for specific combinations of technology. 
-This is often necessary limitation to either make a project feasible or enable efficiency, 
-but it has the side-effect of limiting general applicability.
-Many other eScience frameworks focus on the lineage and management of data, referred to as 
-the so-called provenance problem \cite{Sahoo:2008,Conquest:2021}.
-The goal of the provenance frameworks is sufficient auditibiliy of data that will 
+\cite{Ioannidis2005}. This cost is compounded by the problems of increasingly 'Big Data' 
+based science, where the logistics of maintaining and tracking data sets is challenging.
+While big data may offer many opportunities cross-disciplinary and algorithmic science\cite{Schmitt2015}, 
+there is a strong concern that this will be limited\cite{Succi2019}, 
+and that the core scientific tasks of conceiving,
+designing and running experiments needs to be managed at an ever increasing scale.
+
+Platforms for eScience offer a variety of solutions for these problems including  
+tracking the lineage and management of data, referred to as 
+the provenance problem \cite{Sahoo:2008,Conquest:2021}.
+The goal of provenance frameworks is sufficient auditibiliy of data that will 
 render eScience transparent and repeatable. This can be auditing of data from multiple 
 source systems, or auditing of logs generated during data processing\cite{Ferdous2020}. 
 At the extreme we can seek to quantify every transformation that happens to data in 
 the course of processing\cite{Sahoo2009}. Regardless of the
 specific data to be audited, these frameworks focus on developing unified systems and 
-processes so that auditing can be easily performed over many projects.
+processes so that auditing can be easily performed over many projects. It has been 
+argued that tracking meta-data is critical for the endeavour of large scale open and auditable 
+science\cite{Reznik2022}. It is only through meta-data that we are able to build frameworks
+that can understand and assist the scientific process.
 
-In addition to systems for storage of data, eScience application may include facilities
+In addition to systems for tracking data, eScience application may include facilities
 for orchestration of data processes and external services\cite{Subramanian2013}, 
 requests for experiments with specific parameters\cite{Hunter:2005}, 
 or integrated analysis of results, generation of insights and documentation. 
@@ -185,20 +214,13 @@ frameworks\cite{Alberti:2018,MolnerDomenech:2020}. Similarly, other empirical
 science platforms are built on specific database, webservers or application
 frameworks, which make them less extensible and harder to integrate.
 
-In this work we argue for development of data science frameworks that impose minimal 
-requirements, both in terms of appplication domains and underlying technologies. 
-We present a design framework for building decoupled data science tools that can 
-improve efficiency and replication through standardisation, without
-unreasonable impositions on design decisions. We describe the design of a open 
-source project integration tool (\textit{projit}) that can be used either as a 
-Command Line Application (CLI) or python API. Internally \textit{projit} depends 
-only on a metadata store that uses the general purpose JSON format. 
-As such it is trivial for developers to build interfaces in other
-languages, or devise web service APIs for decentralised versions. We explore a 
-case study of comparing results across multiple projects for which we have used 
-the \textit{projit} application to manage our metadata.
-
-\section{Methodology}
+Many Machine Learning experimentation frameworks focus on the task of making experiments
+easier to execute and deploy into production systems\cite{Alberti:2018,MolnerDomenech:2020}.
+To do so they are often constructed for specific combinations of technology.
+This is often necessary limitation to either make a project feasible or enable efficiency,
+but it has the side-effect of limiting general applicability. An ideal data science
+framework would allow open ended experimentation, with an ability for easy tracking
+and comparison of these experiments.
 
 \begin{figure*}
 \includegraphics[scale=0.6]{./Projit_decoupled_process.drawio.png}
@@ -206,7 +228,23 @@ the \textit{projit} application to manage our metadata.
 \label{fig:projit}
 \end{figure*}
 
-We begin by discussing all desirable elements required of an open science framework. 
+In this work we argue for the development of data science frameworks that impose minimal 
+requirements, both in terms of appplication domains and underlying technologies. 
+We present a design framework for building decoupled data science tools that can 
+improve efficiency and replication through standardisation, without
+unreasonable impositions on design decisions. We describe the design of a open 
+source meta-data tracking project integration tool (\textit{projit}) that can be used either as a 
+Command Line Application (CLI) or python API. Internally \textit{projit} depends 
+only on a simple metadata store that uses the general purpose JSON format. 
+As such it is trivial for developers to build interfaces in other
+languages, or devise web service APIs for decentralised versions. We explore a 
+case study for analysing a project for which we have used 
+the \textit{projit} application to manage our experiment metadata.
+
+
+\section{Methodology}
+
+We begin by discussing the desirable features of an open science framework. 
 These are drawn from observations of both how collaborative science works and the 
 successful components of distributed scientific endeavours. These requirements are 
 drawn from both sciences that are typically dependent on computational frameworks 
@@ -296,6 +334,12 @@ source files. A user can add, modify and list the collection of assets in the
 project: datasets, experiments and results are all accessible from the command line 
 application.
 
+\begin{lstlisting}[language=BASH,label={code:install}, caption=Installation and Invocation of Projit CLI]
+pip install projit
+
+projit init "Test Project"
+\end{lstlisting}
+
 The python package can be included in a script so that the script can access the 
 project metadata store. This allows the script to find the location of common 
 datasets, register themselves as an experiment or execution and store results once 
@@ -309,21 +353,89 @@ This allows distributed data science teams to define their own lines of experime
 but use a synchronised data set then continually contribute to a central meta-data 
 store of project results.
 
+\begin{lstlisting}[language=Python,label={code:usage}, caption=Usage of Projit Python Library]
+import projit as pit
+
+experiment_name = "My Experiment"
+project = pit.projit_load()
+exec_id = project.start_experiment(experiment_name, sys.argv[0], params={})
+#
+# EXPERIMENT EXECUTION CODE 
+#
+project.end_experiment(experiment_name, exec_id)
+\end{lstlisting}
+
+
 \section{Case Study}
 
 We have utilised the projit application across multiple data science projects to store 
-reusable datasets and the results of all experiments. Additionally, the metadata store 
+references to reusable datasets and experimental resultss. Additionally, the metadata store 
 contains information about the number of times each experiment has been executed, 
-and the execution time utilised on each run. This allows us to generate an ad hoc 
-script that can compare projects in terms of the data used, the number of experiments
-conducted and the total execution time. This script is constructed for illustrative 
-purposes to show that the projit tool can permit arbitrary meta-analysis of projects 
-through the standardised metadata stored across git repositories.
+and the execution time utilised on each run. This allows us to conduct an after-the-fact
+investigation into these projects. In this section we demonstrate how some details of these
+projects can be revealed through the project meta-data.
+
+\subsection{Systematic Review with Machine Learning}
+
+In a recent paper we explored the use of machine learning algorithms for filtering a initial
+set of article abstracts as part of a systematic review\cite{HawkinsTivey2023}. 
+The resulting paper focused on four
+different machine learning strategies, the first of which were standard machine learning techniques
+trained on simple features, such as the age of the article, the number of authors, the number of 
+matching keywords in the abstract etc. The presentation of results in this paper created the impression
+that all of these baseline models were executed in the first round of experimentation. By querying
+the \emph{projit} meta-data store to fine the first execution time of each experiment, we created
+Table \ref{tab:execs}, which shows that he Naive Bayes and SVM models were in fact executed last. 
+
+\begin{table}
+\caption{Experiment Executions}
+\label{tab:execs}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{|l|r|r|}
+\toprule
+Experiment            &Execution Count    &First Execution     \\
+\midrule
+Dataset Size         &1                   &2   \\
+Variables            &11                  &1      \\
+Outlier Proportion   &2                   &0  \\
+Std Multiplier       &6                   &     \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+In our case this was because extended literature reviews indicated that many people working on this
+problem previously tended to rely on one of these two techniques. It was decided that we should include
+them in our baselines, as a reasonable reviewer response would be to ask why we did not include these
+models for comparison (given their prevalance in the literature). An ability to query meta-data about
+experimentation, can reveal clues as to the way a piece of research was conducted, and raise valuable
+questions that might be needed to detect suspicious activity.
+
+
 
 \section{Conclusion}
+ 
+Modern science has faced multiple problems with repeatability, credibility and feasibility. The problems
+we want to solve require more and more large scale digital assets and technologies, and we require methods 
+for tracking and managing this growing complexity. These problems exist in academic science and in industry
+practices like data science, where organisations are investing to create reusable technologies and 
+competitive advantages. 
+
+We have argued for a decoupled approach to building eScience tools. One that draws inspiration from the Unix
+philosophy of make simple interoperable tools. This approach will allow us to create an open and easily 
+adaptable set of tools that can support many kinds of scientific projects. 
+
+We have implemented a simple meta-data management tool using these ideas and released it as an open source 
+library and python package. The \emph{projit} tool can be used to track datasets, experiments and results
+for any project that uses algorithms or scripting.
+
+Finally, we provided a simple example of using this meta-data to query the experimental details behind one
+of our previous research projects. Highlighting how \emph{projit} can be used to audit a project and identify
+the experimental realities behind a set of results. 
 
 
 \section{Acknowledgments}
+
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{refs}
