@@ -1,6 +1,13 @@
-Projit: An Open Source Tool for Data Science Project Management
+Projit: An Open Source Python Tool for Decoupled Data Science
 
-Data science projects often require multiple rounds of experimentation that involves careful discipline to prevent problems like over-fitting or p-hacking. Data science projects require management of data, models and results, but the management process needs to be flexible enough to enable rapid and agile experimentation. In this talk we will introduce 'projit,' an open source utility for managing data projects through loose coupling of components in a Git style command line interface.
+Data science projects occupy an unsual space between coding/hacking and methodologically rigorous experimentation. They require careful discipline to prevent problems like target leakage, over-fitting or p-hacking. Typically, data scientists use custom workflows, or proprietary cloud systems to automate and standardise certain elements like management of data sets, scripts, model artefacts and results. The result is a general absence of both standardisation and easy migration of processes for flexible and repeatable data science work.
+
+In this talk we will outline a light weight open source python package that can be used to manage project meta-data in a way that allows easy sharing, migration and collaboration for data scientists working in the python ecosystem. We will discuss some of the design principles, inspired by a combination of the UNIX command line and the git source control utility. We will then demonstrate basic usage of the package with examples from scientific research papers it has been used for.
+
+https://pypi.org/project/projit/
+ 
+
+The Data science  management process needs to be flexible enough to enable rapid and agile experimentation. In this talk we will introduce 'projit,' an open source utility for managing data projects through loose coupling of components in a Git style command line interface.
 
 Projit allows you to register data sets, access them in your experiments through the projit package. You then programmatically register the experiments with an arbitrary list of results and hyper-parameters for each experimental run. All data is stored in a central meta-data repository. This repository can be queried with the command line utility and committed into a git repository such that it stores the meta-data history of your project.
 
