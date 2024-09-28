@@ -15,10 +15,8 @@ jobs:
           # This should be the path to the paper within your repo.
           paper-path: docs/paper/joss.md
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: paper
-          # This is the output path where Pandoc will write the compiled
-          # PDF. Note, this should be the same directory as the input
-          # paper.md
-          path: "docs/paper/joss.pdf"
+          if-no-files-found: error 
+          path: ${{ github.workspace }}/docs/paper/*.pdf
