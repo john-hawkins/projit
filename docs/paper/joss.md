@@ -15,7 +15,7 @@ affiliations:
  - name: Transitional AI Research Group, Australia
    index: 1
 date: 27 Sep 2024
-bibliography: paper.bib
+bibliography: refs.bib
 
 ---
 
