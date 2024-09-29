@@ -42,35 +42,36 @@ and processes. https://github.com/john-hawkins/projit
 Software approaches to managing scientific data, processes and meta-data are 
 typically either built as front-ends for specific 
 scientific domains [@Howe2008;@Pettit:2010] 
-or they are designed to faciliate interoperability between different 
-technology stacks [@Subramanian2013]. Machine learning focused frameworks tend to 
-focus on solving problems of model training and deployment for specific 
-technologies [@Alberti:2018;@MolnerDomenech:2020], and hence have limited generality.
+or they are designed to facilitate interoperability between different 
+technology stacks [@Subramanian2013]. Machine learning project frameworks tend 
+to solve problems of model training and deployment for specific 
+technologies [@Alberti:2018;@MolnerDomenech:2020], and hence have limited 
+application for general data science work.
 
 `Projit` is a Python package for managing data science project meta-data
 inside a simple local JSON store. It provides a CLI tool for
-interrogating this data so that the current state of a project can easily
+interrogating this data so that the project can easily
 be assessed and understood. The API for `projit` was
-designed so that it can be included in arbitrary python scripts to
+designed so that the package can be included in python scripts to
 locate datasets, register experiments and store results along
 with hyper-parameters. 
 
 The `projit` datastore is light-weight so it can be saved
 with code inside a source code repository. Allowing future users to
-interrogate the experiment history of project. This is useful for both
+interrogate the experiment history of a project. This is useful for
 project continuation, auditing/repeatability and opening the possibility
 of scripted meta-data analysis. The `projit` package has been
 used in a number of scientific publications to manage the results of 
-machine learning experiments into systematic reviews for biomedical
-projects [@Hawkins+Tivey:2024] and the analysis of text features derived 
-from URLS [@Hawkins:2023]. In addition, `projit` has been used by the author
-inside multiple industry based proprietary machine learning projects.
+machine learning experiments into biomedical literature reviews
+[@Hawkins+Tivey:2024] and the analysis of text features derived 
+from URLS [@Hawkins:2023]. In addition, `projit` has been used by 
+inside multiple commercial machine learning projects.
 
 # Methodology
 
 The core design principle of projit is that data science projects should 
-be structured as loosely coupled components. Meaning, dependency is inevitable,
-but it should be kept to an absolute minimum.
+be structured as loosely coupled components, with shared meta-data. 
+Some dependency is inevitable, but it should be kept to an absolute minimum.
 For example, experiments depend on a data processing
 pipeline, but do not need to depend on anything but the output of that process.
 Experiments should be able to be executed in parallel, so that they can be
@@ -95,7 +96,7 @@ other open source projects.
 
 ## Project Structure
 
-There is an optional setting that allows users to determine a standard project structure.
+Configuration  allows users to determine a standard project structure.
 This option will initialise any project with a predetermined set of directories and
 files. We draw upon the principle used in the Cookie Cutter Data Science project when
 implementing these project structures [@cookiecutter].
@@ -116,7 +117,7 @@ entities, as shown in the command below:
 ```
 
 The same principle applies to the remove and add commands, which naturally require
-additional paramaters to specifiy what is being added or removed. The design goal 
+additional parameters to specify what is being added or removed. The design goal 
 of the CLI is to make projit intuitive without imposing arbitrary constraints.
 
 # Research Applications
