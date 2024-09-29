@@ -1,7 +1,7 @@
 # Projit
 ### Project Integrator for Decoupled Data Science
-
-> Status: **Beta** Functional.
+ 
+> Status: Functional Release - Active Feature Development
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests](https://github.com/john-hawkins/projit/actions/workflows/python-package.yml/badge.svg)](https://github.com/john-hawkins/projit/actions/workflows/python-package.yml)
