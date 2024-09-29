@@ -1,5 +1,5 @@
 ---
-title: 'Projit: A Python Package and CLI for Data Science Project Management'
+title: 'Projit: An Open Source tool for Decoupled Data Science'
 tags:
   - Python
   - data science
@@ -29,17 +29,26 @@ data scientists use custom workflows, or proprietary cloud systems to automate a
 standardise certain elements like management of data sets, scripts, model artefacts 
 and experimental results. The general absence of standardisation means that we cannot
 easily migrate projects or audit them without significant investment in understanding
-a codebase. Nor can we easily repeat experiments or conduct meta-analysis across 
-multiple projects.
+a codebase, nor can we easily repeat experiments or conduct meta-analysis across 
+multiple projects. We present `projit` -- a simple open source package and CLI
+for maintaining data science project meta-data and interoperability between stages
+and processes.
 
 
 # Statement of need
+
+Software approaches to managing scientific data, processes and meta-data are 
+typically either built as front-ends for specific 
+scientific domains @[Howe2008,Pettit:2010] (leveraging known analytical practices in
+the given domain) or they are designed to faciliate interoperability between different 
+technology stacks @[Subramanian2013]. Machine learning focused frameworks tend to 
+focus on solving problems of model training and deployment for specific technologies\cite@[Alberti:2018,MolnerDomenech:2020], and hence have limited generality.
 
 `Projit` is a Python package for managing data science project meta-data
 inside a simple local JSON store. It also provides a CLI tool for
 interogating this data so that the current state of a project can easily
 be assessed and understood. The API for `projit` was
-designed so that it can be included in arbitrary python scripts to access
+designed so that it can be included in arbitrary python scripts to
 locate datasets, register experiments and store results along
 with hyper-parameters. 
 
@@ -47,7 +56,7 @@ The `projit` datastore is light-weight enough that it can easily be stored
 with code inside a source code repository. Meaning that future users can
 interogate the experiment history of the project. This is useful for both
 project continuation, auditing/repeatability and opening the possibility
-of scripted meta-data analysis. It has already been
+of scripted meta-data analysis. The package has been
 used in a number of scientific publications to manage the results of 
 machine learning experiments into systematic reviews for biomedical
 projects [@Hawkins+Tivey:2024] and the analysis of text features derived 
@@ -68,9 +77,10 @@ generate standardised result sets for comparison.
 To facilitate loose coupling between stages of the project the `projit` utility
 imposes a simple schema for components of a data science project. These consist
 of:
-* Datasets
-* Experiments
-* Results
+- Datasets
+- Experiments
+- Results
+
 All of these entities can be added, removed or modified using either the CLI tool
 or the Python package within scripts. The relation of these components is depicted
 in Figure \autoref{fig:projit}
@@ -93,15 +103,20 @@ In order to make the CLI interface easy to use we borrowed multiple ideas from t
 design of the Git CLI [@git]. Firstly, any command will recursively search from the
 current directory to discover the current project. This means users can run commands
 from anywhere inside the project without tracking the location of the root directory.
-Secondly, we develop a sub-command structure that provides
-something close to a natural language interface. For example, the primary commands 
-`list` or `rm` can be applied to any of the `projit` entities, as shown in the code
-listing below:
+Secondly, we develop a sub-command structure that allows the `'projit` CLI to be
+a versatile tool with something close to a natural language interface.
+For example, the primary command `list` can be applied to any of the `projit` 
+entities, as shown in the code listing below:
 
 ```
 projit list datasets
 projit list experiments
+projit list results
 ```
+
+The same principle applies to the remove and add commands, which naturally require
+additional paramaters to specifiy what is being added or removed. The design goal 
+of the CLI is to make project intuitive without imposing arbitrary constraints.
 
 # Research Applications
 
