@@ -21,9 +21,11 @@ bibliography: refs.bib
 
 # Summary
 
-Data science projects occupy an unsual space between fast scripting, software development,
-and methodologically rigorous experimentation. They require careful discipline to 
-prevent subtle problems like target leakage, over-fitting or p-hacking. At the same time
+Data science projects occupy an unsual space between rapid scripting, 
+software development, and methodologically rigorous experimentation. 
+They require careful discipline to 
+prevent subtle problems like target leakage, over-fitting or p-hacking. 
+At the same time
 they cannot deliver results if they are locked down by rigid frameworks. Typically, 
 data scientists use custom workflows, or proprietary cloud systems to automate and 
 standardise certain elements like management of data sets, scripts, model artefacts 
@@ -39,14 +41,15 @@ and processes.
 
 Software approaches to managing scientific data, processes and meta-data are 
 typically either built as front-ends for specific 
-scientific domains @[Howe2008,Pettit:2010] (leveraging known analytical practices in
+scientific domains [@Howe2008;Pettit:2010] (leveraging known analytical practices in
 the given domain) or they are designed to faciliate interoperability between different 
-technology stacks @[Subramanian2013]. Machine learning focused frameworks tend to 
-focus on solving problems of model training and deployment for specific technologies\cite@[Alberti:2018,MolnerDomenech:2020], and hence have limited generality.
+technology stacks [@Subramanian2013]. Machine learning focused frameworks tend to 
+focus on solving problems of model training and deployment for specific 
+technologies\cite[@Alberti:2018;MolnerDomenech:2020], and hence have limited generality.
 
 `Projit` is a Python package for managing data science project meta-data
 inside a simple local JSON store. It also provides a CLI tool for
-interogating this data so that the current state of a project can easily
+interrogating this data so that the current state of a project can easily
 be assessed and understood. The API for `projit` was
 designed so that it can be included in arbitrary python scripts to
 locate datasets, register experiments and store results along
@@ -54,7 +57,7 @@ with hyper-parameters.
 
 The `projit` datastore is light-weight enough that it can easily be stored
 with code inside a source code repository. Meaning that future users can
-interogate the experiment history of the project. This is useful for both
+interrogate the experiment history of the project. This is useful for both
 project continuation, auditing/repeatability and opening the possibility
 of scripted meta-data analysis. The package has been
 used in a number of scientific publications to manage the results of 
@@ -121,12 +124,14 @@ of the CLI is to make project intuitive without imposing arbitrary constraints.
 # Research Applications
 
 The fundamental research application of `projit` is in managing the project lifecycle
-and efficiency of development. Results to all experiments can be tracked and interrogated
-to easily produce tables of data. An additional level of application comes with a focus
-on open science, allowing other teams to review and audit experiment history, then 
-easily repeat or extend experiments. Finally, there is a research application in meta-analysis.
+and efficiency of development. Results to all experiments can be tracked and 
+interrogated to easily produce tables of data. 
+An additional level of application comes with a focus
+on open science, allowing other teams to review and audit experiment history, 
+then easily repeat or extend experiments. 
+Finally, there is a research application in meta-analysis.
 Projects in which the projit meta-data are stored along with open source code can 
-be interoggated to look at the performance of certain techniques or algorithms across
+be interrogated to look at the performance of certain techniques or algorithms across
 multiple projects.  
 
 # Acknowledgements
