@@ -34,7 +34,7 @@ easily migrate projects or audit them without significant investment in understa
 a codebase, nor can we easily repeat experiments or conduct meta-analysis across 
 multiple projects. We present `projit` -- a simple open source package and CLI
 for maintaining data science project meta-data and interoperability between stages
-and processes.
+and processes. https://github.com/john-hawkins/projit
 
 
 # Statement of need
