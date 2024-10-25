@@ -100,6 +100,17 @@ Results on [test]
 | mytest     | 11230.46 |  13.46 |
 | mytest2    |      nan |  15.86 |
 
+# Code Tests
+
+We have written package tests with PyTest.
+These are automatically executed with a Github action upon commit to the main
+branch. The can also be run locally using the command:
+```
+pytest
+```
+Note: That we maintain the file (requirements.txt)[requirements.txt] so that 
+any additional libraries required for testing can be installed independently
+from a package install. 
 
 # Acknowledgements
 
