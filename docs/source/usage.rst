@@ -95,10 +95,11 @@ This can also be done inside the experiment script itself:
     project = pit.projit_load()
     project.add_experiment("Initial Exp", "experiments/exp_one.py")
 
-```
-Note: The path to the experiment should be relative to the root directory.
-TODO: Automate the resolution of these paths.
-```
+
+.. note::
+    The path to the experiment should be relative to the root directory.
+    TODO: Automate the resolution of these paths.
+
 You can modify an experiment by simply adding it again. This will overwrite any previous path.
 
 You can remove an experiment with the 'rm' command
