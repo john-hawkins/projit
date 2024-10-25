@@ -108,8 +108,8 @@ branch. The can also be run locally using the command:
 ```
 pytest
 ```
-Note: That we maintain the file (requirements.txt)[requirements.txt] so that 
-any additional libraries required for testing can be installed independently
+Note: That we maintain the separate dependency file [requirements.txt](requirements.txt)
+so that any additional libraries required for testing can be installed independently
 from a package install. 
 
 # Acknowledgements
