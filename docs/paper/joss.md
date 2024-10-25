@@ -57,11 +57,11 @@ locate datasets, register experiments and store results along
 with hyper-parameters. 
 
 The `projit` datastore is light-weight so it can be saved
-with code inside a source code repository. Allowing future users to
+with code inside a source code repository, allowing future users to
 interrogate the experiment history of a project. This is useful for
 project continuation, auditing/repeatability and opening the possibility
-of scripted meta-data analysis. The `projit` package has been
-used in a number of scientific publications to manage the results of 
+of scripted meta-data analysis. The authors have used the `projit` package
+in multiple published research projects to manage the results of 
 machine learning experiments into biomedical literature reviews
 [@Hawkins+Tivey:2024] and the analysis of text features derived 
 from URLS [@Hawkins:2023]. In addition, `projit` has been used by 
@@ -69,7 +69,7 @@ inside multiple commercial machine learning projects.
 
 # Methodology
 
-The core design principle of projit is that data science projects should 
+The core design principle of `projit` is that data science projects should 
 be structured as loosely coupled components, with shared meta-data. 
 Some dependency is inevitable, but it should be kept to an absolute minimum.
 For example, experiments depend on a data processing
@@ -92,14 +92,16 @@ in Figure \autoref{fig:projit}
 ![Projit Application Entities.\label{fig:projit}](images/Projit_decoupled_process.drawio.png)
 
 In the development of `projit` we have drawn on additional design principles from
-other open source projects. 
+other open source projects, including the Git CLI [@git] and Cookie Cutter Data Science
+[@cookiecutter], discussed in the sections below.
 
 ## Project Structure
 
-Configuration  allows users to determine a standard project structure.
+Configuration allows users to determine a standard project structure.
 This option will initialise any project with a predetermined set of directories and
 files. We draw upon the principle used in the Cookie Cutter Data Science project when
-implementing these project structures [@cookiecutter].
+implementing these project structures [@cookiecutter]. However, rather than be prescriptive
+on project structure we allow it to be customised through configuration.
 
 ## Natural Language Sub Command CLI
 
@@ -107,7 +109,7 @@ In order to make the CLI interface easy to use we borrowed multiple ideas from t
 design of the Git CLI [@git]. Firstly, any command will recursively search from the
 current directory to discover the current project. This means users can run commands
 from anywhere inside the project without tracking the location of the root directory.
-Secondly, we develop a sub-command structure that allows the `'projit` CLI to be
+Secondly, we develop a sub-command structure that allows the `projit` CLI to be
 a versatile tool with something close to a natural language interface.
 For example, the primary command `list` can be applied to any of the `projit` 
 entities, as shown in the command below:
@@ -118,7 +120,7 @@ entities, as shown in the command below:
 
 The same principle applies to the remove and add commands, which naturally require
 additional parameters to specify what is being added or removed. The design goal 
-of the CLI is to make projit intuitive without imposing arbitrary constraints.
+of the CLI is to make `projit` intuitive without imposing arbitrary constraints.
 
 # Research Applications
 
@@ -131,13 +133,13 @@ Additional application comes with a focus
 on open science, allowing other teams to review and audit experiment history, 
 then easily repeat or extend experiments. 
 Finally, there is a research application in meta-analysis.
-Projects in which the projit meta-data are stored along with open source code can 
+Projects in which the `projit` meta-data are stored along with open source code can 
 be analysed to look at the performance of certain techniques or algorithms across
 multiple projects.  
 
 # Acknowledgements
 
 We acknowledge contributions from Jesse Wu and Priyabrata Karmakar 
-in testing or reviewing the functionality and codebase of projit.
+in testing or reviewing the functionality and codebase of `projit`.
 
 # References
