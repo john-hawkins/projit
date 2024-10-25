@@ -12,3 +12,9 @@ retrieve the project properties from an existing projit project.
 
 You can then use the project object to add or modify the datasets, experiments and results.
 
+
+.. autosummary::
+   :toctree: generated
+
+   projit
+
