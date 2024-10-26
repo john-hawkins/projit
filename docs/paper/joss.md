@@ -87,9 +87,14 @@ of:
 
 All of these entities can be added, removed or modified using either the CLI tool
 or the Python package within scripts. These entities in a project are depicted
-in Figure \autoref{fig:projit}
+in Figure \autoref{fig:projit}. On the right hand side of the figure you see the
+common sequence of critical stages in standard data science (or data mining) 
+workflow models like the CRISP-DM[@crisp]. 
+Each of these stages depends on previous steps, but use of a meta-data
+repository facilitates loose coupling between them. On the left hand side we depict
+additional meta-analysis that can be performed across multiple meta-data stores.
 
-![Projit Application Entities.\label{fig:projit}](images/Projit_decoupled_process.drawio.png)
+![Projit Application Entities.\label{fig:projit}](images/Projit_decoupled_process_v2.drawio.png)
 
 In the development of `projit` we have drawn on additional design principles from
 other open source projects, including the Git CLI [@git] and Cookie Cutter Data Science
