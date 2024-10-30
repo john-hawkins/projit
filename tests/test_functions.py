@@ -16,6 +16,10 @@ from projit.projit import projit_load
 
 #################################################################
 def test_walk():
+    """
+    In this test we ensure that the walk function can traverse a 
+     directory structure as expected.
+    """
     gena = walk_up("./tests")
     path, dirs, files = gena.__next__()
     assert len(dirs) == 1 # pytest will create a __pycache__ folder
@@ -26,10 +30,17 @@ def test_walk():
 
 #################################################################
 def test_locate_projit_config():
+    """
+    In this test we ensure that a config file is not found when 
+     one does not exist
+    """
     assert locate_projit_config() == ""
 
 #################################################################
 def test_projit_init():
+    """
+    In this test we ensure that we can inialise a project properly
+    """
     if path.isdir(config_folder):
         shutil.rmtree(config_folder)
     initialise_project("TEST", "TEST")
@@ -41,6 +52,9 @@ def test_projit_init():
 
 #################################################################
 def test_projit_update():
+    """
+    In this test we ensure that we can update the project properties
+    """
     if path.isdir(config_folder):
         shutil.rmtree(config_folder)
     initialise_project("TEST", "TEST")
@@ -56,6 +70,9 @@ def test_projit_update():
 
 #################################################################
 def test_projit_init_v2():
+    """
+    Second test on project initialisation
+    """
     testdir = "temp_test_dir_xyz"
     os.mkdir(testdir)
     os.chdir(testdir)
@@ -79,6 +96,9 @@ def test_projit_json_load():
 
 #################################################################
 def test_projit_load():
+    """
+    In this test we ensure that we load the project file data
+    """
     testdir = "temp_test_dir_xyz"
     os.mkdir(testdir)
     os.chdir(testdir)
@@ -95,6 +115,10 @@ def test_projit_load():
 
 #################################################################
 def test_template_results():
+    """
+    In this test we ensure that the project initialisation process 
+     will create the right directory in a default setup.
+    """
     testdir = "temp_test_dir_xyz"
     os.mkdir(testdir)
     os.chdir(testdir)
@@ -106,6 +130,9 @@ def test_template_results():
 
 #################################################################
 def test_project_update():
+    """
+    In this test we ensure that we can update the project properties
+    """
     testdir = "temp_test_dir_xyz"
     os.mkdir(testdir)
     os.chdir(testdir)
@@ -119,6 +146,10 @@ def test_project_update():
 
 #################################################################
 def test_project_update_lock():
+    """
+    In this test we ensure that the lock mechanism for upating project
+     details works correctly.
+    """
     testdir = "temp_test_dir_xyz"
     os.mkdir(testdir)
     os.chdir(testdir)
@@ -136,6 +167,9 @@ def test_project_update_lock():
 
 #################################################################
 def test_dataset_add_remove():
+    """
+    In this test we ensure that the remove functions work for datasets
+    """
     testdir = "temp_test_dir_xyz"
     os.mkdir(testdir)
     os.chdir(testdir)
@@ -149,6 +183,10 @@ def test_dataset_add_remove():
 
 #################################################################
 def test_dataset_add_remove_all():
+    """
+    In this test we ensure that remove with wildcard will remove
+     all datasets 
+    """
     testdir = "temp_test_dir_xyz"
     os.mkdir(testdir)
     os.chdir(testdir)
@@ -164,6 +202,10 @@ def test_dataset_add_remove_all():
 
 #################################################################
 def test_experiment_results():
+    """
+    In this test we ensure that retrieving results of experiments
+     returns the right data structure.
+    """
     testdir = "temp_test_dir_xyz"
     os.mkdir(testdir)
     os.chdir(testdir)
@@ -179,6 +221,9 @@ def test_experiment_results():
 
 #################################################################
 def test_experiment_remove():
+    """
+    In this test we ensure that the remove functions work for experiments
+    """
     testdir = "temp_test_dir_xyz"
     os.mkdir(testdir)
     os.chdir(testdir)
@@ -194,6 +239,10 @@ def test_experiment_remove():
 
 #################################################################
 def test_experiment_remove_all():
+    """
+    In this test we ensure that remove with wildcard will remove
+     all experiments and results 
+    """
     testdir = "temp_test_dir_xyz"
     os.mkdir(testdir)
     os.chdir(testdir)
@@ -289,6 +338,9 @@ def test_experiment_executions_incomplete():
 
 #################################################################
 def test_project_params():
+    """
+    Test that we can set and retrieve project parameters
+    """
     testdir = "temp_test_dir_xyz"
     os.mkdir(testdir)
     os.chdir(testdir)
@@ -301,6 +353,9 @@ def test_project_params():
 
 #################################################################
 def test_project_hyperparams():
+    """
+    Test that we can set and retrieve hyperparameters for experiments
+    """
     testdir = "temp_test_dir_xyz"
     os.mkdir(testdir)
     os.chdir(testdir)
@@ -318,6 +373,9 @@ def test_project_hyperparams():
 #################################################################
 
 def test_project_experiment_results():
+    """
+    Test that experimental results are retrieved correctly.
+    """
     testdir = "temp_test_dir_xyz"
     os.mkdir(testdir)
     os.chdir(testdir)
@@ -349,3 +407,4 @@ def test_project_experiment_results():
 
     os.chdir("../")
     shutil.rmtree(testdir)
+
