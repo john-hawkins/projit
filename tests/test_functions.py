@@ -214,25 +214,77 @@ def test_experiment_remove_all():
 
 
 #################################################################
-#def test_experiment_executions():
-#    testdir = "temp_test_dir_xyz"
-#    os.mkdir(testdir)
-#    os.chdir(testdir)
-#    project = proj.init("default", "test execution", "execution test")
-#    exec_id = project.start_experiment("Initial Exp", "experiments/exp_one.py", params={})
-#    time.sleep(2)
-#    project.end_experiment("Initial Exp", exec_id, hyperparams={})
-#    exec_id = project.start_experiment("Initial Exp", "experiments/exp_one.py", params={})
-#    time.sleep(6)
-#    project.end_experiment("Initial Exp", exec_id, hyperparams={})
-#    #Start an additioning hanging execution - ensure it is excluded from stats
-#    exec_id = project.start_experiment("Initial Exp", "experiments/exp_one.py", params={})
-#    execs, mean_time = project.get_experiment_execution_stats("Initial Exp")
-#    assert execs == 2
-#    assert mean_time == pytest.approx(4, 1.0)
-#    os.chdir("../") 
-#    shutil.rmtree(testdir)
+def test_experiment_executions_zero():
+    """
+    In this test we ensure that an experiment without registered executions
+     is reported as zero.
+    """
+    testdir = "temp_test_dir_xyz"
+    os.mkdir(testdir)
+    os.chdir(testdir)
+    project = proj.init("default", "exp", "exp test")
+    project.add_experiment("test",  "pathtofile")
+    execs, mean_time = project.get_experiment_execution_stats("test")
+    assert execs == 0
+    os.chdir("../")
+    shutil.rmtree(testdir)
 
+#################################################################
+def test_experiment_executions_one():
+    """
+    In this test we ensure that a single execution is counted.
+    """
+    testdir = "temp_test_dir_xyz"
+    os.mkdir(testdir)
+    os.chdir(testdir)
+    project = proj.init("default", "exp", "exp test")
+    project.add_experiment("test",  "pathtofile")
+    exec_id = project.start_experiment("test", "pathtofile", params={})
+    project.end_experiment("test", exec_id, hyperparams={})
+    execs, mean_time = project.get_experiment_execution_stats("test")
+    assert execs == 1
+    os.chdir("../")
+    shutil.rmtree(testdir)
+
+#################################################################
+def test_experiment_executions_two():
+    """
+    In this test we ensure that multiple executions are counted.
+    """
+    testdir = "temp_test_dir_xyz"
+    os.mkdir(testdir)
+    os.chdir(testdir)
+    project = proj.init("default", "exp", "exp test")
+    project.add_experiment("test",  "pathtofile")
+    exec_id = project.start_experiment("test", "pathtofile", params={})
+    project.end_experiment("test", exec_id, hyperparams={})
+    exec_id = project.start_experiment("test", "pathtofile", params={})
+    project.end_experiment("test", exec_id, hyperparams={})
+    execs, mean_time = project.get_experiment_execution_stats("test")
+    assert execs == 2
+    os.chdir("../")
+    shutil.rmtree(testdir)
+
+#################################################################
+def test_experiment_executions_incomplete():
+    """
+    In this test we ensure that incomplete executions are not included
+       in the statistics reported about the experiment.
+    """
+    testdir = "temp_test_dir_xyz"
+    os.mkdir(testdir)
+    os.chdir(testdir)
+    project = proj.init("default", "exp", "exp test")
+    project.add_experiment("test",  "pathtofile")
+    exec_id = project.start_experiment("test", "pathtofile", params={})
+    project.end_experiment("test", exec_id, hyperparams={})
+    exec_id = project.start_experiment("test", "pathtofile", params={})
+    project.end_experiment("test", exec_id, hyperparams={})
+    exec_id = project.start_experiment("test", "pathtofile", params={})
+    execs, mean_time = project.get_experiment_execution_stats("test")
+    assert execs == 2
+    os.chdir("../")
+    shutil.rmtree(testdir)
 
 
 #################################################################
