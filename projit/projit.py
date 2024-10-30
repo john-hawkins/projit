@@ -116,6 +116,9 @@ class Projit:
     def get_root_path(self):
         """
         Get the path to where the project folder is located
+
+        :return: path : The Path to the Project folder
+        :rtype: String
         """
         return self.path[0:len(self.path) - len(config_folder)]
 
@@ -217,6 +220,9 @@ class Projit:
         """
         Given an experiment name
         Return the execution statistics
+
+        :return: executions, mean_execution_time : A pair of statistics
+        :rtype: int, float
         """
         if name in self.executions:
             exec_times = self.get_execution_times(name)
@@ -229,6 +235,13 @@ class Projit:
 
 
     def get_mean_execution_time(self, name):
+        """
+        Given an experiment name
+        Return the mean execution time
+
+        :return: mean_execution_time : The mean time of execution
+        :rtype: float
+        """
         exec_times = self.get_execution_times(name)
         if len(exec_times) > 0:
             return np.mean(exec_times)
@@ -237,6 +250,13 @@ class Projit:
 
 
     def get_execution_times(self, name):
+        """
+        Given an experiment name
+        Return an list of all  execution times
+
+        :return: execution_times : Array of execution times
+        :rtype: list(float)
+        """
         if name in self.executions:
             exec_times = []
             for execid, exec in self.executions[name].items():
@@ -280,6 +300,9 @@ class Projit:
     def update_name_description(self, name, descrip):
         """
         Update the core values name and description
+
+        :return: None
+        :rtype: None
         """
         self.initiate_lock()
         self.reload()
@@ -322,6 +345,18 @@ class Projit:
  
 
     def validate_asset(self, asset, name):
+        """
+        Check if a given asset exists
+
+        :param asset: The asset type (experiment|dataset)
+        :type asset: string, required
+
+        :param name: The asset name
+        :type name: string, required
+
+        :return: exists
+        :rtype: Boolean
+        """
         if asset=="experiment":
             return self.experiment_exists(name)
         elif asset=="dataset":
@@ -331,6 +366,21 @@ class Projit:
 
 
     def add_tags(self, asset, name, tags):
+        """
+        Add tags to a specific asset
+
+        :param asset: The asset type (experiment|dataset)
+        :type asset: string, required
+
+        :param name: The asset name
+        :type name: string, required
+
+        :param tags: The distionary of tags
+        :type tags: Dictionary(string:string)
+
+        :return: None
+        :rtype: None
+        """
         self.initiate_lock()
         self.reload()
         assets = {}
@@ -348,6 +398,22 @@ class Projit:
 
 
     def get_tags(self, asset, name, tags):
+        """
+        Retrive specified tags to a specific asset
+        Returns the list of tag values in the same order as requested.        
+
+        :param asset: The asset type (experiment|dataset)
+        :type asset: string, required
+
+        :param name: The asset name
+        :type name: string, required
+
+        :param tags: The list of tags
+        :type tags: list(string)
+
+        :return: tags
+        :rtype: list(string)
+        """
         if asset in self.tags:
             assets = self.tags[asset]
             if name not in assets:
@@ -626,6 +692,12 @@ class Projit:
 
 
     def create_local_path(self, ds):
+        """
+        Create and return a path to a dataset. Internal use.
+
+        :return: Path to dataset
+        :rtype: String
+        """
         return self.get_root_path() + ds
 
 
@@ -633,6 +705,9 @@ class Projit:
         """
         Lock files are used during processes that modify the project
         so that we get consistent state across parallel executions.
+
+        :return: None
+        :rtype: None
         """
         path_to_lock = self.path + "/" + lock_file
         lock_exists = True
@@ -652,6 +727,9 @@ class Projit:
         Lock files are used during processes that modify the project
         so that we get consistent state across parallel executions.
         Release the lock by deleting the lock file
+
+        :return: None
+        :rtype: None
         """
         path_to_lock = self.path + "/" + lock_file
         if os.path.isfile(path_to_lock):
@@ -661,6 +739,9 @@ class Projit:
     def save(self):
         """
         Save your projit project into config files within the projit config dir
+
+        :return: None
+        :rtype: None
         """
         core_props = self.__dict__.copy()
         del core_props['executions']
@@ -680,8 +761,12 @@ class Projit:
 
     def reload(self):
         """
-        Sometimes we reload the project from disk. Necessary when multiple processes are running
-        experiments in the same project.
+        Reload the project meta-data from disk. 
+        - Necessary when multiple processes are running
+           experiments in the same project and we want to avoid overwriting data.
+
+        :return: None
+        :rtype: None
         """
         path_to_config = self.path + "/" + config_file
         path_to_execs = self.path + "/" + execution_file
@@ -707,6 +792,15 @@ class Projit:
 
 
     def render(self, path):
+        """
+        Render the project data into a PDF file
+
+        :param path: The path to write the PF to 
+        :type path: string, required
+
+        :return: None
+        :rtype: None        
+        """
         results = self.get_results()
         pdf = PDF()
         pdf.setup()
@@ -755,6 +849,13 @@ def load(config_path):
 
 ##########################################################################################
 def projit_load():
+    """
+    Load the project by first locating the config file and using it to
+     initialise the projit Project class.
+
+    :return: Projit Object
+    :rtype: Projit
+    """
     return load( locate_projit_config() )
 
 
@@ -782,6 +883,9 @@ def init(template, name, desc=""):
 ##########################################################################################
 
 def init_template(template):
+    """
+    Initialise a project from a specified template
+    """
     if template != "":
         temp = load_template(template)
         for d in temp['dirs']:
