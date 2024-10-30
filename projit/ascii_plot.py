@@ -1,15 +1,18 @@
 from math import log, exp
 """
-    This function was taken from the GitHub gist https://gist.github.com/fransua/6165813
-    It was modified to work with Python 3, provide neater formatting on the tick labels
-    and fix some problems with extreme values being occasionally ommitted.
-    Note: Plot title was removed because we will be using it within functions that precede
-          the calls with their own titles.
-"""
 
 def ascii_plot (ydata, xdata=None, logscale=False, pch='o', 
                 xlabel='X', ylabel='Y', width=72, height=50):
     """
+    Generate an ASCII art plot of a set of data points.
+
+    This function was taken from the GitHub gist https://gist.github.com/fransua/6165813
+    It was modified to work with Python 3, provide neater formatting on the tick labels
+    and fix some problems with extreme values being occasionally ommitted.
+
+    Note: Plot title was removed because we will be using it within functions that precede
+          the calls with their own titles.
+
     :param ydata: list of values to be plotted
     :param None xdata: x coordinate corresponding to ydata. If None will range
        between 1 and the length of ydata.
@@ -102,6 +105,9 @@ def ascii_plot (ydata, xdata=None, logscale=False, pch='o',
 
 
 def arange(beg, end, step):
+    """
+    Utility function to emulate arange from earlier python versions
+    """
     return [beg + i * step for i in range(int(abs(beg-end)/step+.5))]
 
 
