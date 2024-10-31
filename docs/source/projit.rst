@@ -28,6 +28,14 @@ projit.config module
    :undoc-members:
    :show-inheritance:
 
+projit.latex\_table module
+--------------------------
+
+.. automodule:: projit.latex_table
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 projit.pdf module
 -----------------
 
