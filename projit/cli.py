@@ -29,7 +29,17 @@ project = None
 def task_init(name, template=''):
     """
     Initialise a project from the command line.
-    This function request a description, and thus runs in interactive mode.
+    This function will initate a project with a blank description.
+     Users will need to update this in subsequent interation.
+
+    :param name: The name of the project
+    :type name: String, required
+
+    :param template: The name of the template to use when initialising
+    :type template: String, optional
+
+    :return: None
+    :rtype: None
     """
     config_file = locate_projit_config()
     if config_file != "":
@@ -46,6 +56,12 @@ def task_init(name, template=''):
 def task_update(project):
     """
     Update a project from the command line
+
+    This function invokes an interaction via the terminal to update
+     the project properties.
+
+    :return: None
+    :rtype: None
     """
     print("Current Project Name: ", project.name)
     print("Enter an alternative project name (or press enter to keep)")
@@ -61,6 +77,15 @@ def task_update(project):
 
 ##########################################################################################
 def task_status(project):
+    """
+    Print the project propertie to the command line
+
+    :param project: The projit project object
+    :type project: Projit, required
+
+    :return: None
+    :rtype: None
+    """
     print("")
     print("  Project: %s" % project.name)
     print("  Description: %s" % project.desc)
@@ -71,6 +96,21 @@ def task_status(project):
 
 ##########################################################################################
 def filler(current, max_len, content=" "):
+    """
+    Internal function to fill a string with spaces to max_len
+
+    :param current: The length of the current content
+    :type current: Int, required
+
+    :param max_len: The maximum string length
+    :type max_len: Int, required
+
+    :param content: The character to fill with (default ' ')
+    :type content: Char, optional
+
+    :return: filled_content
+    :rtype: String
+    """
     return content * (max_len - current)
 
 ##########################################################################################
@@ -80,15 +120,34 @@ def print_header(header):
 
 ##########################################################################################
 def task_compare(project, datasets, metric, format, precision):
-   """
-   Compare results across muliple datasets.
-   This command loads the results for each dataset and extarcts just the records
-   for the specified metric to compile the comparison dataset to display.
-   """
-   title = "Compare Results" 
-   warning = ""
-   results = None
-   for dataset in datasets: 
+    """
+    Compare results across muliple datasets.
+
+    This command loads the results for each dataset and extracts just the records
+    for the specified metric to compile the comparison dataset to display.
+
+    :param project: The projit project object
+    :type project: Projit, required
+
+    :param datasets: The list of datasets to compare
+    :type datasets: list(String), required
+
+    :param metric: The metric to use for comparison
+    :type metric: String, required
+
+    :param format: The output format (markdown|latex|default)
+    :type format: String, required
+
+    :param precision: The precision for results in the table 
+    :type precision: Int, required
+
+    :return: None
+    :rtype: None
+    """
+    title = "Compare Results" 
+    warning = ""
+    results = None
+    for dataset in datasets: 
        rez = project.get_results(dataset)
        if metric not in rez.columns:
            rez[metric] = np.nan
@@ -100,17 +159,17 @@ def task_compare(project, datasets, metric, format, precision):
        else:
            results = pd.merge(results,rez,on="experiment")
            
-   if len(warning) > 0:
+    if len(warning) > 0:
        print("*** WARNINGS ***")
        print(warning)
 
-   results = results.round(precision)
+    results = results.round(precision)
 
-   if format == 'markdown':
+    if format == 'markdown':
         print_results_markdown(title, results)
-   elif format == 'latex':
+    elif format == 'latex':
         print_results_latex(title, results)
-   else:
+    else:
         print(" ___" + title + "__________________________________[ %s ]___" % metric)
         pd.set_option('expand_frame_repr', False)
         pd.set_option('display.max_columns', 999)
@@ -118,6 +177,22 @@ def task_compare(project, datasets, metric, format, precision):
 
 
 def extract_max_tags_lengths(project, asset, tags):
+    """
+    Internal function to determine the maximum length of the content
+     inside a specific set of tags on an asset in the project.
+ 
+    :param project: The projit project object
+    :type project: Projit, required
+
+    :param asset: The asset type
+    :type asset: String, required
+
+    :param tags: The tags to search for
+    :type tags: list(String), required
+ 
+    :return: List of tag lengths
+    :rtype: list(Int)
+    """
     if asset in project.tags:
         tagset = project.tags[asset]
         max_tag_lengths = []
