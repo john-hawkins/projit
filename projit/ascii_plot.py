@@ -1,5 +1,4 @@
 from math import log, exp
-"""
 
 def ascii_plot (ydata, xdata=None, logscale=False, pch='o', 
                 xlabel='X', ylabel='Y', width=72, height=50):
