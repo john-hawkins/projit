@@ -84,17 +84,19 @@ generate standardised result sets for comparison.
 To facilitate loose coupling between stages of the project the `projit` utility
 imposes a simple schema for components of a data science project. These consist
 of:
-* Datasets
-* Experiments
-* Results
 
-All of these entities can be added, removed or modified using either the CLI tool
-or the Python package within scripts. Usage of these entities in a project workflow
-are depicted in Figure \autoref{fig:projit}. On the right hand side of the figure you see the
+- Datasets
+- Experiments
+  - Executions
+- Results
+
+These entities can be added, removed or modified using either the CLI tool
+or the Python package within scripts. A standard project workflow
+is depicted in Figure \autoref{fig:projit}. On the right hand side of the figure you see the
 common sequence of critical stages in standard data science (or data mining) 
 workflow models like the CRISP-DM[@crisp]. 
 Each of these stages depends on entities defined and created in previous steps. 
-Use of a the `projit` meta-data repository facilitates loose coupling between them. 
+Use of the `projit` meta-data repository facilitates loose coupling between steps. 
 On the left hand side we depict
 additional meta-analysis that can be performed across multiple meta-data stores.
 
@@ -124,7 +126,7 @@ For example, the primary command `list` can be applied to any of the `projit`
 entities, as shown in the command below:
 
 ```
-> projit list datasets
+   > projit list datasets
 ```
 
 The same principle applies to the remove and add commands, which naturally require
@@ -134,9 +136,9 @@ of the CLI is to make `projit` intuitive without imposing arbitrary constraints.
 # Research Applications
 
 The fundamental research application of `projit` is in managing the project lifecycle
-and efficiency of development. Paths to datasets are retrieved from meta-data, not
-hard coded. Experiments are named, with execution times tracked. The Results to 
-all experiments can be tracked over each iteration, with hyper-parameters and 
+and minimising dependencies between steps. Paths to datasets are retrieved from 
+meta-data, not hard coded. Experiments are named, with execution times tracked. 
+Results of all experiments can be tracked over each iteration, with hyper-parameters and 
 interrogated to easily produce tables of data and analysis.
 Additional application comes with a focus
 on open science, allowing other teams to review and audit experiment history, 
@@ -149,12 +151,14 @@ multiple projects.
 # Example Usage
 
 The following demonstrates the process of initialising a project, registering
-a dataset and experiments. Change into the project directory and initialise.
-The template is optional (used if you want to create a directory structure).
+a dataset and experiment, then tracking results. 
+First change into the project directory and initialise it as a `projit` project.
 ```
    > projit init <Project-Name> template=default
 ```
-Then add one or more datasets that you want to be used in experiments.
+The `template` variable is optional and only used if you want to create a 
+directory structure.
+Next step is to add one or more datasets that you want to be used in experiments.
 ``` 
    > projit add dataset train data/train.csv
 ```
