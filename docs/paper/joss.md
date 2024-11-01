@@ -10,11 +10,11 @@ authors:
   - name: John Hawkins
     orcid: 0000-0001-6507-3671
     equal-contrib: true
-    affiliation: "1,2,3" # (Multiple affiliations must be quoted)
+    affiliation: "1,2" # (Multiple affiliations must be quoted)
 affiliations:
- - name: Transitional AI Research Group, Australia
+ - name: Transitional AI Research Group,
    index: 1
- - name: Pingla Institute, Australia
+ - name: Pingla Institute, Sydney, Australia
    index: 2
 date: 31 Oct 2024
 bibliography: refs.bib
