@@ -115,19 +115,54 @@ def get_properties(pathway):
 
 ################################################################################
 def write_properties(pathway, props):
+    """
+    Write properties file to a given path
+
+    :param name: The pathway to write to
+    :type name: String, required
+
+    :param props: The properties object
+    :type props: Dictionary(String), required
+
+    :return: None
+    :rtype: None
+    """
     filename = (pathway + "/" + properties_file)
     write_config(props, filename)
 
 ################################################################################
 def get_data_config(pathway):
+    """
+    Internal utility function for getting path to meta-data file
+     contain datasets.
+
+    :return: Path
+    :rtype: String
+    """
     return open_config(pathway + "/" + data_file)
 
 ################################################################################
 def get_experiments(pathway):
+    """
+    Internal utility function for getting path to meta-data file
+     containing experiments and exections.
+
+    :return: Path
+    :rtype: String
+    """
     return open_config(pathway + "/" + experiments_file)
 
 ################################################################################
 def open_config(filename):
+    """
+    Internal utility function for getting config object
+
+    :param name: The filename to open
+    :type name: String, required
+
+    :return: config
+    :rtype: Dictionary
+    """
     with open(filename) as file:
         config = yaml.load(file, Loader=yaml.FullLoader)
     return config
@@ -135,6 +170,18 @@ def open_config(filename):
 
 ################################################################################
 def write_config(config, filename):
+    """
+    Internal utility function for writing config object
+
+    :param config: The config file to save
+    :type config: Dictionary, required
+
+    :param name: The filename to save it to
+    :type name: String, required
+
+    :return: None
+    :rtype: None
+    """
     with open(filename, 'w') as outfile:
         yaml.dump(config, outfile, default_flow_style=False, allow_unicode=True)
 

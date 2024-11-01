@@ -128,7 +128,8 @@ class Projit:
         Start an experiment execution.
         This function will create a new experiment if this is the first execution
         otherwise it will simply add a new execution record.
-         It returns an identifer for the execution (needed to end the execution)
+        Function returns an unique identifer for the execution: required
+        to end the execution in a call to :meth:`projit.Projit.end_experiment`
 
         :param name: The experiment name (Unique Identifer)
         :type name: string, required
@@ -221,6 +222,9 @@ class Projit:
         Given an experiment name
         Return the execution statistics
 
+        :param name: The experiment name (Unique Identifer)
+        :type name: string, required
+
         :return: executions, mean_execution_time : A pair of statistics
         :rtype: int, float
         """
@@ -239,6 +243,9 @@ class Projit:
         Given an experiment name
         Return the mean execution time
 
+        :param name: The experiment name (Unique Identifer)
+        :type name: string, required
+
         :return: mean_execution_time : The mean time of execution
         :rtype: float
         """
@@ -253,6 +260,9 @@ class Projit:
         """
         Given an experiment name
         Return an list of all  execution times
+
+        :param name: The experiment name (Unique Identifer)
+        :type name: string, required
 
         :return: execution_times : Array of execution times
         :rtype: list(float)
@@ -300,6 +310,12 @@ class Projit:
     def update_name_description(self, name, descrip):
         """
         Update the core values name and description
+
+        :param name: The project name 
+        :type name: string, required
+
+        :param descrip: The project description 
+        :type descrip: string, required
 
         :return: None
         :rtype: None
@@ -762,8 +778,8 @@ class Projit:
     def reload(self):
         """
         Reload the project meta-data from disk. 
-        - Necessary when multiple processes are running
-           experiments in the same project and we want to avoid overwriting data.
+        - Necessary when multiple processes are running experiments 
+        in the same project and we want to avoid overwriting data.
 
         :return: None
         :rtype: None

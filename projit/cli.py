@@ -25,12 +25,12 @@ from projit import __version__
 
 project = None
 
-##########################################################################################
+##################################################################################
 def task_init(name, template=''):
     """
-    Initialise a project from the command line.
+    CLI Internal Task Function: Initialise a project from the command line.
     This function will initate a project with a blank description.
-     Users will need to update this in subsequent interation.
+    Users will need to update this in subsequent interation.
 
     :param name: The name of the project
     :type name: String, required
@@ -52,13 +52,13 @@ def task_init(name, template=''):
     project = projit_init(template, name, descrip)
 
 
-##########################################################################################
+##################################################################################
 def task_update(project):
     """
-    Update a project from the command line
+    CLI Internal Task Function: Update a project from the command line
 
     This function invokes an interaction via the terminal to update
-     the project properties.
+    the project properties.
 
     :return: None
     :rtype: None
@@ -75,10 +75,10 @@ def task_update(project):
         descrip = project.desc
     project.update_name_description(name, descrip)
 
-##########################################################################################
+##################################################################################
 def task_status(project):
     """
-    Print the project propertie to the command line
+    CLI Internal Task Function: Print the project properties to the command line
 
     :param project: The projit project object
     :type project: Projit, required
@@ -94,7 +94,7 @@ def task_status(project):
     print("  Executions: %i" % len(project.executions))
     print("")
 
-##########################################################################################
+##################################################################################
 def filler(current, max_len, content=" "):
     """
     Internal function to fill a string with spaces to max_len
@@ -113,15 +113,15 @@ def filler(current, max_len, content=" "):
     """
     return content * (max_len - current)
 
-##########################################################################################
+##################################################################################
 def print_header(header):
     full_header = header + ("_" * (90-len(header)))
     print(full_header)
 
-##########################################################################################
+##################################################################################
 def task_compare(project, datasets, metric, format, precision):
     """
-    Compare results across muliple datasets.
+    CLI Internal Task Function: Compare results across muliple datasets.
 
     This command loads the results for each dataset and extracts just the records
     for the specified metric to compile the comparison dataset to display.
@@ -178,8 +178,8 @@ def task_compare(project, datasets, metric, format, precision):
 
 def extract_max_tags_lengths(project, asset, tags):
     """
-    Internal function to determine the maximum length of the content
-     inside a specific set of tags on an asset in the project.
+    CLI Internal Function: determine the maximum length of the content
+    inside a specific set of tags on an asset in the project.
  
     :param project: The projit project object
     :type project: Projit, required
@@ -212,10 +212,10 @@ def extract_max_tags_lengths(project, asset, tags):
         return [0 for x in tags]
 
 
-##########################################################################################
+################################################################################
 def task_list(subcmd, project, dataset, format, precision, tags):
     """
-    List content of a project from the command line
+    CLI Internal Task Function: List content of a project from the command line
     """
     if len(tags) > 0:
         tags_max_len = max([len(x) for x in tags])
@@ -330,26 +330,41 @@ def task_list(subcmd, project, dataset, format, precision, tags):
 
 
 
-##########################################################################################
+###############################################################################
 def task_render(project, path):
     """
     Generates a pdf and writes it to the provided path
+
+    :param project: The projit project object
+    :type project: Projit, required
+
+    :param path: The rendering path
+    :type path: String, required
     """
     project.render(path)
 
 
-##########################################################################################
+###############################################################################
 
 def print_results_latex(title, df):
     """
-    Latex output - Putting this in a central function in case we change the functionality
-     or format in the future.
+    Latex output - Putting this in a central function in case we change the 
+    functionality or format in the future.
+
+    :param title: The table title
+    :type title: String, required
+
+    :param df: The dataframe to print out
+    :type df: DataFrame, required
+
+    :return: None
+    :rtype: None
     """
     #output = df.to_latex()
     #print(output)
     print_latex(df, title)
 
-##########################################################################################
+###############################################################################
 
 def print_results_markdown(title, df):
     longest_name = max(df["experiment"].apply(lambda x: len(x)))
@@ -405,7 +420,7 @@ def print_results_markdown(title, df):
         print(rowcontent)
     print()
 
-##########################################################################################
+###############################################################################
 def task_add(project, asset, name, path):
     """
     Add elements to a project from the command line
@@ -418,7 +433,7 @@ def task_add(project, asset, name, path):
         print("ERROR: Request to add unrecognised asset type: %s" % asset)
         exit(1)
 
-##########################################################################################
+################################################################################
 def task_tag(project, asset, name, values):
     """
     Add tags to an asset in the project from the command line
@@ -436,7 +451,7 @@ def task_tag(project, asset, name, values):
         exit(1)
 
 
-##########################################################################################
+###############################################################################
 def task_rm(project, asset, name):
     """
     Remove elements to a project from the command line
@@ -460,7 +475,7 @@ def task_rm(project, asset, name):
     else:
         print(f"** Remove command for {asset} named {name} cancelled ** ")
 
-##########################################################################################
+###############################################################################
 def task_plot(project, experiment, property, metric):
     if property == "execution":
         print()
@@ -486,7 +501,7 @@ def task_plot(project, experiment, property, metric):
         print()
 
 
-##########################################################################################
+#################################################################################
 def print_usage(prog):
     """ Command line application usage instrutions. """
     print(" USAGE ")
@@ -523,7 +538,7 @@ def print_usage(prog):
     print("")
 
 
-##########################################################################################
+###############################################################################
 def main():
     try:
         cli_main()
@@ -535,7 +550,7 @@ def main():
             project.release_lock()
 
 
-##########################################################################################
+###############################################################################
 def cli_main():
    parser = argparse.ArgumentParser()
    parser.add_argument('-v', '--version', help='Print Version', action='store_true')
@@ -650,6 +665,6 @@ def cli_main():
       task_render(project, args.path)
 
 
-##########################################################################################
+#################################################################################
 if __name__ == '__main__':
     main()
