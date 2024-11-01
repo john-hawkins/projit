@@ -10,11 +10,13 @@ authors:
   - name: John Hawkins
     orcid: 0000-0001-6507-3671
     equal-contrib: true
-    affiliation: "1" # (Multiple affiliations must be quoted)
+    affiliation: "1,2,3" # (Multiple affiliations must be quoted)
 affiliations:
  - name: Transitional AI Research Group, Australia
    index: 1
-date: 27 Sep 2024
+ - name: Pingla Institute, Australia
+   index: 2
+date: 31 Oct 2024
 bibliography: refs.bib
 
 ---
@@ -64,8 +66,9 @@ of scripted meta-data analysis. The authors have used the `projit` package
 in multiple published research projects to manage the results of 
 machine learning experiments into biomedical literature reviews
 [@Hawkins+Tivey:2024] and the analysis of text features derived 
-from URLS [@Hawkins:2023]. In addition, `projit` has been used by 
-inside multiple commercial machine learning projects.
+from URLS [@Hawkins:2023]. In addition, `projit` has been used by the author 
+for commercial projects within industry to benchmark machine
+learning techniques for classification and regression problems.
 
 # Methodology
 
@@ -142,6 +145,54 @@ Finally, there is a research application in meta-analysis.
 Projects in which the `projit` meta-data are stored along with open source code can 
 be analysed to look at the performance of certain techniques or algorithms across
 multiple projects.  
+
+# Example Usage
+
+The following demonstrates the process of initialising a project and registering
+dataset and experiments. First change into the project directory and initialise.
+The template is optional (used if you want to create a directory structure).
+```
+   > projit init <Project-Name> template=default
+```
+Then add one or multiple datasets that you want to be used across multiple experiments.
+``` 
+   > projit add dataset train data/train.csv
+```
+This dataset can then be accessed inside any experimental script by querying the project
+data as in this python example:
+``` 
+   import projit as pit
+   project = pit.projit_load()
+   train_data_path = project.get_dataset("train")
+```
+Once your datasets are registered and available, you want to create experiments as follows.
+```
+   > projit add experiment "Initial Exp" experiments/exp_one.py
+```
+Alternatively, you can add the experiment within the script itself, as well as start and end its
+execution to track executions over time with this python example:
+```
+   import projit as pit
+   project = pit.projit_load()
+   exec_id = project.start_experiment("Initial Exp", "experiments/exp_one.py", params={})
+   #
+   # INSERT ALL EXPERIMENT CODE HERE
+   #
+   project.end_experiment("Initial Exp", exec_id, hyperparams={})
+```
+After experiments have been executed you will also want to register experimental results
+that are associated with the experiment. Follow this python example:
+```
+   project.add_result("Initial Exp", <METRIC_NAME>, <NUMERIC_VALUE>, <DATASET_NAME>)
+```
+This function can be called multiple times for every metric you want to record.
+The dataset name is optional, and allows you to store metrics against different cuts of
+data for later analysis.
+
+Finally you can use the command line tools to query the results:
+```
+   > projit list results <DATASET_NAME>
+```
 
 # Acknowledgements
 
