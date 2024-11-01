@@ -148,39 +148,37 @@ multiple projects.
 
 # Example Usage
 
-The following demonstrates the process of initialising a project and registering
-dataset and experiments. First change into the project directory and initialise.
+The following demonstrates the process of initialising a project, registering
+a dataset and experiments. Change into the project directory and initialise.
 The template is optional (used if you want to create a directory structure).
 ```
    > projit init <Project-Name> template=default
 ```
-Then add one or multiple datasets that you want to be used across multiple experiments.
+Then add one or more datasets that you want to be used in experiments.
 ``` 
    > projit add dataset train data/train.csv
 ```
-This dataset can then be accessed inside any experimental script by querying the project
+This dataset can then be accessed inside any script by querying the project
 data as in this python example:
 ``` 
    import projit as pit
    project = pit.projit_load()
    train_data_path = project.get_dataset("train")
 ```
-Once your datasets are registered and available, you want to create experiments as follows.
+Once your datasets are registered and available, you register experiments as follows.
 ```
-   > projit add experiment "Initial Exp" experiments/exp_one.py
+   > projit add experiment "Initial Exp" exp/exp_one.py
 ```
 Alternatively, you can add the experiment within the script itself, as well as start and end its
 execution to track executions over time with this python example:
 ```
    import projit as pit
    project = pit.projit_load()
-   exec_id = project.start_experiment("Initial Exp", "experiments/exp_one.py", params={})
-   #
+   exec_id = project.start_experiment("Initial Exp", "exp/exp_one.py", params={})
    # INSERT ALL EXPERIMENT CODE HERE
-   #
    project.end_experiment("Initial Exp", exec_id, hyperparams={})
 ```
-After experiments have been executed you will also want to register experimental results
+After experiments have been executed you want to register experimental results
 that are associated with the experiment. Follow this python example:
 ```
    project.add_result("Initial Exp", <METRIC_NAME>, <NUMERIC_VALUE>, <DATASET_NAME>)
@@ -189,7 +187,7 @@ This function can be called multiple times for every metric you want to record.
 The dataset name is optional, and allows you to store metrics against different cuts of
 data for later analysis.
 
-Finally you can use the command line tools to query the results:
+Finally you can use the command line tools to query and tabulate the results:
 ```
    > projit list results <DATASET_NAME>
 ```
