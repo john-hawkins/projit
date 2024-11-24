@@ -131,8 +131,9 @@ over each iteration.
     project.end_experiment("Initial Exp", exec_id, hyperparams={})
 
 This will add the experiment if it is not already registered.
-It will then create an execution record for the first and all subsequent executions of the script.
-The execution record with contain start and end times, the git hash (if present) of the codebase
+It will then create an execution record for the first and all subsequent 
+executions of the script. The execution record will contain start and end times, 
+the git hash (if present) of the codebase
 and any optional parameters or hyperparameters you wish to record.
 
 
@@ -245,11 +246,13 @@ For example
     >projit compare dataset1,dataset2,dataset3 RMSE
 
 
-Will produce a table where each row corresponds to a specific experiment, and each column will correspond 
-to one of the three specfied datasets. Within the table each cell will contain the RMSE of the experiment
+Will produce a table where each row corresponds to a specific experiment, 
+and each column will correspond to one of the three specfied datasets. 
+Within the table each cell will contain the RMSE of the experiment
 on that dataset.
 
-
+Note that the `compare` functionality support comparisons of arbitrary
+numbers of datasets, but only a single parameter at a time.
 
 
 
