@@ -91,7 +91,7 @@ def task_status(project):
     print("  Description: %s" % project.desc)
     print("  Datasets: %i" % len(project.datasets))
     print("  Experiments: %i" % len(project.experiments))
-    print("  Executions: %i" % len(project.executions))
+    print("  Executions: %i" % project.get_total_executions())
     print("")
 
 ##################################################################################

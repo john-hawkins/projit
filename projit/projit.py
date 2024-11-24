@@ -216,6 +216,17 @@ class Projit:
         self.save()
         self.release_lock()    
 
+    def get_total_executions(self):
+        """
+        Get a count of all experiment executions as an aggregate statistic
+
+        :return: executions
+        :rtype: int
+        """
+        executions = 0
+        for name in self.executions:
+            executions += len(self.executions[name])
+        return executions
 
     def get_experiment_execution_stats(self, name):
         """
@@ -259,7 +270,7 @@ class Projit:
     def get_execution_times(self, name):
         """
         Given an experiment name
-        Return an list of all  execution times
+        Return a list of all  execution times
 
         :param name: The experiment name (Unique Identifer)
         :type name: string, required

@@ -314,6 +314,31 @@ def test_experiment_executions_two():
     os.chdir("../")
     shutil.rmtree(testdir)
 
+
+#################################################################
+def test_experiment_executions_three():
+    """
+    In this test we ensure that multiple executions over differents
+    experiments are unerstood in totality but not confounded.
+    """
+    testdir = "temp_test_dir_xyz"
+    os.mkdir(testdir)
+    os.chdir(testdir)
+    project = proj.init("default", "exp", "exp test")
+    project.add_experiment("test",  "pathtofile")
+    exec_id = project.start_experiment("test", "pathtofile", params={})
+    project.end_experiment("test", exec_id, hyperparams={})
+    exec_id = project.start_experiment("test", "pathtofile", params={})
+    project.end_experiment("test", exec_id, hyperparams={})
+    exec_id = project.start_experiment("test2", "pathtofile", params={})
+    project.end_experiment("test2", exec_id, hyperparams={})
+    execs, mean_time = project.get_experiment_execution_stats("test")
+    assert execs == 2
+    totals = project.get_total_executions()
+    assert totals == 3
+    os.chdir("../")
+    shutil.rmtree(testdir)
+
 #################################################################
 def test_experiment_executions_incomplete():
     """
