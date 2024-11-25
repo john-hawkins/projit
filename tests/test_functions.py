@@ -330,6 +330,8 @@ def test_experiment_executions_three():
     project.end_experiment("test", exec_id, hyperparams={})
     exec_id = project.start_experiment("test", "pathtofile", params={})
     project.end_experiment("test", exec_id, hyperparams={})
+    
+    project.add_experiment("test2",  "pathtofile")
     exec_id = project.start_experiment("test2", "pathtofile", params={})
     project.end_experiment("test2", exec_id, hyperparams={})
     execs, mean_time = project.get_experiment_execution_stats("test")
