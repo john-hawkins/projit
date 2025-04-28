@@ -7,10 +7,12 @@
 [![Tests](https://github.com/john-hawkins/projit/actions/workflows/python-package.yml/badge.svg)](https://github.com/john-hawkins/projit/actions/workflows/python-package.yml)
 [![Documentation Status](https://readthedocs.org/projects/projit/badge/?version=latest)](https://projit.readthedocs.io/en/latest/?badge=latest)
 [![PyPI](https://img.shields.io/pypi/v/projit.svg)](https://pypi.org/project/projit)
+[![status](https://joss.theoj.org/papers/d9ef7e44278dec2d5597763118e56e45/status.svg)](https://joss.theoj.org/papers/d9ef7e44278dec2d5597763118e56e45)
 
-Projit is a utility to help data scientists manage projects that contain multiple experiments
-and components that need to interact in a de-coupled manner. 
-Use it to define and manage project structure, properties, data, experiments & collaboration.
+Projit is a utility to help data scientists manage projects that contain 
+multiple experiments and components that need to interact in a de-coupled manner. 
+Use it to define and manage project structure, properties, data, 
+experiments & collaboration.
 
 The goal of this project is to allow data scientists and teams to work on projects in
 a structured and standardized way. The projit utility allows you to establish a
