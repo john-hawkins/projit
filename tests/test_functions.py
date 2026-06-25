@@ -15,6 +15,12 @@ from projit.utils import write_properties
 from projit.projit import projit_load
 
 #################################################################
+def reset_test_dir(dirname):
+    if path.isdir(dirname):
+        shutil.rmtree(dirname)
+    os.mkdir(dirname)
+
+#################################################################
 def test_walk():
     """
     In this test we ensure that the walk function can traverse a 
@@ -74,7 +80,7 @@ def test_projit_init_v2():
     Second test on project initialisation
     """
     testdir = "temp_test_dir_xyz"
-    os.mkdir(testdir)
+    reset_test_dir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "TEST", "TEST")
     assert locate_projit_config() != ""
@@ -100,7 +106,7 @@ def test_projit_load():
     In this test we ensure that we load the project file data
     """
     testdir = "temp_test_dir_xyz"
-    os.mkdir(testdir)
+    reset_test_dir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "myproject", "myproject")
     os.mkdir("someotherdir")
@@ -117,10 +123,10 @@ def test_projit_load():
 def test_template_results():
     """
     In this test we ensure that the project initialisation process 
-     will create the right directory in a default setup.
+    will create the right directory in a default setup.
     """
     testdir = "temp_test_dir_xyz"
-    os.mkdir(testdir)
+    reset_test_dir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "subdir", "sub dir test")
     assert project.name == "subdir"
@@ -134,7 +140,7 @@ def test_project_update():
     In this test we ensure that we can update the project properties
     """
     testdir = "temp_test_dir_xyz"
-    os.mkdir(testdir)
+    reset_test_dir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "exp", "exp test")
     project.update_name_description("Name", "DESC")
@@ -148,10 +154,10 @@ def test_project_update():
 def test_project_update_lock():
     """
     In this test we ensure that the lock mechanism for upating project
-     details works correctly.
+    details works correctly.
     """
     testdir = "temp_test_dir_xyz"
-    os.mkdir(testdir)
+    reset_test_dir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "exp", "exp test")
     # MODIFY THE PROJECT JSON FILE THEN TEST THAT THE
@@ -171,7 +177,7 @@ def test_dataset_add_remove():
     In this test we ensure that the remove functions work for datasets
     """
     testdir = "temp_test_dir_xyz"
-    os.mkdir(testdir)
+    reset_test_dir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "exp", "exp test")
     project.add_dataset("test",  "pathtofile")
@@ -188,7 +194,7 @@ def test_dataset_add_remove_all():
      all datasets 
     """
     testdir = "temp_test_dir_xyz"
-    os.mkdir(testdir)
+    reset_test_dir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "exp", "exp test")
     project.add_dataset("test1",  "pathtofile")
@@ -207,13 +213,13 @@ def test_experiment_results():
      returns the right data structure.
     """
     testdir = "temp_test_dir_xyz"
-    os.mkdir(testdir)
+    reset_test_dir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "exp", "exp test")
     project.add_experiment("test",  "pathtofiles")
     project.add_result("test",  "rmse", 0.5)
     results = project.get_results()
-    assert str(type(results)) == "<class 'pandas.core.frame.DataFrame'>"
+    assert isinstance(results, pd.DataFrame)
     assert "experiment" in results.columns
     assert "rmse" in results.columns
     os.chdir("../")
@@ -225,7 +231,7 @@ def test_experiment_remove():
     In this test we ensure that the remove functions work for experiments
     """
     testdir = "temp_test_dir_xyz"
-    os.mkdir(testdir)
+    reset_test_dir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "exp", "exp test")
     project.add_experiment("test",  "pathtofile")
@@ -244,7 +250,7 @@ def test_experiment_remove_all():
      all experiments and results 
     """
     testdir = "temp_test_dir_xyz"
-    os.mkdir(testdir)
+    reset_test_dir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "exp", "exp test")
     project.add_experiment("test",  "pathtofile")
@@ -269,7 +275,7 @@ def test_experiment_executions_zero():
      is reported as zero.
     """
     testdir = "temp_test_dir_xyz"
-    os.mkdir(testdir)
+    reset_test_dir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "exp", "exp test")
     project.add_experiment("test",  "pathtofile")
@@ -284,7 +290,7 @@ def test_experiment_executions_one():
     In this test we ensure that a single execution is counted.
     """
     testdir = "temp_test_dir_xyz"
-    os.mkdir(testdir)
+    reset_test_dir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "exp", "exp test")
     project.add_experiment("test",  "pathtofile")
@@ -301,7 +307,7 @@ def test_experiment_executions_two():
     In this test we ensure that multiple executions are counted.
     """
     testdir = "temp_test_dir_xyz"
-    os.mkdir(testdir)
+    reset_test_dir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "exp", "exp test")
     project.add_experiment("test",  "pathtofile")
@@ -322,7 +328,7 @@ def test_experiment_executions_three():
     experiments are unerstood in totality but not confounded.
     """
     testdir = "temp_test_dir_xyz"
-    os.mkdir(testdir)
+    reset_test_dir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "exp", "exp test")
     project.add_experiment("test",  "pathtofile")
@@ -348,7 +354,7 @@ def test_experiment_executions_incomplete():
        in the statistics reported about the experiment.
     """
     testdir = "temp_test_dir_xyz"
-    os.mkdir(testdir)
+    reset_test_dir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "exp", "exp test")
     project.add_experiment("test",  "pathtofile")
@@ -369,7 +375,7 @@ def test_project_params():
     Test that we can set and retrieve project parameters
     """
     testdir = "temp_test_dir_xyz"
-    os.mkdir(testdir)
+    reset_test_dir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "test params", "param test")
     project.add_param("test",  "myval")
@@ -384,7 +390,7 @@ def test_project_hyperparams():
     Test that we can set and retrieve hyperparameters for experiments
     """
     testdir = "temp_test_dir_xyz"
-    os.mkdir(testdir)
+    reset_test_dir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "test params", "param test")
     with pytest.raises(Exception) as e_info:
@@ -404,7 +410,7 @@ def test_project_experiment_results():
     Test that experimental results are retrieved correctly.
     """
     testdir = "temp_test_dir_xyz"
-    os.mkdir(testdir)
+    reset_test_dir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "test", "test")
     project.add_experiment("myexp", "mypath")
@@ -415,7 +421,7 @@ def test_project_experiment_results():
         results.RMSE,
         float
     )
-    assert str(type(results)) == "<class 'pandas.core.frame.DataFrame'>"
+    assert isinstance(results, pd.DataFrame)
     dt.validate(
         results.columns,
         {'RMSE', 'experiment'},
@@ -425,7 +431,7 @@ def test_project_experiment_results():
     # Add a result to the base structure and ensure it does not interfere
     project.add_result("myexp", "RMSE", 0.3)
     results2 = project.get_results("mydata")
-    assert str(type(results2)) == "<class 'pandas.core.frame.DataFrame'>"
+    assert isinstance(results2, pd.DataFrame)
     dt.validate(
         results2.columns,
         {'RMSE', 'experiment'},
@@ -434,4 +440,3 @@ def test_project_experiment_results():
 
     os.chdir("../")
     shutil.rmtree(testdir)
-
