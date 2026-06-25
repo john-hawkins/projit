@@ -1,0 +1,12 @@
+# Runtime dependencies (mirrors [project.dependencies] in pyproject.toml)
+numpy>=1.16.4
+pandas>=0.25.3
+pyyaml
+fpdf
+gitpython
+setuptools
+
+# Test dependencies (mirrors [dependency-groups.dev] in pyproject.toml)
+pytest>=7
+datatest>=0.11.1
+pytest-cov>=4

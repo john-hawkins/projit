@@ -7,7 +7,7 @@ license = { text = "MIT" }
 authors = [
     { name = "John Hawkins", email = "john@getting-data-science-done.com" },
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "numpy>=1.16.4",
     "pandas>=0.25.3",
