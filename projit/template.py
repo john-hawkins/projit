@@ -1,25 +1,20 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
+from importlib.resources import files
 from io import StringIO
 import datetime as dt
-import pkg_resources
-import codecs
 import json
 import sys
 import os
 
 ################################################################################
-resource_package = __name__
 
 def load_template(filename):
     """
     Utility function to load a project template from a file
-
-
     """
-    _path = '/'.join(('templates', filename))
-    rawd = pkg_resources.resource_string(resource_package, _path).decode("utf-8")
-    temp = json.loads(rawd)
+    rawd = (files("projit") / "templates" / filename).read_bytes()
+    temp = json.loads(rawd.decode("utf-8"))
     return temp
 
 ###############################################################################
