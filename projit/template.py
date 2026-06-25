@@ -46,6 +46,17 @@ def eprint(*args, **kwargs):
 
 profiles = {}
 
+def reset_profiles():
+    """
+    Clear all recorded profiles. Call this in tests or at pipeline start
+    to prevent state leaking between runs.
+
+    :return: None
+    :rtype: None
+    """
+    global profiles
+    profiles = {}
+
 def initialise_profile():
     """
     Initialise the profiles
@@ -53,7 +64,7 @@ def initialise_profile():
     :return: None
     :rtype: None
     """
-    profiles = {}
+    reset_profiles()
 
 def start_profile(proc_name):
     """

@@ -26,6 +26,7 @@ def ascii_plot (ydata, xdata=None, logscale=False, pch='o',
     """
     if not xdata:
         xdata = range(1, len(ydata)+1)
+    xdata = list(xdata)
     yydata = []
     logf = log if logscale else lambda x: x
     expf = exp if logscale else lambda x: x
@@ -34,13 +35,25 @@ def ascii_plot (ydata, xdata=None, logscale=False, pch='o',
             yydata.append(logf(i))
         except ValueError:
             yydata.append(float('-inf'))
-    ymax = max(yydata)
-    ymax = ymax + (ymax*0.05)
-    ydiff = float(abs(float(min(yydata)) - ymax)/(height * 2))
+    # Filter out -inf values (e.g. log(0)) for range calculations only
+    finite_yy = [y for y in yydata if y != float('-inf')]
+    if not finite_yy:
+        finite_yy = [0.0]
+    ymax = max(finite_yy)
+    ymax = ymax + (ymax * 0.05)
+    y_min = min(finite_yy)
+    ydiff = float(abs(float(y_min) - ymax) / (height * 2))
+    if ydiff == 0:
+        ydiff = 1.0
     y_arange = [(i - ydiff, i + ydiff) for i in
-                sorted(arange(min(yydata), ymax + ydiff, ydiff * 2), reverse=True)]
-    xdiff = float(abs(float(min(xdata)) - max(xdata)))/(width * 2)
-    x_arange = [(i-xdiff, i+xdiff) for i in
+                sorted(arange(y_min, ymax + ydiff, ydiff * 2), reverse=True)]
+    # Guard against uniform x values (e.g. single data point)
+    if min(xdata) == max(xdata):
+        xdata = list(range(1, len(yydata) + 1))
+    xdiff = float(abs(float(min(xdata)) - max(xdata))) / (width * 2)
+    if xdiff == 0:
+        xdiff = 1.0
+    x_arange = [(i - xdiff, i + xdiff) for i in
                 sorted(arange(float(min(xdata)), max(xdata) + xdiff, xdiff * 2))]
     graph = ylabel
     graph += '\n'
@@ -96,7 +109,7 @@ def ascii_plot (ydata, xdata=None, logscale=False, pch='o',
         return temp3
 
     graph += ' '*7 + ''.join(
-        [ add_x_point(float(sum(x_arange[x])/2)) for x in range(0,width,10)]
+        [ add_x_point(float(sum(x_arange[min(x, len(x_arange)-1)])/2)) for x in range(0,width,10)]
     ) + ('' if width % 10 else add_x_point(float(sum(x_arange[-1])/2)))+ '\n'
     graph += ' ' * 7 + '{0:^{1}}'.format(xlabel, width)
     graph += '\n'
