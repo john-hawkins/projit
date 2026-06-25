@@ -367,6 +367,11 @@ def print_results_latex(title, df):
 ###############################################################################
 
 def print_results_markdown(title, df):
+    titleline = "\n%s\n%s" % (title, "-"*len(title))
+    if df.empty or len(df["experiment"]) == 0:
+        print(titleline)
+        print()
+        return
     longest_name = max(df["experiment"].apply(lambda x: len(x)))
     name_spacer = 12
     if(longest_name>10):
@@ -396,9 +401,6 @@ def print_results_markdown(title, df):
     other_col_widths = list(mygen)
     col_widths.extend(other_col_widths)
     total_widths = sum(col_widths)
-    # This title line was an attempt to print it as a merged table cell
-    # titleline = "| %s%s %s" % (title, " "*(total_widths-len(title)-2), "|"*(len(col_widths)) )
-    titleline = "\n%s\n%s" % (title, "-"*len(title))
     print(titleline)
     header = ""
     for colname, colwidth in zip(list(df.columns), col_widths):
@@ -441,12 +443,18 @@ def task_tag(project, asset, name, values):
     vals = values.split(",")
     tags = {}
     for val in vals:
-        temp = val.split("=")
-        tags[temp[0]] = temp[1]
+        if "=" not in val:
+            print(f"ERROR: Invalid tag format '{val}'. Expected key=value pairs separated by commas.")
+            exit(1)
+        key, value = val.split("=", 1)
+        if not key:
+            print(f"ERROR: Empty tag key in '{val}'. Keys must be non-empty.")
+            exit(1)
+        tags[key] = value
 
     if project.validate_asset(asset, name):
         project.add_tags(asset, name, tags)
-    else: 
+    else:
         print(f"ERROR: Invalid request to tag asset {name} of type {asset} - please check available assets")
         exit(1)
 
@@ -604,19 +612,19 @@ def cli_main():
 
    if args.version:
        print(" Version:", __version__)
-       exit(1)
+       exit(0)
 
    if args.usage:
        print_usage("projit")
-       exit(1)
+       exit(0)
 
    if args.cmd == None:
        print_usage("projit")
-       exit(1)
+       exit(0)
 
    if args.cmd == "init":
       task_init(args.name)
-      exit(1)
+      exit(0)
 
    """
    From this point on all commands required that we are inside a valid projit project

@@ -45,15 +45,24 @@ def clean_data_for_latex(input):
     This utility function is required because some strings might contain LaTeX special
       characters, and therefor need to be escaped before latex rendering will function.
     """
+    _BS = "\x00"   # placeholder for backslash
+    _TL = "\x01"   # placeholder for tilde
     strdata = str(input)
-    strdata = strdata.replace("%","\\%")
-    strdata = strdata.replace("$","\\$")
-    strdata = strdata.replace("#","\\#")
-    strdata = strdata.replace("^","\\^")
-    strdata = strdata.replace("&","\\&")
-    strdata = strdata.replace("_","\\_")
-    strdata = strdata.replace("{","\\{")
-    strdata = strdata.replace("}","\\}")
+    # Replace special chars that expand to sequences containing { or } using
+    # placeholders, so those braces are not caught by the later { } escaping.
+    strdata = strdata.replace("\\", _BS)
+    strdata = strdata.replace("~", _TL)
+    strdata = strdata.replace("%", "\\%")
+    strdata = strdata.replace("$", "\\$")
+    strdata = strdata.replace("#", "\\#")
+    strdata = strdata.replace("^", "\\^")
+    strdata = strdata.replace("&", "\\&")
+    strdata = strdata.replace("_", "\\_")
+    strdata = strdata.replace("{", "\\{")
+    strdata = strdata.replace("}", "\\}")
+    # Expand placeholders after all brace escaping is done
+    strdata = strdata.replace(_BS, "\\textbackslash{}")
+    strdata = strdata.replace(_TL, "\\textasciitilde{}")
     return strdata
 
 

@@ -1,4 +1,5 @@
 from datetime import datetime
+from urllib.parse import urlparse
 import pandas as pd
 import numpy as np
 import hashlib
@@ -282,14 +283,26 @@ class Projit:
             exec_times = []
             for execid, exec in self.executions[name].items():
                 if exec["end"] != "":
-                    a = datetime.strptime(exec["start"], '%Y-%m-%d %H:%M:%S.%f')
-                    b = datetime.strptime(exec["end"], '%Y-%m-%d %H:%M:%S.%f')
-                    diff = (b-a).seconds
-                    exec_times.append(diff)
+                    try:
+                        a = self._parse_datetime(exec["start"])
+                        b = self._parse_datetime(exec["end"])
+                        diff = (b-a).seconds
+                        exec_times.append(diff)
+                    except (ValueError, KeyError):
+                        pass
             return exec_times
         else:
             return []
 
+
+    @staticmethod
+    def _parse_datetime(s):
+        for fmt in ('%Y-%m-%d %H:%M:%S.%f', '%Y-%m-%d %H:%M:%S'):
+            try:
+                return datetime.strptime(s, fmt)
+            except ValueError:
+                pass
+        raise ValueError(f"Cannot parse datetime string: {s!r}")
 
     def add_experiment(self, name, path):
         """
@@ -646,7 +659,6 @@ class Projit:
         :rtype: pandas.DataFrame
         """
 
-        df = pd.DataFrame()
         if dataset==None:
             myresults = self.results
         else:
@@ -654,15 +666,19 @@ class Projit:
                 myresults = self.dataresults[dataset]
             else:
                 raise Exception("Projit Dataset Exception: No results for dataset: %s " % dataset)
+        rows = []
         for exp in self.experiments:
             key = exp[0]
             if key in myresults:
-                rez = myresults[key]
+                rez = dict(myresults[key])
             else:
                 rez = {}
             rez['experiment'] = key
-            df = pd.concat([df, pd.DataFrame(rez, index=[0])], ignore_index=True)
-        # Ensure that the first column in the results is "experiments"
+            rows.append(pd.DataFrame(rez, index=[0]))
+        if not rows:
+            return pd.DataFrame(columns=["experiment"])
+        df = pd.concat(rows, ignore_index=True)
+        # Ensure that the first column in the results is "experiment"
         cols = ["experiment"]
         rest = df.columns.to_list()
         rest.remove('experiment')
@@ -697,7 +713,7 @@ class Projit:
         if name in self.hyperparams:
             return self.hyperparams[name]
         else:
-            raise Exception("Projit Parameter Exception: Hyper parameters for experiemnt '%s' are not available:" % name)
+            raise Exception("Projit Parameter Exception: Hyper parameters for experiment '%s' are not available:" % name)
 
 
     def get_path_to_dataset(self, name):
@@ -709,13 +725,10 @@ class Projit:
 
 
     def is_complete_path(self, path):
-        if path[0:1] == "/":
+        if os.path.isabs(path):
             return True
-        if path[0:3] == "s3:":
-            return True
-        if path[0:4] == "http":
-            return True
-        return False
+        parsed = urlparse(path)
+        return parsed.scheme in ('s3', 'http', 'https', 'gs', 'ftp', 'file')
 
 
     def create_local_path(self, ds):
@@ -733,20 +746,20 @@ class Projit:
         Lock files are used during processes that modify the project
         so that we get consistent state across parallel executions.
 
+        Uses exclusive file creation (open with 'x') for atomic lock acquisition
+        to avoid race conditions between checking and creating the lock file.
+
         :return: None
         :rtype: None
         """
         path_to_lock = self.path + "/" + lock_file
-        lock_exists = True
-        while lock_exists:
-            if os.path.isfile(path_to_lock):
+        while True:
+            try:
+                with open(path_to_lock, 'x') as outfile:
+                    json.dump({}, outfile, indent=0)
+                break
+            except FileExistsError:
                 time.sleep(5)
-            else:
-                lock_exists = False
-
-        lock_content = {}
-        with open(path_to_lock, 'w') as outfile:
-            json.dump(lock_content, outfile, indent=0)
 
 
     def release_lock(self):

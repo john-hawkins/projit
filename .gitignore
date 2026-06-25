@@ -1,1 +1,26 @@
+# macOS
 *.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+dist/
+build/
+.coverage
+htmlcov/
+
+# Virtual environments (uv creates .venv; legacy envs below)
+.venv/
+myenv/
+.codex-venv/
+
+# uv — lock file IS committed; exclude nothing else
+
+# pytest
+.pytest_cache/
+
+# Editor
+*.swp
+*.swo
