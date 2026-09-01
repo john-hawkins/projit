@@ -620,6 +620,10 @@ class Projit:
         :return: None
         :rtype: None
         """
+        if not self.experiment_exists(experiment):
+            raise Exception("Projit Experiment Exception: No experiment called: '%s' -- Register your experiment first." % experiment)
+        if dataset is not None and not self.dataset_exists(dataset):
+            raise Exception("Projit Dataset Exception: No dataset called: '%s' -- Register your dataset first." % dataset)
 
         self.initiate_lock()
         self.reload()
