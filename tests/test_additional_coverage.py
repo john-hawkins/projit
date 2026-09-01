@@ -34,6 +34,7 @@ def test_write_and_open_config_round_trip(tmp_path):
 
 def test_add_experiment_overwrite_cleans_results(project):
     project.add_experiment("baseline", "old.py")
+    project.add_dataset("validation", "val.csv")
     project.add_result("baseline", "rmse", 0.5)
     project.add_result("baseline", "rmse", 0.4, dataset="validation")
 

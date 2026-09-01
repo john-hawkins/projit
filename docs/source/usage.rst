@@ -183,7 +183,7 @@ You can also produce a simple ascii plot of the execution time over all iteratio
 Manage Results
 ^^^^^^^^^^^^^^^^^^^^^
 
-You can also add results associated with an experiment. 
+You can also add results associated with an experiment.
 You supply the experiment name, the metric and the value.
 
 .. code-block:: python
@@ -191,6 +191,13 @@ You supply the experiment name, the metric and the value.
     import projit as pit
     project = pit.projit_load()
     project.add_result("Initial Exp", "rmse", 10.4)
+
+Note that ``add_result`` requires the named experiment to already be
+registered with ``add_experiment`` (or ``start_experiment``) -- and, if you
+pass a dataset name as shown below, that dataset must already be registered
+with ``add_dataset`` as well. Calling ``add_result`` with an experiment or
+dataset name that hasn't been registered raises an exception rather than
+silently recording an orphaned result.
 
 You can add as many metric as you want in an ad-hoc fashion.
 There is no requirement for every experiment to track the same metrics.
@@ -216,12 +223,13 @@ Experimental results can also be added such that they are associated with specif
 datasets. This is useful to track performance on validation, test or holdouts sets.
 As well as separate out-of-time test sets.
 
-To add the results to a specific dataset:
+To add the results to a specific dataset, the dataset must be registered first:
 
 .. code-block:: python
 
     import projit as pit
     project = pit.projit_load()
+    project.add_dataset("MyTestDataSet", "data/test.csv")
     project.add_result("Initial Exp", "rmse", 10.4, "MyTestDataSet")
 
 You can then list the results just for that specific dataset:
@@ -229,6 +237,11 @@ You can then list the results just for that specific dataset:
 .. code-block:: bash
 
     >projit list results MyTestDataSet
+
+Note the difference in argument meaning between the two commands above:
+the first (optional) positional argument to ``add_result`` is always the
+**experiment** name, while the optional positional argument to
+``projit list results`` is a **dataset** name used to filter the results.
 
 
 

@@ -104,16 +104,20 @@ def test_get_results_experiment_with_no_results(project):
 
 
 # ===========================================================================
-# T-05  add_result for unregistered experiment — succeeds silently
+# T-05  add_result for unregistered experiment — raises (fixed, see issue 13)
 # ===========================================================================
 
 def test_add_result_for_unregistered_experiment(project):
-    """T-05: add_result for an unregistered experiment stores silently."""
-    # Should not raise
-    project.add_result("ghost_exp", "rmse", 0.9)
-    # The result is stored but won't appear in get_results (no registered exp)
-    df = project.get_results()
-    assert "ghost_exp" not in df["experiment"].values if not df.empty else True
+    """T-05: add_result for an unregistered experiment raises an exception."""
+    with pytest.raises(Exception):
+        project.add_result("ghost_exp", "rmse", 0.9)
+
+
+def test_add_result_for_unregistered_dataset(project):
+    """T-05b: add_result with a valid experiment but unregistered dataset raises."""
+    project.add_experiment("exp1", "run.py")
+    with pytest.raises(Exception):
+        project.add_result("exp1", "rmse", 0.9, dataset="ghost_dataset")
 
 
 # ===========================================================================
