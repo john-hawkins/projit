@@ -1,15 +1,16 @@
-import argparse
-import pandas as pd
-import numpy as np
+# -*- coding: utf-8 -*-
+
+"""
+   projit.cli: Command line interface for projit.
+   This file provides argument parsing and execution via the click-based CLI.
+"""
+
 import sys
 import os
 
-# -*- coding: utf-8 -*-
-  
-"""
-   projit.cli: Command line interface for projit.
-   This file provide argument parsing and execution via entry point main()
-"""
+import click
+import pandas as pd
+import numpy as np
 
 from .utils import locate_projit_config
 from .config import config_folder
@@ -22,8 +23,6 @@ from .ascii_plot import ascii_plot
 from .latex_table import print_latex
 
 from projit import __version__
-
-project = None
 
 ##################################################################################
 def task_init(name, template=''):
@@ -510,169 +509,210 @@ def task_plot(project, experiment, property, metric):
 
 
 #################################################################################
-def print_usage(prog):
-    """ Command line application usage instrutions. """
-    print(" USAGE ")
-    print(" ", prog, "[OPTIONS] <COMMAND> [<ASSET>] [<PARAMS>*]")
-    print("   <COMMAND>     - CORE TASK TO PERFORM: [init | upate | rm | status | add | list | compare | render]")
-    print("   <ASSET>       - (OPTIONAL) Dependant on COMMAND: [dataset | experiment | results]")
-    print("   <PARAMS>      - (OPTIONAL) Dependant on COMMAND: Usually names and paths")
-    print("   [OPTIONS]")
-    print("      -v, --version          - Print version")
-    print("      -h, --help             - Get command help")
-    print("      -m, --markdown         - Use markdown format when printing results")
-    print("      -l, --latex            - Use LaTeX format when printing results")
-    print("      -p, --precision <N>    - Set the numerical precision to <N>")
-    print("")
-    print("   COMMON USAGE PATTERNS")
-    print("   ", prog, "init 'Project name'                     # Initialise project")
-    print("   ", prog, "status                                  # View project status")
-    print("   ", prog, "add dataset train data/train.csv        # Register training data")
-    print("   ", prog, "add dataset test data/test.csv          # Register testing data")
-    print("   ", prog, "add experiment explore explore.ipynb    # Register an experiment script")
-    print("   ", prog, "list datasets                           # List the available datasets")
-    print("   ", prog, "list experiments                        # List the registered experiments")
-    print("   ", prog, "list results                            # List the registered results ")
-    print("   ", prog, "list results test                       # List the registered results on dataset 'test' ")
-    print("   ", prog, "plot initial execution                  # Plot the execution times for the experiment named 'initial'")
-    print("   ", prog, "plot initial hyperparam alpha           # Plot the change in hyperparam 'alpha' for the experiment named 'initial'")
-    print("   ", prog, "plot initial result MSE                 # Plot the change in result 'MSE' for the experiment named 'initial'")
-    print("   ", prog, "render path_to_output.pdf               # Render a PDF document summarising the project")
-    print("   ", prog, "-m list results test                    # List results on 'test' data in Markdown format")
-    print("   ", prog, "rm experiment explore                   # Remove the experiment explore (requires confirmation)")
-    print("   ", prog, "rm experiment .                         # Remove all experiments (requires confirmation)")
-    print("   ", prog, "-m list results test                    # List results on test data in Markdown format")
-    print("   ", prog, "compare dataone,datatwo MAE             # Compare results over datasets using metric MAE")
-    print("")
+# Click CLI
+#################################################################################
+
+CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 
 
-###############################################################################
-def main():
-    try:
-        cli_main()
-    except Exception as e:
-        print("*** Projit CLI Error ***")
-        print(e)
-    finally:
-        if project is not None:
-            project.release_lock()
+@click.group(context_settings=CONTEXT_SETTINGS, invoke_without_command=True)
+@click.version_option(__version__, "-v", "--version")
+@click.option("-m", "--markdown", is_flag=True, default=False,
+              help="Use markdown format for results output.")
+@click.option("-l", "--latex", is_flag=True, default=False,
+              help="Use LaTeX format for results output (overrides -m).")
+@click.option("-p", "--precision", type=int, default=3, show_default=True,
+              help="Numerical precision for displayed results.")
+@click.pass_context
+def cli(ctx, markdown, latex, precision):
+    """projit — project tracking for data science and ML experiments.
+
+    Run 'projit COMMAND --help' for detailed help on any subcommand.
+
+    \b
+    Common usage patterns:
+      projit init 'Project name'                     # Initialise project
+      projit status                                  # View project status
+      projit add dataset train data/train.csv        # Register training data
+      projit add experiment explore explore.ipynb    # Register an experiment
+      projit list datasets                           # List datasets
+      projit list experiments                        # List experiments
+      projit list results                            # List all results
+      projit list results test                       # Results for dataset 'test'
+      projit -m list results test                    # Results in Markdown format
+      projit compare dataone,datatwo MAE             # Compare results by metric
+      projit render path_to_output.pdf               # Render PDF summary
+    """
+    ctx.ensure_object(dict)
+    ctx.obj["format"] = "latex" if latex else ("markdown" if markdown else "simple")
+    ctx.obj["precision"] = precision
+    if ctx.invoked_subcommand is None:
+        click.echo(ctx.get_help())
 
 
-###############################################################################
-def cli_main():
-   parser = argparse.ArgumentParser()
-   parser.add_argument('-v', '--version', help='Print Version', action='store_true')
-   parser.add_argument('-m', '--markdown', help='Use markdown for output', action='store_true')
-   parser.add_argument('-l', '--latex', help='Use LaTeX for output - overrides markdown', action='store_true')
-   parser.add_argument('-u', '--usage', help='Print detailed usage instructions with examples', action='store_true')
-   parser.add_argument('-p', '--precision', help='Define numerical precision', type=int, default=3)
+def _require_project():
+    """Load and return the current project, or exit with an error."""
+    config_path = locate_projit_config()
+    if config_path == "":
+        click.echo(" ERROR: This is not a projit project.")
+        click.echo("        Please initialise the project first.")
+        click.echo(" > projit init <PROJECT NAME>")
+        raise SystemExit(1)
+    return projit_load(config_path)
 
-   subparsers = parser.add_subparsers(dest="cmd") 
 
-   init_parser = subparsers.add_parser('init')
-   init_parser.add_argument('name')
-   init_parser.add_argument('template', nargs='?', default="")
+@cli.command(context_settings=CONTEXT_SETTINGS)
+@click.argument("name")
+@click.argument("template", default="")
+def init(name, template):
+    """Initialise a new projit project in the current directory.
 
-   up_parser = subparsers.add_parser('update')
+    NAME is the project name.
+    TEMPLATE (optional) is the project template to use (default: 'default').
+    """
+    task_init(name, template)
 
-   add_parser = subparsers.add_parser('add')
-   add_parser.add_argument('asset')
-   add_parser.add_argument('name')
-   add_parser.add_argument('path')
 
-   add_parser = subparsers.add_parser('tag')
-   add_parser.add_argument('asset')
-   add_parser.add_argument('name')
-   add_parser.add_argument('values')
+@cli.command(context_settings=CONTEXT_SETTINGS)
+def update():
+    """Interactively update the project name and description."""
+    project = _require_project()
+    task_update(project)
 
-   list_parser = subparsers.add_parser('list')
-   list_parser.add_argument('subcmd')
-   list_parser.add_argument('dataset', nargs='?', default="")
-   list_parser.add_argument('--tags', nargs='+', default="")
 
-   plot_parser = subparsers.add_parser('plot')
-   plot_parser.add_argument('experiment')
-   plot_parser.add_argument('property')
-   plot_parser.add_argument('metric', nargs='?', default="")
+@cli.command(context_settings=CONTEXT_SETTINGS)
+def status():
+    """Show a summary of the current project (datasets, experiments, runs)."""
+    project = _require_project()
+    task_status(project)
 
-   rm_parser = subparsers.add_parser('rm')
-   rm_parser.add_argument('asset')
-   rm_parser.add_argument('name')
 
-   comp_parser = subparsers.add_parser('compare')
-   comp_parser.add_argument('datasets')
-   comp_parser.add_argument('metric')
+@cli.command(context_settings=CONTEXT_SETTINGS)
+@click.argument("asset", type=click.Choice(["dataset", "experiment"]))
+@click.argument("name")
+@click.argument("path")
+def add(asset, name, path):
+    """Register a dataset or experiment with the project.
 
-   ren_parser = subparsers.add_parser('render')
-   ren_parser.add_argument('path')
+    \b
+    ASSET  the type to register: 'dataset' or 'experiment'
+    NAME   the label used to refer to this asset
+    PATH   the file system path (or URL) to the asset
+    """
+    project = _require_project()
+    task_add(project, asset, name, path)
 
-   sta_parser = subparsers.add_parser('status')
- 
-   args = parser.parse_args() 
 
-   if args.version:
-       print(" Version:", __version__)
-       exit(0)
+@cli.command(context_settings=CONTEXT_SETTINGS)
+@click.argument("asset", type=click.Choice(["dataset", "experiment"]))
+@click.argument("name")
+@click.argument("values")
+def tag(asset, name, values):
+    """Add key=value metadata tags to a dataset or experiment.
 
-   if args.usage:
-       print_usage("projit")
-       exit(0)
+    \b
+    ASSET   the asset type: 'dataset' or 'experiment'
+    NAME    the name of the asset to tag
+    VALUES  comma-separated key=value pairs, e.g. 'env=prod,split=80'
+    """
+    project = _require_project()
+    task_tag(project, asset, name, values)
 
-   if args.cmd == None:
-       print_usage("projit")
-       exit(0)
 
-   if args.cmd == "init":
-      task_init(args.name)
-      exit(0)
+@cli.command(name="list", context_settings=CONTEXT_SETTINGS)
+@click.argument("subcmd", type=click.Choice(["datasets", "experiments", "results"]))
+@click.argument("dataset", default="")
+@click.option("--tags", multiple=True,
+              help="Tag columns to include in the output (repeatable).")
+@click.pass_context
+def list_cmd(ctx, subcmd, dataset, tags):
+    """List datasets, experiments, or results registered in this project.
 
-   """
-   From this point on all commands required that we are inside a valid projit project
-   """
-   config_path = locate_projit_config()
-   if config_path=="":
-       print(" ERROR: This is not a projit project.")
-       print("        Please initialise the project first.")
-       print(" > projit init <PROJECT NAME>")
-       exit(1)
+    \b
+    SUBCMD   what to list: 'datasets', 'experiments', or 'results'
+    DATASET  (optional) filter results to a specific dataset name
 
-   project = projit_load(config_path)
+    Supports the global -m/--markdown, -l/--latex, and -p/--precision options.
+    """
+    project = _require_project()
+    fmt = ctx.obj.get("format", "simple")
+    precision = ctx.obj.get("precision", 3)
+    task_list(subcmd, project, dataset, fmt, precision, list(tags))
 
-   format = 'simple'
-   if args.markdown:
-       format = 'markdown'
-   if args.latex:
-       format = 'latex'
 
-   if args.cmd == 'list':
-      task_list(args.subcmd, project, args.dataset, format, args.precision, args.tags)
+@cli.command(context_settings=CONTEXT_SETTINGS)
+@click.argument("asset", type=click.Choice(["dataset", "experiment"]))
+@click.argument("name")
+def rm(asset, name):
+    """Remove a dataset or experiment from the project (requires confirmation).
 
-   if args.cmd == 'compare':
-      datasets = args.datasets.split(",")
-      task_compare(project, datasets, args.metric, format, args.precision)
+    \b
+    ASSET  the asset type: 'dataset' or 'experiment'
+    NAME   the name of the asset to remove; use '.' to remove all of that type
+    """
+    project = _require_project()
+    task_rm(project, asset, name)
 
-   if args.cmd == 'add':
-      task_add(project, args.asset, args.name, args.path)
 
-   if args.cmd == 'tag':
-      task_tag(project, args.asset, args.name, args.values)
+@cli.command(context_settings=CONTEXT_SETTINGS)
+@click.argument("datasets")
+@click.argument("metric")
+@click.pass_context
+def compare(ctx, datasets, metric):
+    """Compare experiment results across multiple datasets for a given metric.
 
-   if args.cmd == 'rm':
-      task_rm(project, args.asset, args.name)
+    \b
+    DATASETS  comma-separated list of dataset names, e.g. 'train,test,val'
+    METRIC    the result column to compare across datasets
 
-   if args.cmd == 'plot':
-      task_plot(project, args.experiment, args.property, args.metric)
+    Supports the global -m/--markdown, -l/--latex, and -p/--precision options.
+    """
+    project = _require_project()
+    fmt = ctx.obj.get("format", "simple")
+    precision = ctx.obj.get("precision", 3)
+    dataset_list = datasets.split(",")
+    task_compare(project, dataset_list, metric, fmt, precision)
 
-   if args.cmd == 'update':
-      task_update(project)
 
-   if args.cmd == 'status':
-      task_status(project)
+@cli.command(context_settings=CONTEXT_SETTINGS)
+@click.argument("experiment")
+@click.argument("property", type=click.Choice(["execution", "hyperparam", "result"]))
+@click.argument("metric", default="")
+def plot(experiment, property, metric):
+    """Plot execution times or tracked values for an experiment.
 
-   if args.cmd == 'render':
-      task_render(project, args.path)
+    \b
+    EXPERIMENT  the name of the experiment to plot
+    PROPERTY    what to plot: 'execution', 'hyperparam', or 'result'
+    METRIC      required when PROPERTY is 'hyperparam' or 'result'
+    """
+    project = _require_project()
+    task_plot(project, experiment, property, metric)
+
+
+@cli.command(context_settings=CONTEXT_SETTINGS)
+@click.argument("path")
+def render(path):
+    """Render a PDF summary document for the project.
+
+    PATH is the output file path, e.g. 'reports/summary.pdf'.
+    """
+    project = _require_project()
+    task_render(project, path)
 
 
 #################################################################################
-if __name__ == '__main__':
+# Entrypoint
+#################################################################################
+
+def main():
+    cli()
+
+
+# Backward-compatibility alias used by existing tests that import cli_main
+cli_main = cli
+
+
+#################################################################################
+if __name__ == "__main__":
     main()
