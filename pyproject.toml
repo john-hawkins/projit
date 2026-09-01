@@ -15,6 +15,7 @@ dependencies = [
     "fpdf",
     "gitpython",
     "setuptools",
+    "click>=8.0",
 ]
 
 [project.urls]
