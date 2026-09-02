@@ -36,7 +36,7 @@ def test_top_level_help_lists_all_subcommands():
     runner = CliRunner()
     result = runner.invoke(cli, ["--help"])
     assert result.exit_code == 0
-    for cmd in ["init", "update", "add", "tag", "list", "rm", "compare", "plot", "render", "status"]:
+    for cmd in ["init", "update", "add", "add-result", "start", "stop", "tag", "list", "rm", "compare", "plot", "render", "status"]:
         assert cmd in result.output, f"'{cmd}' missing from top-level --help"
 
 
@@ -104,6 +104,120 @@ def test_add_invalid_asset_shows_error_with_choices():
         result = runner.invoke(cli, ["add", "badtype", "myname", "mypath"])
     assert result.exit_code != 0
     assert "badtype" in result.output or "invalid" in result.output.lower()
+
+
+# ===========================================================================
+# add-result --help and validation
+# ===========================================================================
+
+def test_add_result_help_describes_arguments():
+    runner = CliRunner()
+    result = runner.invoke(cli, ["add-result", "--help"])
+    assert result.exit_code == 0
+    assert "EXPERIMENT" in result.output or "experiment" in result.output.lower()
+    assert "METRIC" in result.output or "metric" in result.output.lower()
+    assert "DATASET" in result.output or "dataset" in result.output.lower()
+
+
+def test_add_result_for_registered_experiment():
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        _init_project(runner)
+        runner.invoke(cli, ["add", "experiment", "exp1", "train.py"])
+        result = runner.invoke(cli, ["add-result", "exp1", "rmse", "0.5"])
+        assert result.exit_code == 0
+        list_result = runner.invoke(cli, ["list", "results"])
+        assert "exp1" in list_result.output
+
+
+def test_add_result_with_dataset():
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        _init_project(runner)
+        runner.invoke(cli, ["add", "experiment", "exp1", "train.py"])
+        runner.invoke(cli, ["add", "dataset", "test", "data/test.csv"])
+        result = runner.invoke(cli, ["add-result", "exp1", "rmse", "0.5", "test"])
+        assert result.exit_code == 0
+        list_result = runner.invoke(cli, ["list", "results", "test"])
+        assert "exp1" in list_result.output
+
+
+def test_add_result_for_unregistered_experiment_shows_error():
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        _init_project(runner)
+        result = runner.invoke(cli, ["add-result", "ghost", "rmse", "0.5"])
+        assert result.exit_code != 0
+
+
+def test_add_result_for_unregistered_dataset_shows_error():
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        _init_project(runner)
+        runner.invoke(cli, ["add", "experiment", "exp1", "train.py"])
+        result = runner.invoke(cli, ["add-result", "exp1", "rmse", "0.5", "ghost_dataset"])
+        assert result.exit_code != 0
+
+
+# ===========================================================================
+# start / stop --help and validation
+# ===========================================================================
+
+def test_start_help_describes_arguments():
+    runner = CliRunner()
+    result = runner.invoke(cli, ["start", "--help"])
+    assert result.exit_code == 0
+    assert "NAME" in result.output or "name" in result.output.lower()
+    assert "PATH" in result.output or "path" in result.output.lower()
+
+
+def test_stop_help_describes_arguments():
+    runner = CliRunner()
+    result = runner.invoke(cli, ["stop", "--help"])
+    assert result.exit_code == 0
+    assert "NAME" in result.output or "name" in result.output.lower()
+    assert "ID" in result.output or "id" in result.output.lower()
+
+
+def test_start_registers_experiment_and_prints_execution_id():
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        _init_project(runner)
+        result = runner.invoke(cli, ["start", "exp1", "train.py"])
+        assert result.exit_code == 0
+        exec_id = result.output.strip()
+        assert len(exec_id) > 0
+        list_result = runner.invoke(cli, ["list", "experiments"])
+        assert "exp1" in list_result.output
+
+
+def test_start_then_stop_records_execution():
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        _init_project(runner)
+        start_result = runner.invoke(cli, ["start", "exp1", "train.py"])
+        exec_id = start_result.output.strip()
+        stop_result = runner.invoke(cli, ["stop", "exp1", exec_id])
+        assert stop_result.exit_code == 0
+        list_result = runner.invoke(cli, ["list", "experiments"])
+        assert "exp1" in list_result.output
+
+
+def test_stop_with_unknown_execution_id_shows_error():
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        _init_project(runner)
+        runner.invoke(cli, ["start", "exp1", "train.py"])
+        result = runner.invoke(cli, ["stop", "exp1", "not-a-real-id"])
+        assert result.exit_code != 0
+
+
+def test_stop_for_unregistered_experiment_shows_error():
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        _init_project(runner)
+        result = runner.invoke(cli, ["stop", "ghost", "some-id"])
+        assert result.exit_code != 0
 
 
 # ===========================================================================
@@ -402,11 +516,7 @@ def test_global_markdown_produces_markdown_table():
     with runner.isolated_filesystem():
         _init_project(runner)
         runner.invoke(cli, ["add", "experiment", "exp1", "train.py"])
-        # Use projit API directly to add a result since CLI doesn't add results
-        from projit.projit import load
-        from projit.config import config_folder
-        p = load(config_folder)
-        p.add_result("exp1", "rmse", 0.5)
+        runner.invoke(cli, ["add-result", "exp1", "rmse", "0.5"])
         result = runner.invoke(cli, ["-m", "list", "results"])
         assert result.exit_code == 0
         assert "|" in result.output  # markdown table separator
@@ -418,10 +528,7 @@ def test_global_precision_affects_output():
     with runner.isolated_filesystem():
         _init_project(runner)
         runner.invoke(cli, ["add", "experiment", "exp1", "train.py"])
-        from projit.projit import load
-        from projit.config import config_folder
-        p = load(config_folder)
-        p.add_result("exp1", "rmse", 0.12345)
+        runner.invoke(cli, ["add-result", "exp1", "rmse", "0.12345"])
         result_p1 = runner.invoke(cli, ["-p", "1", "list", "results"])
         result_p5 = runner.invoke(cli, ["-p", "5", "list", "results"])
         assert result_p1.exit_code == 0

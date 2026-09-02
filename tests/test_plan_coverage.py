@@ -121,6 +121,41 @@ def test_add_result_for_unregistered_dataset(project):
 
 
 # ===========================================================================
+# BUG-14  start_experiment() deadlock on an unregistered experiment name
+# ===========================================================================
+
+def test_start_experiment_auto_registers_without_deadlocking(project):
+    """BUG-14: start_experiment() must not deadlock when auto-registering a
+    brand new experiment name (i.e. called without add_experiment() first).
+
+    Guarded with SIGALRM so a regression fails fast with a clear message
+    instead of hanging the whole test run forever (initiate_lock() retries
+    with no timeout).
+    """
+    signal = pytest.importorskip("signal")
+    if not hasattr(signal, "SIGALRM"):
+        pytest.skip("SIGALRM not available on this platform")
+
+    def _timeout_handler(signum, frame):
+        raise TimeoutError(
+            "start_experiment() did not return within 10s -- likely a "
+            "regression of the BUG-14 deadlock (initiate_lock() called "
+            "reentrantly via add_experiment())"
+        )
+
+    previous_handler = signal.signal(signal.SIGALRM, _timeout_handler)
+    signal.alarm(10)
+    try:
+        exec_id = project.start_experiment("brand_new_exp", "run.py")
+    finally:
+        signal.alarm(0)
+        signal.signal(signal.SIGALRM, previous_handler)
+
+    assert project.experiment_exists("brand_new_exp")
+    project.end_experiment("brand_new_exp", exec_id)
+
+
+# ===========================================================================
 # T-06  add_tags — merges with existing tags (BUG-5 verification)
 # ===========================================================================
 

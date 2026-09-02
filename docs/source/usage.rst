@@ -1,7 +1,12 @@
 Usage Guide
 ===========
 
-Usage of projit happens at multiple points in a project development
+Usage of projit happens at multiple points in a project development.
+
+This page is a topic-by-topic reference and mixes CLI and API examples
+within each section. If you'd rather see one complete project lifecycle
+worked through end-to-end using only one interface, see
+:doc:`tutorial_cli` (CLI-only) or :doc:`tutorial_api` (API-only).
 
 Project Initialization
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -31,6 +36,11 @@ OR
 Each of these two commands will read the template definitions inside the
 ```templates``` directory and create all the specified directories.
 
+The ``template=`` prefix shown above is optional and kept only for backward
+compatibility -- ``projit init <Project-Name> default`` (without the
+``template=`` prefix) works identically, and is what ``projit init --help``
+shows.
+
 You can then update these properties as follows:
 
 .. code-block:: bash
@@ -57,6 +67,17 @@ package and the following syntax:
     import projit as pit
     project = pit.projit_load()
     train_data = project.get_dataset("train")
+
+You can list all registered datasets by reading the ``datasets`` attribute
+directly -- it is a plain dictionary of ``{name: path}`` and there is no
+separate ``list_datasets()`` API method:
+
+.. code-block:: python
+
+    import projit as pit
+    project = pit.projit_load()
+    for name, path in project.datasets.items():
+        print(name, path)
 
 Note that the following syntax will work regardless of where in the directory structure the
 script is extected. The projit Project determines the path to the data with the condition that
@@ -131,10 +152,40 @@ over each iteration.
     project.end_experiment("Initial Exp", exec_id, hyperparams={})
 
 This will add the experiment if it is not already registered.
-It will then create an execution record for the first and all subsequent 
-executions of the script. The execution record will contain start and end times, 
+It will then create an execution record for the first and all subsequent
+executions of the script. The execution record will contain start and end times,
 the git hash (if present) of the codebase
 and any optional parameters or hyperparameters you wish to record.
+
+.. important::
+    ``start_experiment``/``end_experiment`` do not run your script for you --
+    they only bracket a timestamped metadata record around code that you run
+    yourself between the two calls. Neither ``params`` nor ``hyperparams`` is
+    read by projit or passed into your script; they are opaque dictionaries
+    stored on the execution record for your own later reference. By
+    convention, ``params`` (passed to ``start_experiment``) records
+    configuration known *before* the run -- e.g. dataset split, random seed,
+    target column -- while ``hyperparams`` (passed to ``end_experiment``)
+    records values decided or finalised *during or after* the run. Nothing
+    enforces this split: if you want the values in ``params`` to actually
+    configure your run, your own code must read them back out of the dict
+    you passed in.
+
+The same start/end pattern is available from the CLI, for wrapping a script
+you run yourself without writing any Python:
+
+.. code-block:: bash
+
+    EXEC_ID=$(projit start "Initial Exp" experiments/exp_one.py)
+    python experiments/exp_one.py
+    projit stop "Initial Exp" "$EXEC_ID"
+
+``projit start`` prints the execution ID to stdout, which must be captured
+and passed to ``projit stop`` to close out that execution record. As with
+the Python API, ``projit start`` registers the experiment automatically if
+it isn't already registered. The CLI versions don't currently accept
+``params``/``hyperparams`` -- use the Python API if you need to record
+those.
 
 
 You can list the experiments you have registered and executed using the CLI:
@@ -192,6 +243,12 @@ You supply the experiment name, the metric and the value.
     project = pit.projit_load()
     project.add_result("Initial Exp", "rmse", 10.4)
 
+The same can be done from the command line with ``add-result``:
+
+.. code-block:: bash
+
+    >projit add-result "Initial Exp" rmse 10.4
+
 Note that ``add_result`` requires the named experiment to already be
 registered with ``add_experiment`` (or ``start_experiment``) -- and, if you
 pass a dataset name as shown below, that dataset must already be registered
@@ -232,16 +289,27 @@ To add the results to a specific dataset, the dataset must be registered first:
     project.add_dataset("MyTestDataSet", "data/test.csv")
     project.add_result("Initial Exp", "rmse", 10.4, "MyTestDataSet")
 
+Or from the command line, with the dataset name as the fourth argument to
+``add-result``:
+
+.. code-block:: bash
+
+    >projit add dataset MyTestDataSet data/test.csv
+    >projit add-result "Initial Exp" rmse 10.4 MyTestDataSet
+
 You can then list the results just for that specific dataset:
 
 .. code-block:: bash
 
     >projit list results MyTestDataSet
 
-Note the difference in argument meaning between the two commands above:
-the first (optional) positional argument to ``add_result`` is always the
-**experiment** name, while the optional positional argument to
-``projit list results`` is a **dataset** name used to filter the results.
+Note the difference in argument meaning between ``add-result``/``add_result``
+and ``list results`` above: the (required) positional argument to
+``add-result``/``add_result`` is always the **experiment** name, and its
+optional trailing argument is a **dataset** name to associate the result
+with. The optional positional argument to ``projit list results`` is instead
+a **dataset** name used to *filter* the results shown -- don't confuse the
+two.
 
 
 
