@@ -1,4 +1,7 @@
-from importlib.metadata import version as _pkg_version, PackageNotFoundError as _PKGError
+from importlib.metadata import (
+    version as _pkg_version,
+    PackageNotFoundError as _PKGError,
+)
 
 try:
     __version__ = _pkg_version("projit")

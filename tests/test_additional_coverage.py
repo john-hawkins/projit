@@ -95,8 +95,13 @@ def test_start_experiment_persists_execution_and_tags(project):
 
     assert execution_id in reloaded.executions["train-model"]
     assert reloaded.executions["train-model"][execution_id]["params"] == {"lr": 0.1}
-    assert reloaded.executions["train-model"][execution_id]["hyperparams"] == {"depth": 3}
-    assert reloaded.get_tags("experiment", "train-model", ["stage", "owner"]) == ["baseline", ""]
+    assert reloaded.executions["train-model"][execution_id]["hyperparams"] == {
+        "depth": 3
+    }
+    assert reloaded.get_tags("experiment", "train-model", ["stage", "owner"]) == [
+        "baseline",
+        "",
+    ]
 
 
 def test_reload_restores_saved_project_state(project):

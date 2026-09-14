@@ -9,10 +9,11 @@ import projit.projit as proj
 from projit.utils import walk_up
 from projit.config import config_folder
 from projit.utils import locate_projit_config
-from projit.utils import initialise_project 
+from projit.utils import initialise_project
 from projit.utils import get_properties
 from projit.utils import write_properties
 from projit.projit import projit_load
+
 
 #################################################################
 def reset_test_dir(dirname):
@@ -20,27 +21,30 @@ def reset_test_dir(dirname):
         shutil.rmtree(dirname)
     os.mkdir(dirname)
 
+
 #################################################################
 def test_walk():
     """
-    In this test we ensure that the walk function can traverse a 
+    In this test we ensure that the walk function can traverse a
      directory structure as expected.
     """
     gena = walk_up("./tests")
     path, dirs, files = gena.__next__()
-    assert len(dirs) == 1 # pytest will create a __pycache__ folder
+    assert len(dirs) == 1  # pytest will create a __pycache__ folder
     path, dirs, files = gena.__next__()
     # Back in the project root. dirs should contain ['projit','tests']
-    assert 'projit' in dirs
-    assert 'tests' in dirs
+    assert "projit" in dirs
+    assert "tests" in dirs
+
 
 #################################################################
 def test_locate_projit_config():
     """
-    In this test we ensure that a config file is not found when 
+    In this test we ensure that a config file is not found when
      one does not exist
     """
     assert locate_projit_config() == ""
+
 
 #################################################################
 def test_projit_init():
@@ -52,9 +56,10 @@ def test_projit_init():
     initialise_project("TEST", "TEST")
     assert locate_projit_config() != ""
     cfg = get_properties(config_folder)
-    assert cfg['project_name'] == "TEST"
-    assert cfg['description'] == "TEST"
+    assert cfg["project_name"] == "TEST"
+    assert cfg["description"] == "TEST"
     shutil.rmtree(config_folder)
+
 
 #################################################################
 def test_projit_update():
@@ -66,13 +71,14 @@ def test_projit_update():
     initialise_project("TEST", "TEST")
     assert locate_projit_config() != ""
     cfg = get_properties(config_folder)
-    cfg['project_name'] = "TEST2"
-    cfg['description'] = "TEST2"
+    cfg["project_name"] = "TEST2"
+    cfg["description"] = "TEST2"
     write_properties(config_folder, cfg)
     cfg2 = get_properties(config_folder)
-    assert cfg2['project_name'] == "TEST2"
-    assert cfg2['description'] == "TEST2"
+    assert cfg2["project_name"] == "TEST2"
+    assert cfg2["description"] == "TEST2"
     shutil.rmtree(config_folder)
+
 
 #################################################################
 def test_projit_init_v2():
@@ -89,6 +95,7 @@ def test_projit_init_v2():
     assert path.isdir("data")
     os.chdir("../")
     shutil.rmtree(testdir)
+
 
 #################################################################
 def test_projit_json_load():
@@ -114,15 +121,16 @@ def test_projit_load():
     theproject = projit_load()
     print("ORIGINAL:", project.path)
     print("LOADED:", theproject.path)
-    assert project.name == theproject.name 
+    assert project.name == theproject.name
     os.chdir("../")
     os.chdir("../")
     shutil.rmtree(testdir)
 
+
 #################################################################
 def test_template_results():
     """
-    In this test we ensure that the project initialisation process 
+    In this test we ensure that the project initialisation process
     will create the right directory in a default setup.
     """
     testdir = "temp_test_dir_xyz"
@@ -133,6 +141,7 @@ def test_template_results():
     assert path.isdir("data")
     os.chdir("../")
     shutil.rmtree(testdir)
+
 
 #################################################################
 def test_project_update():
@@ -150,6 +159,7 @@ def test_project_update():
     os.chdir("../")
     shutil.rmtree(testdir)
 
+
 #################################################################
 def test_project_update_lock():
     """
@@ -162,7 +172,7 @@ def test_project_update_lock():
     project = proj.init("default", "exp", "exp test")
     # MODIFY THE PROJECT JSON FILE THEN TEST THAT THE
     # - NEW VALUES ARE LOADED BEFORE THE SAVE
-    project.params = {"TEST":"TEST"}
+    project.params = {"TEST": "TEST"}
     project.save()
     project.update_name_description("Name", "DESC")
     assert len(project.params) == 1
@@ -170,6 +180,7 @@ def test_project_update_lock():
     assert project.desc == "DESC"
     os.chdir("../")
     shutil.rmtree(testdir)
+
 
 #################################################################
 def test_dataset_add_remove():
@@ -180,31 +191,33 @@ def test_dataset_add_remove():
     reset_test_dir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "exp", "exp test")
-    project.add_dataset("test",  "pathtofile")
+    project.add_dataset("test", "pathtofile")
     assert len(project.datasets) == 1
     project.rm_dataset("test")
     assert len(project.datasets) == 0
     os.chdir("../")
     shutil.rmtree(testdir)
 
+
 #################################################################
 def test_dataset_add_remove_all():
     """
     In this test we ensure that remove with wildcard will remove
-     all datasets 
+     all datasets
     """
     testdir = "temp_test_dir_xyz"
     reset_test_dir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "exp", "exp test")
-    project.add_dataset("test1",  "pathtofile")
-    project.add_dataset("test2",  "pathtofile")
-    project.add_dataset("test3",  "pathtofile")
+    project.add_dataset("test1", "pathtofile")
+    project.add_dataset("test2", "pathtofile")
+    project.add_dataset("test3", "pathtofile")
     assert len(project.datasets) == 3
     project.rm_dataset(".")
     assert len(project.datasets) == 0
     os.chdir("../")
     shutil.rmtree(testdir)
+
 
 #################################################################
 def test_experiment_results():
@@ -216,14 +229,15 @@ def test_experiment_results():
     reset_test_dir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "exp", "exp test")
-    project.add_experiment("test",  "pathtofiles")
-    project.add_result("test",  "rmse", 0.5)
+    project.add_experiment("test", "pathtofiles")
+    project.add_result("test", "rmse", 0.5)
     results = project.get_results()
     assert isinstance(results, pd.DataFrame)
     assert "experiment" in results.columns
     assert "rmse" in results.columns
     os.chdir("../")
     shutil.rmtree(testdir)
+
 
 #################################################################
 def test_experiment_remove():
@@ -234,8 +248,8 @@ def test_experiment_remove():
     reset_test_dir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "exp", "exp test")
-    project.add_experiment("test",  "pathtofile")
-    project.add_result("test",  "rmse", 0.5)
+    project.add_experiment("test", "pathtofile")
+    project.add_result("test", "rmse", 0.5)
     assert len(project.experiments) == 1
     project.rm_experiment("test")
     assert len(project.experiments) == 0
@@ -243,22 +257,23 @@ def test_experiment_remove():
     os.chdir("../")
     shutil.rmtree(testdir)
 
+
 #################################################################
 def test_experiment_remove_all():
     """
     In this test we ensure that remove with wildcard will remove
-     all experiments and results 
+     all experiments and results
     """
     testdir = "temp_test_dir_xyz"
     reset_test_dir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "exp", "exp test")
-    project.add_experiment("test",  "pathtofile")
-    project.add_experiment("test2",  "pathtofile")
-    project.add_experiment("test3",  "pathtofile")
-    project.add_result("test",  "rmse", 0.5)
-    project.add_result("test2",  "rmse", 0.5)
-    project.add_result("test3",  "rmse", 0.5)
+    project.add_experiment("test", "pathtofile")
+    project.add_experiment("test2", "pathtofile")
+    project.add_experiment("test3", "pathtofile")
+    project.add_result("test", "rmse", 0.5)
+    project.add_result("test2", "rmse", 0.5)
+    project.add_result("test3", "rmse", 0.5)
     assert len(project.experiments) == 3
     assert len(project.results) == 3
     project.rm_experiment(".")
@@ -278,11 +293,12 @@ def test_experiment_executions_zero():
     reset_test_dir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "exp", "exp test")
-    project.add_experiment("test",  "pathtofile")
+    project.add_experiment("test", "pathtofile")
     execs, mean_time = project.get_experiment_execution_stats("test")
     assert execs == 0
     os.chdir("../")
     shutil.rmtree(testdir)
+
 
 #################################################################
 def test_experiment_executions_one():
@@ -293,13 +309,14 @@ def test_experiment_executions_one():
     reset_test_dir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "exp", "exp test")
-    project.add_experiment("test",  "pathtofile")
+    project.add_experiment("test", "pathtofile")
     exec_id = project.start_experiment("test", "pathtofile", params={})
     project.end_experiment("test", exec_id, hyperparams={})
     execs, mean_time = project.get_experiment_execution_stats("test")
     assert execs == 1
     os.chdir("../")
     shutil.rmtree(testdir)
+
 
 #################################################################
 def test_experiment_executions_two():
@@ -310,7 +327,7 @@ def test_experiment_executions_two():
     reset_test_dir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "exp", "exp test")
-    project.add_experiment("test",  "pathtofile")
+    project.add_experiment("test", "pathtofile")
     exec_id = project.start_experiment("test", "pathtofile", params={})
     project.end_experiment("test", exec_id, hyperparams={})
     exec_id = project.start_experiment("test", "pathtofile", params={})
@@ -331,13 +348,13 @@ def test_experiment_executions_three():
     reset_test_dir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "exp", "exp test")
-    project.add_experiment("test",  "pathtofile")
+    project.add_experiment("test", "pathtofile")
     exec_id = project.start_experiment("test", "pathtofile", params={})
     project.end_experiment("test", exec_id, hyperparams={})
     exec_id = project.start_experiment("test", "pathtofile", params={})
     project.end_experiment("test", exec_id, hyperparams={})
-    
-    project.add_experiment("test2",  "pathtofile")
+
+    project.add_experiment("test2", "pathtofile")
     exec_id = project.start_experiment("test2", "pathtofile", params={})
     project.end_experiment("test2", exec_id, hyperparams={})
     execs, mean_time = project.get_experiment_execution_stats("test")
@@ -346,6 +363,7 @@ def test_experiment_executions_three():
     assert totals == 3
     os.chdir("../")
     shutil.rmtree(testdir)
+
 
 #################################################################
 def test_experiment_executions_incomplete():
@@ -357,7 +375,7 @@ def test_experiment_executions_incomplete():
     reset_test_dir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "exp", "exp test")
-    project.add_experiment("test",  "pathtofile")
+    project.add_experiment("test", "pathtofile")
     exec_id = project.start_experiment("test", "pathtofile", params={})
     project.end_experiment("test", exec_id, hyperparams={})
     exec_id = project.start_experiment("test", "pathtofile", params={})
@@ -378,11 +396,12 @@ def test_project_params():
     reset_test_dir(testdir)
     os.chdir(testdir)
     project = proj.init("default", "test params", "param test")
-    project.add_param("test",  "myval")
+    project.add_param("test", "myval")
     results = project.get_param("test")
     assert results == "myval"
     os.chdir("../")
     shutil.rmtree(testdir)
+
 
 #################################################################
 def test_project_hyperparams():
@@ -394,16 +413,18 @@ def test_project_hyperparams():
     os.chdir(testdir)
     project = proj.init("default", "test params", "param test")
     with pytest.raises(Exception) as e_info:
-        project.add_hyperparam("myexp",  "myval")
+        project.add_hyperparam("myexp", "myval")
 
     project.add_experiment("myexp", "mypath")
-    project.add_hyperparam("myexp",  "myval")
+    project.add_hyperparam("myexp", "myval")
     results = project.get_hyperparam("myexp")
     assert results == "myval"
     os.chdir("../")
     shutil.rmtree(testdir)
 
+
 #################################################################
+
 
 def test_project_experiment_results():
     """
@@ -417,14 +438,11 @@ def test_project_experiment_results():
     project.add_dataset("mydata", "datapath")
     project.add_result("myexp", "RMSE", 0.4, "mydata")
     results = project.get_results("mydata")
-    dt.validate(
-        results.RMSE,
-        float
-    )
+    dt.validate(results.RMSE, float)
     assert isinstance(results, pd.DataFrame)
     dt.validate(
         results.columns,
-        {'RMSE', 'experiment'},
+        {"RMSE", "experiment"},
     )
     resultslen = len(results)
 
@@ -434,7 +452,7 @@ def test_project_experiment_results():
     assert isinstance(results2, pd.DataFrame)
     dt.validate(
         results2.columns,
-        {'RMSE', 'experiment'},
+        {"RMSE", "experiment"},
     )
     assert len(results) == len(results2)
 

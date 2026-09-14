@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """
-   projit.cli: Command line interface for projit.
-   This file provides argument parsing and execution via the click-based CLI.
+projit.cli: Command line interface for projit.
+This file provides argument parsing and execution via the click-based CLI.
 """
 
 import sys
@@ -24,8 +24,9 @@ from .latex_table import print_latex
 
 from projit import __version__
 
+
 ##################################################################################
-def task_init(name, template=''):
+def task_init(name, template=""):
     """
     CLI Internal Task Function: Initialise a project from the command line.
     This function will initate a project with a blank description.
@@ -42,12 +43,14 @@ def task_init(name, template=''):
     """
     config_file = locate_projit_config()
     if config_file != "":
-        print("ERROR: Projit Project already exists. Run `projit update` to change details.")
+        print(
+            "ERROR: Projit Project already exists. Run `projit update` to change details."
+        )
         exit(1)
     descrip = ""
-    if len(template)>9:
-        if template[0:9]=="template=":
-            template=template[9:]
+    if len(template) > 9:
+        if template[0:9] == "template=":
+            template = template[9:]
     project = projit_init(template, name, descrip)
 
 
@@ -74,6 +77,7 @@ def task_update(project):
         descrip = project.desc
     project.update_name_description(name, descrip)
 
+
 ##################################################################################
 def task_status(project):
     """
@@ -92,6 +96,7 @@ def task_status(project):
     print("  Experiments: %i" % len(project.experiments))
     print("  Executions: %i" % project.get_total_executions())
     print("")
+
 
 ##################################################################################
 def filler(current, max_len, content=" "):
@@ -112,10 +117,12 @@ def filler(current, max_len, content=" "):
     """
     return content * (max_len - current)
 
+
 ##################################################################################
 def print_header(header):
-    full_header = header + ("_" * (90-len(header)))
+    full_header = header + ("_" * (90 - len(header)))
     print(full_header)
+
 
 ##################################################################################
 def task_compare(project, datasets, metric, format, precision):
@@ -137,41 +144,41 @@ def task_compare(project, datasets, metric, format, precision):
     :param format: The output format (markdown|latex|default)
     :type format: String, required
 
-    :param precision: The precision for results in the table 
+    :param precision: The precision for results in the table
     :type precision: Int, required
 
     :return: None
     :rtype: None
     """
-    title = "Compare Results" 
+    title = "Compare Results"
     warning = ""
     results = None
-    for dataset in datasets: 
-       rez = project.get_results(dataset)
-       if metric not in rez.columns:
-           rez[metric] = np.nan
-           warning += f"Metric '{metric}' not present for dataset '{dataset}'\n"
-       rez = rez.loc[:,['experiment',metric]]
-       rez.columns = ['experiment', dataset]
-       if results is None:
-           results = rez
-       else:
-           results = pd.merge(results,rez,on="experiment")
-           
+    for dataset in datasets:
+        rez = project.get_results(dataset)
+        if metric not in rez.columns:
+            rez[metric] = np.nan
+            warning += f"Metric '{metric}' not present for dataset '{dataset}'\n"
+        rez = rez.loc[:, ["experiment", metric]]
+        rez.columns = ["experiment", dataset]
+        if results is None:
+            results = rez
+        else:
+            results = pd.merge(results, rez, on="experiment")
+
     if len(warning) > 0:
-       print("*** WARNINGS ***")
-       print(warning)
+        print("*** WARNINGS ***")
+        print(warning)
 
     results = results.round(precision)
 
-    if format == 'markdown':
+    if format == "markdown":
         print_results_markdown(title, results)
-    elif format == 'latex':
+    elif format == "latex":
         print_results_latex(title, results)
     else:
         print(" ___" + title + "__________________________________[ %s ]___" % metric)
-        pd.set_option('expand_frame_repr', False)
-        pd.set_option('display.max_columns', 999)
+        pd.set_option("expand_frame_repr", False)
+        pd.set_option("display.max_columns", 999)
         print(results)
 
 
@@ -179,7 +186,7 @@ def extract_max_tags_lengths(project, asset, tags):
     """
     CLI Internal Function: determine the maximum length of the content
     inside a specific set of tags on an asset in the project.
- 
+
     :param project: The projit project object
     :type project: Projit, required
 
@@ -188,7 +195,7 @@ def extract_max_tags_lengths(project, asset, tags):
 
     :param tags: The tags to search for
     :type tags: list(String), required
- 
+
     :return: List of tag lengths
     :rtype: list(Int)
     """
@@ -203,8 +210,8 @@ def extract_max_tags_lengths(project, asset, tags):
                 else:
                     temp.append(0)
             max_val = max(temp)
-            if max_val<len(t):
-               max_val = len(t)
+            if max_val < len(t):
+                max_val = len(t)
             max_tag_lengths.append(max_val)
         return max_tag_lengths
     else:
@@ -227,21 +234,35 @@ def task_list(subcmd, project, dataset, format, precision, tags):
         print_header("__Datasets")
         if len(project.datasets.keys()) > 0:
             tag_header = ""
-            if len(tags)>0:
-               tag_max_lengths = extract_max_tags_lengths(project, "dataset", tags)
-               for tag,tag_len in zip(tags,tag_max_lengths):
-                   tag_header = tag_header + tag + filler(len(tag), tag_len+3, "_")
-                
+            if len(tags) > 0:
+                tag_max_lengths = extract_max_tags_lengths(project, "dataset", tags)
+                for tag, tag_len in zip(tags, tag_max_lengths):
+                    tag_header = tag_header + tag + filler(len(tag), tag_len + 3, "_")
+
             long_key = max([len(k) for k in project.datasets.keys()])
-            myhead = "__Name" + filler(len("Name"), long_key+3, "_") + tag_header + "Path_________"
+            myhead = (
+                "__Name"
+                + filler(len("Name"), long_key + 3, "_")
+                + tag_header
+                + "Path_________"
+            )
             print_header(myhead)
             for ds in project.datasets:
                 tag_output = ""
-                if len(tags)>0:
-                    tag_vals = project.get_tags("dataset", ds, tags)                
-                    for tag,tag_len in zip(tag_vals,tag_max_lengths):
-                        tag_output = tag_output + tag + filler(len(tag), tag_len+3, " ")
-                print("  ", ds, filler(len(ds), long_key+3 ), tag_output, project.datasets[ds], sep="" )
+                if len(tags) > 0:
+                    tag_vals = project.get_tags("dataset", ds, tags)
+                    for tag, tag_len in zip(tag_vals, tag_max_lengths):
+                        tag_output = (
+                            tag_output + tag + filler(len(tag), tag_len + 3, " ")
+                        )
+                print(
+                    "  ",
+                    ds,
+                    filler(len(ds), long_key + 3),
+                    tag_output,
+                    project.datasets[ds],
+                    sep="",
+                )
         else:
             print(" NONE")
         print("")
@@ -249,56 +270,73 @@ def task_list(subcmd, project, dataset, format, precision, tags):
         print_header("__Experiments")
         if len(project.experiments) > 0:
             tag_header = ""
-            if len(tags)>0:
-               tag_max_lengths = extract_max_tags_lengths(project, "experiment", tags)
-               for tag,tag_len in zip(tags,tag_max_lengths):
-                   tag_header = tag_header + tag + filler(len(tag), tag_len+3, "_")
+            if len(tags) > 0:
+                tag_max_lengths = extract_max_tags_lengths(project, "experiment", tags)
+                for tag, tag_len in zip(tags, tag_max_lengths):
+                    tag_header = tag_header + tag + filler(len(tag), tag_len + 3, "_")
 
             long_key = max([len(k[0]) for k in project.experiments])
-            myhead = "__Name__" + filler(len("Name__"), long_key+3, "_") + tag_header + "Runs__" + "MeanRunTime___" + "Path______"
+            myhead = (
+                "__Name__"
+                + filler(len("Name__"), long_key + 3, "_")
+                + tag_header
+                + "Runs__"
+                + "MeanRunTime___"
+                + "Path______"
+            )
             print_header(myhead)
             for exp in project.experiments:
                 tag_output = ""
-                if len(tags)>0:
+                if len(tags) > 0:
                     tag_vals = project.get_tags("experiment", exp[0], tags)
-                    for tag,tag_len in zip(tag_vals,tag_max_lengths):
-                        tag_output = tag_output + tag + filler(len(tag), tag_len+3, " ")
+                    for tag, tag_len in zip(tag_vals, tag_max_lengths):
+                        tag_output = (
+                            tag_output + tag + filler(len(tag), tag_len + 3, " ")
+                        )
                 execs, mean_time = project.get_experiment_execution_stats(exp[0])
                 mins, secs = divmod(mean_time, 60)
-                if mins>60:
+                if mins > 60:
                     hours, mins = divmod(mins, 60)
                 else:
                     hours = 0
                 hours = int(hours)
                 mins = int(mins)
                 secs = int(secs)
-                if hours>9:
+                if hours > 9:
                     h_str = f"{hours}h"
-                elif hours==0:
+                elif hours == 0:
                     h_str = f"   "
                 else:
                     h_str = f" {hours}h"
 
-                if mins>9:
+                if mins > 9:
                     m_str = f"{mins}m"
-                elif mins==0:
+                elif mins == 0:
                     m_str = f"   "
                 else:
                     m_str = f" {mins}m"
 
-                if secs>9:
+                if secs > 9:
                     s_str = f"{secs}s"
-                elif mins==0:
+                elif mins == 0:
                     s_str = f"   "
                 else:
                     s_str = f" {secs}s"
 
                 mytime = f" {h_str} {m_str} {s_str}  "
 
-                print("  ", exp[0], filler(len(exp[0]), long_key+3), tag_output, 
-                           filler(len(str(execs)), 4), execs, "  ", 
-                           mytime, filler(len(str(mytime)), 12), 
-                           exp[1], sep=""  
+                print(
+                    "  ",
+                    exp[0],
+                    filler(len(exp[0]), long_key + 3),
+                    tag_output,
+                    filler(len(str(execs)), 4),
+                    execs,
+                    "  ",
+                    mytime,
+                    filler(len(str(mytime)), 12),
+                    exp[1],
+                    sep="",
                 )
         else:
             print(" NONE")
@@ -309,24 +347,23 @@ def task_list(subcmd, project, dataset, format, precision, tags):
             rez = project.get_results()
         else:
             rez = project.get_results(dataset)
-            title += " on [%s]"%dataset
+            title += " on [%s]" % dataset
 
         rez = rez.round(precision)
- 
-        if format == 'markdown':
+
+        if format == "markdown":
             print_results_markdown(title, rez)
-        elif format == 'latex':
+        elif format == "latex":
             print_results_latex(title, rez)
         else:
             print_header(f"__Results__[{dataset}]")
-            pd.set_option('expand_frame_repr', False)
-            pd.set_option('display.max_columns', 999)
+            pd.set_option("expand_frame_repr", False)
+            pd.set_option("display.max_columns", 999)
             print(rez)
             print()
     else:
         print(" ERROR: List received an unrecognised sub-command: %s" % subcmd)
         exit(1)
-
 
 
 ###############################################################################
@@ -345,9 +382,10 @@ def task_render(project, path):
 
 ###############################################################################
 
+
 def print_results_latex(title, df):
     """
-    Latex output - Putting this in a central function in case we change the 
+    Latex output - Putting this in a central function in case we change the
     functionality or format in the future.
 
     :param title: The table title
@@ -359,40 +397,42 @@ def print_results_latex(title, df):
     :return: None
     :rtype: None
     """
-    #output = df.to_latex()
-    #print(output)
+    # output = df.to_latex()
+    # print(output)
     print_latex(df, title)
+
 
 ###############################################################################
 
+
 def print_results_markdown(title, df):
-    titleline = "\n%s\n%s" % (title, "-"*len(title))
+    titleline = "\n%s\n%s" % (title, "-" * len(title))
     if df.empty or len(df["experiment"]) == 0:
         print(titleline)
         print()
         return
     longest_name = max(df["experiment"].apply(lambda x: len(x)))
     name_spacer = 12
-    if(longest_name>10):
-        name_spacer = longest_name+2
+    if longest_name > 10:
+        name_spacer = longest_name + 2
 
     col_widths = [name_spacer]
+
     def colwidth(input):
-         wid = len(input)
-         if (wid<6):
-             return 8
-         return wid+2
+        wid = len(input)
+        if wid < 6:
+            return 8
+        return wid + 2
 
     other_cols = list(df.columns)
     other_cols.remove("experiment")
     other_col_widths = list(map(colwidth, other_cols))
 
-
     def widthGenerator(col_names, col_widths):
         for colname, colwidth in zip(col_names, col_widths):
-            longest =  max( df[colname].apply(lambda x: len(str(round(x,2)))))
-            if longest > (colwidth-2):
-                yield longest+2
+            longest = max(df[colname].apply(lambda x: len(str(round(x, 2)))))
+            if longest > (colwidth - 2):
+                yield longest + 2
             else:
                 yield colwidth
 
@@ -403,23 +443,24 @@ def print_results_markdown(title, df):
     print(titleline)
     header = ""
     for colname, colwidth in zip(list(df.columns), col_widths):
-        header += ("| %s%s "% (colname, " "*(colwidth-len(colname)-2) ))
+        header += "| %s%s " % (colname, " " * (colwidth - len(colname) - 2))
     header += "|"
     under = ""
     for colwith in col_widths:
-        under += ("| %s:"% ( "-"*(colwith-2) ))
+        under += "| %s:" % ("-" * (colwith - 2))
     under += "|"
     print(header)
     print(under)
     for i in range(len(df)):
-        name = df.loc[i,"experiment"]
-        rowcontent = "| %s%s "%(name, " "*(name_spacer-len(name)-2) )
+        name = df.loc[i, "experiment"]
+        rowcontent = "| %s%s " % (name, " " * (name_spacer - len(name) - 2))
         for colname, colwidth in zip(other_cols, other_col_widths):
-            content = str(round(df.loc[i,colname],2))
-            rowcontent += "| %s%s "%( " "*(colwidth-len(content)-2), content )
+            content = str(round(df.loc[i, colname], 2))
+            rowcontent += "| %s%s " % (" " * (colwidth - len(content) - 2), content)
         rowcontent += "|"
         print(rowcontent)
     print()
+
 
 ###############################################################################
 def task_add(project, asset, name, path):
@@ -434,6 +475,7 @@ def task_add(project, asset, name, path):
         print("ERROR: Request to add unrecognised asset type: %s" % asset)
         exit(1)
 
+
 ################################################################################
 def task_tag(project, asset, name, values):
     """
@@ -443,7 +485,9 @@ def task_tag(project, asset, name, values):
     tags = {}
     for val in vals:
         if "=" not in val:
-            print(f"ERROR: Invalid tag format '{val}'. Expected key=value pairs separated by commas.")
+            print(
+                f"ERROR: Invalid tag format '{val}'. Expected key=value pairs separated by commas."
+            )
             exit(1)
         key, value = val.split("=", 1)
         if not key:
@@ -454,7 +498,9 @@ def task_tag(project, asset, name, values):
     if project.validate_asset(asset, name):
         project.add_tags(asset, name, tags)
     else:
-        print(f"ERROR: Invalid request to tag asset {name} of type {asset} - please check available assets")
+        print(
+            f"ERROR: Invalid request to tag asset {name} of type {asset} - please check available assets"
+        )
         exit(1)
 
 
@@ -497,18 +543,18 @@ def task_rm(project, asset, name):
     """
     Remove elements to a project from the command line
     """
-    if asset not in ["dataset","experiment"]:
+    if asset not in ["dataset", "experiment"]:
         print("ERROR: Request to remove unrecognised asset type: %s" % asset)
         exit(1)
 
     if name == ".":
         print(f"Remove all {asset}s. Please confirm (y/n)")
         response = input(">")
-    else: 
+    else:
         print(f"Remove {asset} named {name}. Please confirm (y/n)")
         response = input(">")
 
-    if response=='y':
+    if response == "y":
         if asset == "dataset":
             project.rm_dataset(name)
         if asset == "experiment":
@@ -516,29 +562,36 @@ def task_rm(project, asset, name):
     else:
         print(f"** Remove command for {asset} named {name} cancelled ** ")
 
+
 ###############################################################################
 def task_plot(project, experiment, property, metric):
     if property == "execution":
         print()
         print_header(f"__Experiment_[{experiment}]_execution_time_")
         values = project.get_execution_times(experiment)
-        print(ascii_plot(values, xlabel='Iteration', ylabel='Seconds',  width=70, height=12)) 
+        print(
+            ascii_plot(
+                values, xlabel="Iteration", ylabel="Seconds", width=70, height=12
+            )
+        )
         print()
     elif property == "hyperparam":
         print()
         print_header(f"__Experiment_[{experiment}]_hyperparameter_[{metric}]_")
         print("  TODO")
         print()
-        #print(ascii_plot([50,90,130,70,60,0,80,120,100], xlabel='Iteration', ylabel=metric, width=70, height=12)) 
+        # print(ascii_plot([50,90,130,70,60,0,80,120,100], xlabel='Iteration', ylabel=metric, width=70, height=12))
     elif property == "result":
         print()
         print_header(f"__Experiment_[{experiment}]_result_[{metric}]_")
         print("  TODO")
         print()
-        #print(ascii_plot([50,90,130,70,60,0,80,120,100], xlabel='Iteration', ylabel=metric, width=70, height=12)) 
+        # print(ascii_plot([50,90,130,70,60,0,80,120,100], xlabel='Iteration', ylabel=metric, width=70, height=12))
     else:
         print()
-        print(f"\nUnrecognized Experiment Property [{property}] -- Valid Options [execution,hyperparam,result]")
+        print(
+            f"\nUnrecognized Experiment Property [{property}] -- Valid Options [execution,hyperparam,result]"
+        )
         print()
 
 
@@ -551,12 +604,28 @@ CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 
 @click.group(context_settings=CONTEXT_SETTINGS, invoke_without_command=True)
 @click.version_option(__version__, "-v", "--version")
-@click.option("-m", "--markdown", is_flag=True, default=False,
-              help="Use markdown format for results output.")
-@click.option("-l", "--latex", is_flag=True, default=False,
-              help="Use LaTeX format for results output (overrides -m).")
-@click.option("-p", "--precision", type=int, default=3, show_default=True,
-              help="Numerical precision for displayed results.")
+@click.option(
+    "-m",
+    "--markdown",
+    is_flag=True,
+    default=False,
+    help="Use markdown format for results output.",
+)
+@click.option(
+    "-l",
+    "--latex",
+    is_flag=True,
+    default=False,
+    help="Use LaTeX format for results output (overrides -m).",
+)
+@click.option(
+    "-p",
+    "--precision",
+    type=int,
+    default=3,
+    show_default=True,
+    help="Numerical precision for displayed results.",
+)
 @click.pass_context
 def cli(ctx, markdown, latex, precision):
     """projit — project tracking for data science and ML experiments.
@@ -710,8 +779,9 @@ def tag(asset, name, values):
 @cli.command(name="list", context_settings=CONTEXT_SETTINGS)
 @click.argument("subcmd", type=click.Choice(["datasets", "experiments", "results"]))
 @click.argument("dataset", default="")
-@click.option("--tags", multiple=True,
-              help="Tag columns to include in the output (repeatable).")
+@click.option(
+    "--tags", multiple=True, help="Tag columns to include in the output (repeatable)."
+)
 @click.pass_context
 def list_cmd(ctx, subcmd, dataset, tags):
     """List datasets, experiments, or results registered in this project.
@@ -792,6 +862,7 @@ def render(path):
 #################################################################################
 # Entrypoint
 #################################################################################
+
 
 def main():
     cli()

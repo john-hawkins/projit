@@ -21,6 +21,7 @@ from projit.cli import cli  # will fail until click migration is implemented
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _init_project(runner, name="TestProject"):
     """Initialise a project inside the runner's current isolated directory."""
     result = runner.invoke(cli, ["init", name])
@@ -32,11 +33,26 @@ def _init_project(runner, name="TestProject"):
 # Top-level help
 # ===========================================================================
 
+
 def test_top_level_help_lists_all_subcommands():
     runner = CliRunner()
     result = runner.invoke(cli, ["--help"])
     assert result.exit_code == 0
-    for cmd in ["init", "update", "add", "add-result", "start", "stop", "tag", "list", "rm", "compare", "plot", "render", "status"]:
+    for cmd in [
+        "init",
+        "update",
+        "add",
+        "add-result",
+        "start",
+        "stop",
+        "tag",
+        "list",
+        "rm",
+        "compare",
+        "plot",
+        "render",
+        "status",
+    ]:
         assert cmd in result.output, f"'{cmd}' missing from top-level --help"
 
 
@@ -52,6 +68,7 @@ def test_version_flag():
     result = runner.invoke(cli, ["--version"])
     assert result.exit_code == 0
     from projit import __version__
+
     assert __version__ in result.output
 
 
@@ -69,6 +86,7 @@ def test_dash_h_is_synonymous_with_help():
 # init --help
 # ===========================================================================
 
+
 def test_init_help_describes_name_and_template():
     runner = CliRunner()
     result = runner.invoke(cli, ["init", "--help"])
@@ -80,6 +98,7 @@ def test_init_help_describes_name_and_template():
 # ===========================================================================
 # add --help and validation
 # ===========================================================================
+
 
 def test_add_help_shows_asset_choices():
     runner = CliRunner()
@@ -109,6 +128,7 @@ def test_add_invalid_asset_shows_error_with_choices():
 # ===========================================================================
 # add-result --help and validation
 # ===========================================================================
+
 
 def test_add_result_help_describes_arguments():
     runner = CliRunner()
@@ -155,13 +175,16 @@ def test_add_result_for_unregistered_dataset_shows_error():
     with runner.isolated_filesystem():
         _init_project(runner)
         runner.invoke(cli, ["add", "experiment", "exp1", "train.py"])
-        result = runner.invoke(cli, ["add-result", "exp1", "rmse", "0.5", "ghost_dataset"])
+        result = runner.invoke(
+            cli, ["add-result", "exp1", "rmse", "0.5", "ghost_dataset"]
+        )
         assert result.exit_code != 0
 
 
 # ===========================================================================
 # start / stop --help and validation
 # ===========================================================================
+
 
 def test_start_help_describes_arguments():
     runner = CliRunner()
@@ -224,6 +247,7 @@ def test_stop_for_unregistered_experiment_shows_error():
 # tag --help
 # ===========================================================================
 
+
 def test_tag_help_describes_key_value_format():
     runner = CliRunner()
     result = runner.invoke(cli, ["tag", "--help"])
@@ -242,6 +266,7 @@ def test_tag_help_shows_asset_choices():
 # ===========================================================================
 # list --help and validation
 # ===========================================================================
+
 
 def test_list_help_shows_subcmd_choices():
     runner = CliRunner()
@@ -265,7 +290,18 @@ def test_list_help_mentions_format_options():
     result = runner.invoke(cli, ["list", "--help"])
     assert result.exit_code == 0
     # Either the global options are shown or the help text references them
-    assert any(token in result.output for token in ["-m", "--markdown", "-l", "--latex", "-p", "--precision", "format"])
+    assert any(
+        token in result.output
+        for token in [
+            "-m",
+            "--markdown",
+            "-l",
+            "--latex",
+            "-p",
+            "--precision",
+            "format",
+        ]
+    )
 
 
 def test_list_help_describes_dataset_param():
@@ -288,6 +324,7 @@ def test_list_invalid_subcmd_shows_error():
 # rm --help
 # ===========================================================================
 
+
 def test_rm_help_shows_asset_choices():
     runner = CliRunner()
     result = runner.invoke(cli, ["rm", "--help"])
@@ -307,6 +344,7 @@ def test_rm_help_mentions_dot_for_all():
 # compare --help
 # ===========================================================================
 
+
 def test_compare_help_mentions_comma_separated_datasets():
     runner = CliRunner()
     result = runner.invoke(cli, ["compare", "--help"])
@@ -324,6 +362,7 @@ def test_compare_help_describes_metric():
 # ===========================================================================
 # plot --help
 # ===========================================================================
+
 
 def test_plot_help_shows_property_choices():
     runner = CliRunner()
@@ -345,6 +384,7 @@ def test_plot_help_mentions_metric_is_conditional():
 # render --help
 # ===========================================================================
 
+
 def test_render_help_describes_output_path():
     runner = CliRunner()
     result = runner.invoke(cli, ["render", "--help"])
@@ -356,6 +396,7 @@ def test_render_help_describes_output_path():
 # ===========================================================================
 # status + update --help
 # ===========================================================================
+
 
 def test_status_has_help():
     runner = CliRunner()
@@ -372,6 +413,7 @@ def test_update_has_help():
 # ===========================================================================
 # Integration: project lifecycle
 # ===========================================================================
+
 
 def test_init_creates_projit_directory():
     runner = CliRunner()
@@ -412,7 +454,10 @@ def test_status_outside_project_shows_init_hint():
     with runner.isolated_filesystem():
         result = runner.invoke(cli, ["status"])
         assert result.exit_code != 0
-        assert "init" in result.output.lower() or "not a projit project" in result.output.lower()
+        assert (
+            "init" in result.output.lower()
+            or "not a projit project" in result.output.lower()
+        )
 
 
 def test_add_dataset_then_list():
@@ -469,7 +514,9 @@ def test_tag_experiment():
     with runner.isolated_filesystem():
         _init_project(runner)
         runner.invoke(cli, ["add", "experiment", "myexp", "train.py"])
-        result = runner.invoke(cli, ["tag", "experiment", "myexp", "stage=prod,env=test"])
+        result = runner.invoke(
+            cli, ["tag", "experiment", "myexp", "stage=prod,env=test"]
+        )
         assert result.exit_code == 0
 
 
@@ -485,6 +532,7 @@ def test_tag_invalid_format_shows_error():
 # ===========================================================================
 # Global option propagation
 # ===========================================================================
+
 
 def test_global_markdown_flag_accepted_by_list():
     runner = CliRunner()
