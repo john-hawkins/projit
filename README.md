@@ -9,8 +9,8 @@
 [![PyPI](https://img.shields.io/pypi/v/projit.svg)](https://pypi.org/project/projit)
 
 If you find a bug or have an idea on how to improve projit please read 
-through the (contributing guidelines)[CONTRIBUTING.md] also take a look an the principles 
-of developing [Open Source Software][https://opensource.guide/].
+through the [contributing guidelines](CONTRIBUTING.md) also take a look an the principles 
+of developing [Open Source Software](https://opensource.guide/).
 
 Projit is a utility to help data scientists manage projects that contain 
 multiple experiments and components that need to interact in a de-coupled manner. 
