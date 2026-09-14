@@ -11,6 +11,8 @@ data sets, experiments and documentation.
    introduction
    installation
    usage
+   tutorial_cli
+   tutorial_api
    tags
    api
    license

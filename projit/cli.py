@@ -459,6 +459,40 @@ def task_tag(project, asset, name, values):
 
 
 ###############################################################################
+def task_add_result(project, experiment, metric, value, dataset):
+    """
+    Record a result metric for an experiment from the command line
+    """
+    ds = dataset if dataset != "" else None
+    try:
+        project.add_result(experiment, metric, value, ds)
+    except Exception as e:
+        print(f"ERROR: {e}")
+        exit(1)
+
+
+###############################################################################
+def task_start(project, name, path):
+    """
+    Start (register) an experiment execution from the command line
+    """
+    exec_id = project.start_experiment(name, path)
+    print(exec_id)
+
+
+###############################################################################
+def task_stop(project, name, id):
+    """
+    End a previously started experiment execution from the command line
+    """
+    try:
+        project.end_experiment(name, id)
+    except Exception as e:
+        print(f"ERROR: {e}")
+        exit(1)
+
+
+###############################################################################
 def task_rm(project, asset, name):
     """
     Remove elements to a project from the command line
@@ -535,6 +569,9 @@ def cli(ctx, markdown, latex, precision):
       projit status                                  # View project status
       projit add dataset train data/train.csv        # Register training data
       projit add experiment explore explore.ipynb    # Register an experiment
+      projit start explore explore.ipynb             # Register an execution start
+      projit stop explore <execution id>             # Close out that execution
+      projit add-result explore rmse 12.4            # Record a result metric
       projit list datasets                           # List datasets
       projit list experiments                        # List experiments
       projit list results                            # List all results
@@ -601,6 +638,57 @@ def add(asset, name, path):
     """
     project = _require_project()
     task_add(project, asset, name, path)
+
+
+@cli.command(name="add-result", context_settings=CONTEXT_SETTINGS)
+@click.argument("experiment")
+@click.argument("metric")
+@click.argument("value", type=float)
+@click.argument("dataset", default="")
+def add_result(experiment, metric, value, dataset):
+    """Record a result metric for an experiment.
+
+    \b
+    EXPERIMENT  the experiment name (must already be registered)
+    METRIC      the metric name, e.g. 'rmse'
+    VALUE       the numeric metric value
+    DATASET     (optional) associate the result with a specific registered dataset
+    """
+    project = _require_project()
+    task_add_result(project, experiment, metric, value, dataset)
+
+
+@cli.command(context_settings=CONTEXT_SETTINGS)
+@click.argument("name")
+@click.argument("path")
+def start(name, path):
+    """Start (register) an execution of an experiment and print its execution ID.
+
+    \b
+    NAME  the experiment name
+    PATH  the path to the experiment script
+
+    Registers the experiment if it isn't already, and prints the execution
+    ID, which must be passed to 'projit stop' to close out this execution
+    record. Run your experiment script yourself between 'projit start' and
+    'projit stop' -- projit does not execute it for you.
+    """
+    project = _require_project()
+    task_start(project, name, path)
+
+
+@cli.command(context_settings=CONTEXT_SETTINGS)
+@click.argument("name")
+@click.argument("id")
+def stop(name, id):
+    """End a previously started experiment execution.
+
+    \b
+    NAME  the experiment name
+    ID    the execution ID printed by 'projit start'
+    """
+    project = _require_project()
+    task_stop(project, name, id)
 
 
 @cli.command(context_settings=CONTEXT_SETTINGS)

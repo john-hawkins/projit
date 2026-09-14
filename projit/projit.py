@@ -132,13 +132,26 @@ class Projit:
         Function returns an unique identifer for the execution: required
         to end the execution in a call to :meth:`projit.Projit.end_experiment`
 
+        Note that this function does not run the experiment script itself --
+        it only records a timestamped execution entry. You are expected to
+        run your own script/code between the calls to `start_experiment` and
+        `end_experiment`. Neither `params` here nor `hyperparams` (passed to
+        `end_experiment`) are read by projit or passed into your script --
+        they are opaque metadata stored on the execution record for your own
+        later reference. By convention `params` records configuration known
+        before the run (e.g. dataset split, random seed, target column) while
+        `hyperparams` records values decided or finalized during/after the
+        run, but nothing enforces this split -- use either dict for whatever
+        you find useful.
+
         :param name: The experiment name (Unique Identifer)
         :type name: string, required
 
         :param path: The path to the experiment script being executed
         :type path: string, required
 
-        :param params: Optional dictionary of parameters used in the experiment execution
+        :param params: Optional dictionary of parameters used in the experiment execution.
+                       Stored as metadata only -- not passed to your script.
         :type params: Dictionary, optional
 
         :param tags: Optional dictionary of tags to describe the experiment
@@ -151,7 +164,10 @@ class Projit:
         self.reload()
 
         if not self.experiment_exists(name):
-            self.add_experiment(name, path)
+            # Inlined equivalent of add_experiment() -- add_experiment()
+            # acquires its own lock, which would deadlock against the lock
+            # already held here.
+            self.experiments.append((name, path))
 
         startdt = str(datetime.now())
         s = name + startdt
@@ -188,7 +204,9 @@ class Projit:
         :param id: The execution hash ID returned by the function: start_experiment 
         :type id: string, required
 
-        :param hyperparams: Optional dictionary of hyperparameters used in the experiment execution
+        :param hyperparams: Optional dictionary of hyperparameters used in the experiment execution.
+                       Stored as metadata only -- not passed to your script. See the note
+                       on `params` in :meth:`projit.Projit.start_experiment`.
         :type path: Dictionary, option
 
         :return: None
