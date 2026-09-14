@@ -9,6 +9,7 @@ import os
 
 ################################################################################
 
+
 def load_template(filename):
     """
     Utility function to load a project template from a file
@@ -17,12 +18,14 @@ def load_template(filename):
     temp = json.loads(rawd.decode("utf-8"))
     return temp
 
+
 ###############################################################################
 
 """
    This is a set of functions to allow the application to print time
    profiles of the various steps in a pipeline they are experimenting with
 """
+
 
 def eprint(*args, **kwargs):
     """
@@ -33,13 +36,15 @@ def eprint(*args, **kwargs):
 
     :param kwargs: Keyword arguments for print function
     :type kwargs: dictionary(String:String), required
- 
+
     :return: None
     :rtype: None
     """
     print(*args, file=sys.stderr, **kwargs)
 
+
 profiles = {}
+
 
 def reset_profiles():
     """
@@ -52,6 +57,7 @@ def reset_profiles():
     global profiles
     profiles = {}
 
+
 def initialise_profile():
     """
     Initialise the profiles
@@ -61,29 +67,31 @@ def initialise_profile():
     """
     reset_profiles()
 
+
 def start_profile(proc_name):
     """
     Start the profile of named process
-    
+
     :return: None
     :rtype: None
     """
-    n1=dt.datetime.now()
+    n1 = dt.datetime.now()
     if proc_name in profiles:
         profiles[proc_name]["start"] = n1
     else:
-        profiles[proc_name] = {"start":n1}
+        profiles[proc_name] = {"start": n1}
+
 
 def end_profile(proc_name):
     """
     End the profiling of a named process
-    
+
     :return: None
     :rtype: None
     """
     n2 = dt.datetime.now()
     n1 = profiles[proc_name]["start"]
-    total = n2-n1
+    total = n2 - n1
     profiles[proc_name]["end"] = n2
     if "total" in profiles[proc_name]:
         curr_total = profiles[proc_name]["total"]
@@ -91,17 +99,19 @@ def end_profile(proc_name):
     else:
         profiles[proc_name]["total"] = total
 
+
 def print_profiles():
     """
     Print the result of the profiling of processes
-    
+
     :return: None
     :rtype: None
     """
     eprint("Computation Time Profile for each Pipeline Step")
     eprint("-----------------------------------------------")
     for k in profiles.keys():
-        eprint(padded(k), str(profiles[k]["total"]) ) 
+        eprint(padded(k), str(profiles[k]["total"]))
+
 
 def padded(k, padto=20):
     """
@@ -117,5 +127,4 @@ def padded(k, padto=20):
     :rtype: String
     """
     spacer_len = padto - len(k)
-    return k + (" "*spacer_len)
-
+    return k + (" " * spacer_len)

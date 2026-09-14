@@ -20,27 +20,29 @@ from .pdf import PDF
 
 ##########################################################################################
 
+
 class Projit:
     """
     Projit Class.
-    This is a data structure to contain the core elements of a data science 
+    This is a data structure to contain the core elements of a data science
     project. It will permit loose coupling between processes and experiments
-    but provide a simple overarching structure for communication and 
+    but provide a simple overarching structure for communication and
     documentation.
     """
 
-    def __init__(self, 
-                 path, 
-                 name, 
-                 desc="", 
-                 experiments=[], 
-                 datasets={},
-                 results={}, 
-                 params={},
-                 hyperparams={},
-                 dataresults={},
-                 executions={},
-                 tags={}
+    def __init__(
+        self,
+        path,
+        name,
+        desc="",
+        experiments=[],
+        datasets={},
+        results={},
+        params={},
+        hyperparams={},
+        dataresults={},
+        executions={},
+        tags={},
     ):
         """
         Initialise a projit project object.
@@ -66,40 +68,40 @@ class Projit:
                         Structure: {'experiment':{'metric':'value'}}
         :type results: Dictionary of Dictionary, optional
 
-        :param params: A dictionary of additional parameters share across experiments. 
+        :param params: A dictionary of additional parameters share across experiments.
                        For example: target variable name, identifier column.
         :type params: Dictionary, optional
 
-        :param hyperparams: A dictionary of hyper parameters for experiments. 
-                       Structure: {'experiment':{'param':'value', etc}} 
+        :param hyperparams: A dictionary of hyper parameters for experiments.
+                       Structure: {'experiment':{'param':'value', etc}}
         :type hyperparams: Dictionary, optional
 
         :param dataresults: The dictionary of results on specific data sets.
                             These are used when you want your experimental results broken
-                            down by the datasets. 
+                            down by the datasets.
                             Structure: {'dataset':{'experiment':{'metric':'value'}}}
         :type dataresults: Dictionary of Dictionary of Dictionary, optional
 
         :param executions: The dictionary of experiment executions.
                             This structure is used to store all experimental runs.
-                            The ID is a HASH of experiment_name and 
+                            The ID is a HASH of experiment_name and
                             Structure: {'experiment_name':{
-                                             'ID':{ 
-                                                 'start':DATETIME, 
+                                             'ID':{
+                                                 'start':DATETIME,
                                                  'end':DATETIME,
-                                                 'githash':STRING, 
+                                                 'githash':STRING,
                                                  'params':DICT,
                                                  'hyperparams':DICT
                                               }
                                            }
                                        }
         :type executions: Dictionary of Dictionary of Dictionary, optional
- 
+
         :param tags: The dictionary of tags for project assets.
         :type tags: Dictionary of Dictionary of Dictionary, optional
 
-        :return: None 
-        :rtype: None 
+        :return: None
+        :rtype: None
         """
         self.path = path
         self.name = name
@@ -113,7 +115,6 @@ class Projit:
         self.executions = executions
         self.tags = tags
 
-
     def get_root_path(self):
         """
         Get the path to where the project folder is located
@@ -121,8 +122,7 @@ class Projit:
         :return: path : The Path to the Project folder
         :rtype: String
         """
-        return self.path[0:len(self.path) - len(config_folder)]
-
+        return self.path[0 : len(self.path) - len(config_folder)]
 
     def start_experiment(self, name, path, params={}, tags={}):
         """
@@ -177,21 +177,20 @@ class Projit:
             ghash = repo.head.object.hexsha
         except git.exc.InvalidGitRepositoryError:
             ghash = ""
-        payload = {'start':startdt, 'end':"", 'githash':ghash, 'params':params}
+        payload = {"start": startdt, "end": "", "githash": ghash, "params": params}
         exper_execs = {}
 
         if name in self.executions:
             exper_execs = self.executions[name]
         exper_execs[id] = payload
-        self.executions[name] = exper_execs 
+        self.executions[name] = exper_execs
         self.save()
         self.release_lock()
 
-        if len(tags)>0:
+        if len(tags) > 0:
             self.add_tags("experiment", name, tags)
 
         return id
-
 
     def end_experiment(self, name, id, hyperparams={}):
         """
@@ -201,7 +200,7 @@ class Projit:
         :param name: The experiment name (Unique Identifer)
         :type name: string, required
 
-        :param id: The execution hash ID returned by the function: start_experiment 
+        :param id: The execution hash ID returned by the function: start_experiment
         :type id: string, required
 
         :param hyperparams: Optional dictionary of hyperparameters used in the experiment execution.
@@ -214,26 +213,32 @@ class Projit:
         """
 
         if not self.experiment_exists(name):
-            raise Exception(f"Projit Experiment Exception: Cannot end experiment: '{name}' -- Experiment not registered")
-        
+            raise Exception(
+                f"Projit Experiment Exception: Cannot end experiment: '{name}' -- Experiment not registered"
+            )
+
         self.initiate_lock()
         self.reload()
         if name in self.executions:
             exper_execs = self.executions[name]
         else:
-            raise Exception(f"Projit Experiment Exception: Cannot end experiment: '{name}' -- Executions not started")
+            raise Exception(
+                f"Projit Experiment Exception: Cannot end experiment: '{name}' -- Executions not started"
+            )
 
         if id in exper_execs:
             payload = exper_execs[id]
         else:
-            raise Exception(f"Projit Experiment Exception: Cannot end experiment: '{name}' -- Executions not started")
+            raise Exception(
+                f"Projit Experiment Exception: Cannot end experiment: '{name}' -- Executions not started"
+            )
 
-        payload['end'] = str(datetime.now())
-        payload['hyperparams'] = hyperparams
+        payload["end"] = str(datetime.now())
+        payload["hyperparams"] = hyperparams
         exper_execs[id] = payload
         self.executions[name] = exper_execs
         self.save()
-        self.release_lock()    
+        self.release_lock()
 
     def get_total_executions(self):
         """
@@ -267,7 +272,6 @@ class Projit:
         else:
             return 0, 0
 
-
     def get_mean_execution_time(self, name):
         """
         Given an experiment name
@@ -284,7 +288,6 @@ class Projit:
             return np.mean(exec_times)
         else:
             return 0
-
 
     def get_execution_times(self, name):
         """
@@ -304,7 +307,7 @@ class Projit:
                     try:
                         a = self._parse_datetime(exec["start"])
                         b = self._parse_datetime(exec["end"])
-                        diff = (b-a).seconds
+                        diff = (b - a).seconds
                         exec_times.append(diff)
                     except (ValueError, KeyError):
                         pass
@@ -312,10 +315,9 @@ class Projit:
         else:
             return []
 
-
     @staticmethod
     def _parse_datetime(s):
-        for fmt in ('%Y-%m-%d %H:%M:%S.%f', '%Y-%m-%d %H:%M:%S'):
+        for fmt in ("%Y-%m-%d %H:%M:%S.%f", "%Y-%m-%d %H:%M:%S"):
             try:
                 return datetime.strptime(s, fmt)
             except ValueError:
@@ -324,7 +326,7 @@ class Projit:
 
     def add_experiment(self, name, path):
         """
-        Add information of a new experiment to the project. 
+        Add information of a new experiment to the project.
         Then save the project configuration.
         This function will overwrite an experiment of the same name
         and delete any previous results.
@@ -340,23 +342,22 @@ class Projit:
         """
         self.initiate_lock()
         self.reload()
-        for elem in self.experiments: 
+        for elem in self.experiments:
             if elem[0] == name:
                 self.experiments.remove(elem)
                 self.clean_experimental_results(name)
-        self.experiments.append( (name, path) )
+        self.experiments.append((name, path))
         self.save()
         self.release_lock()
-
 
     def update_name_description(self, name, descrip):
         """
         Update the core values name and description
 
-        :param name: The project name 
+        :param name: The project name
         :type name: string, required
 
-        :param descrip: The project description 
+        :param descrip: The project description
         :type descrip: string, required
 
         :return: None
@@ -368,7 +369,6 @@ class Projit:
         self.desc = descrip
         self.save()
         self.release_lock()
-
 
     def dataset_exists(self, name):
         """
@@ -385,7 +385,6 @@ class Projit:
                 return True
         return False
 
-
     def experiment_exists(self, name):
         """
         Check if a given experiment is in the data structure
@@ -400,7 +399,6 @@ class Projit:
             if elem[0] == name:
                 return True
         return False
- 
 
     def validate_asset(self, asset, name):
         """
@@ -415,13 +413,12 @@ class Projit:
         :return: exists
         :rtype: Boolean
         """
-        if asset=="experiment":
+        if asset == "experiment":
             return self.experiment_exists(name)
-        elif asset=="dataset":
+        elif asset == "dataset":
             return self.dataset_exists(name)
         else:
             return False
-
 
     def add_tags(self, asset, name, tags):
         """
@@ -454,11 +451,10 @@ class Projit:
         self.save()
         self.release_lock()
 
-
     def get_tags(self, asset, name, tags):
         """
         Retrive specified tags to a specific asset
-        Returns the list of tag values in the same order as requested.        
+        Returns the list of tag values in the same order as requested.
 
         :param asset: The asset type (experiment|dataset)
         :type asset: string, required
@@ -488,7 +484,6 @@ class Projit:
         else:
             return ["" for t in tags]
 
-
     def clean_experimental_results(self, name):
         """
         Remove all results for a given experiment
@@ -504,7 +499,6 @@ class Projit:
         for dataset in self.dataresults:
             if name in self.dataresults[dataset]:
                 del self.dataresults[dataset][name]
-
 
     def add_dataset(self, name, path):
         """
@@ -525,7 +519,6 @@ class Projit:
         self.save()
         self.release_lock()
 
-
     def rm_dataset(self, name):
         """
         Remove a named dataset to the project.
@@ -539,14 +532,13 @@ class Projit:
         self.initiate_lock()
         self.reload()
         if name in self.datasets:
-            del self.datasets[name] 
+            del self.datasets[name]
             self.save()
-        elif name==".":
+        elif name == ".":
             del self.datasets
             self.datasets = {}
             self.save()
         self.release_lock()
-
 
     def rm_experiment(self, name):
         """
@@ -560,7 +552,7 @@ class Projit:
         """
         self.initiate_lock()
         self.reload()
-        if name==".":
+        if name == ".":
             for elem in self.experiments:
                 self.clean_experimental_results(elem[0])
             self.experiments = []
@@ -572,7 +564,6 @@ class Projit:
                     self.clean_experimental_results(name)
             self.save()
         self.release_lock()
-
 
     def add_param(self, name, value):
         """
@@ -589,10 +580,9 @@ class Projit:
         """
         self.initiate_lock()
         self.reload()
-        self.params[name] = value 
+        self.params[name] = value
         self.save()
         self.release_lock()
-
 
     def add_hyperparam(self, name, value):
         """
@@ -614,8 +604,10 @@ class Projit:
             self.save()
             self.release_lock()
         else:
-            raise Exception("Projit Experiment Exception: No experiment called: '%s' -- Register your experiment first." % name)
-
+            raise Exception(
+                "Projit Experiment Exception: No experiment called: '%s' -- Register your experiment first."
+                % name
+            )
 
     def add_result(self, experiment, metric, value, dataset=None):
         """
@@ -633,26 +625,32 @@ class Projit:
         :type value: float, required
 
         :param dataset: The dataset against which the results are generated
-        :type dataset: string, optional 
+        :type dataset: string, optional
 
         :return: None
         :rtype: None
         """
         if not self.experiment_exists(experiment):
-            raise Exception("Projit Experiment Exception: No experiment called: '%s' -- Register your experiment first." % experiment)
+            raise Exception(
+                "Projit Experiment Exception: No experiment called: '%s' -- Register your experiment first."
+                % experiment
+            )
         if dataset is not None and not self.dataset_exists(dataset):
-            raise Exception("Projit Dataset Exception: No dataset called: '%s' -- Register your dataset first." % dataset)
+            raise Exception(
+                "Projit Dataset Exception: No dataset called: '%s' -- Register your dataset first."
+                % dataset
+            )
 
         self.initiate_lock()
         self.reload()
-        if dataset==None:
+        if dataset == None:
             if experiment in self.results:
                 rez = self.results[experiment]
             else:
                 rez = {}
             rez[metric] = value
             self.results[experiment] = rez
-        else: 
+        else:
             if dataset in self.dataresults:
                 rez = self.dataresults[dataset]
             else:
@@ -667,7 +665,6 @@ class Projit:
         self.save()
         self.release_lock()
 
-
     def get_results(self, dataset=None):
         """
         Retrieve the experimental results as a DataFrame.
@@ -681,13 +678,15 @@ class Projit:
         :rtype: pandas.DataFrame
         """
 
-        if dataset==None:
+        if dataset == None:
             myresults = self.results
         else:
             if dataset in self.dataresults:
                 myresults = self.dataresults[dataset]
             else:
-                raise Exception("Projit Dataset Exception: No results for dataset: %s " % dataset)
+                raise Exception(
+                    "Projit Dataset Exception: No results for dataset: %s " % dataset
+                )
         rows = []
         for exp in self.experiments:
             key = exp[0]
@@ -695,7 +694,7 @@ class Projit:
                 rez = dict(myresults[key])
             else:
                 rez = {}
-            rez['experiment'] = key
+            rez["experiment"] = key
             rows.append(pd.DataFrame(rez, index=[0]))
         if not rows:
             return pd.DataFrame(columns=["experiment"])
@@ -703,10 +702,9 @@ class Projit:
         # Ensure that the first column in the results is "experiment"
         cols = ["experiment"]
         rest = df.columns.to_list()
-        rest.remove('experiment')
+        rest.remove("experiment")
         cols.extend(rest)
-        return df.loc[:,cols]
-
+        return df.loc[:, cols]
 
     def get_dataset(self, name):
         """
@@ -721,22 +719,28 @@ class Projit:
         if name in self.datasets:
             return self.datasets[name]
         else:
-            raise Exception("Projit Dataset Exception: Named dataset '%s' not available. Register your dataset" % name)
-
+            raise Exception(
+                "Projit Dataset Exception: Named dataset '%s' not available. Register your dataset"
+                % name
+            )
 
     def get_param(self, name):
         if name in self.params:
             return self.params[name]
         else:
-            raise Exception("Projit Parameter Exception: Named parameter '%s' is not available:" % name)
-
+            raise Exception(
+                "Projit Parameter Exception: Named parameter '%s' is not available:"
+                % name
+            )
 
     def get_hyperparam(self, name):
         if name in self.hyperparams:
             return self.hyperparams[name]
         else:
-            raise Exception("Projit Parameter Exception: Hyper parameters for experiment '%s' are not available:" % name)
-
+            raise Exception(
+                "Projit Parameter Exception: Hyper parameters for experiment '%s' are not available:"
+                % name
+            )
 
     def get_path_to_dataset(self, name):
         ds = self.get_dataset(name)
@@ -745,13 +749,11 @@ class Projit:
         else:
             return self.create_local_path(ds)
 
-
     def is_complete_path(self, path):
         if os.path.isabs(path):
             return True
         parsed = urlparse(path)
-        return parsed.scheme in ('s3', 'http', 'https', 'gs', 'ftp', 'file')
-
+        return parsed.scheme in ("s3", "http", "https", "gs", "ftp", "file")
 
     def create_local_path(self, ds):
         """
@@ -761,7 +763,6 @@ class Projit:
         :rtype: String
         """
         return self.get_root_path() + ds
-
 
     def initiate_lock(self):
         """
@@ -777,12 +778,11 @@ class Projit:
         path_to_lock = self.path + "/" + lock_file
         while True:
             try:
-                with open(path_to_lock, 'x') as outfile:
+                with open(path_to_lock, "x") as outfile:
                     json.dump({}, outfile, indent=0)
                 break
             except FileExistsError:
                 time.sleep(5)
-
 
     def release_lock(self):
         """
@@ -797,7 +797,6 @@ class Projit:
         if os.path.isfile(path_to_lock):
             os.remove(path_to_lock)
 
-
     def save(self):
         """
         Save your projit project into config files within the projit config dir
@@ -806,25 +805,24 @@ class Projit:
         :rtype: None
         """
         core_props = self.__dict__.copy()
-        del core_props['executions']
-        del core_props['tags']
+        del core_props["executions"]
+        del core_props["tags"]
         path_to_json = self.path + "/" + config_file
-        with open(path_to_json, 'w') as outfile:
+        with open(path_to_json, "w") as outfile:
             json.dump(core_props, outfile, indent=0)
 
         path_to_json = self.path + "/" + execution_file
-        with open(path_to_json, 'w') as outfile:
+        with open(path_to_json, "w") as outfile:
             json.dump(self.executions, outfile, indent=0)
 
         path_to_json = self.path + "/" + tag_file
-        with open(path_to_json, 'w') as outfile:
+        with open(path_to_json, "w") as outfile:
             json.dump(self.tags, outfile, indent=0)
-
 
     def reload(self):
         """
-        Reload the project meta-data from disk. 
-        - Necessary when multiple processes are running experiments 
+        Reload the project meta-data from disk.
+        - Necessary when multiple processes are running experiments
         in the same project and we want to avoid overwriting data.
 
         :return: None
@@ -852,23 +850,22 @@ class Projit:
                 _tags = json.load(f)
                 setattr(self, "tags", _tags)
 
-
     def render(self, path):
         """
         Render the project data into a PDF file
 
-        :param path: The path to write the PF to 
+        :param path: The path to write the PF to
         :type path: string, required
 
         :return: None
-        :rtype: None        
+        :rtype: None
         """
         results = self.get_results()
         pdf = PDF()
         pdf.setup()
         pdf.add_title(self.name)
         pdf.add_description(self.desc)
-        pdf.output(path, 'F')
+        pdf.output(path, "F")
 
 
 ##########################################################################################
@@ -896,7 +893,7 @@ def load(config_path):
     path_to_execs = config_path + "/" + execution_file
     if os.path.exists(path_to_execs):
         with open(path_to_execs) as f:
-            _execs['executions'] = json.load(f)
+            _execs["executions"] = json.load(f)
 
     _tags = {}
     path_to_tags = config_path + "/" + tag_file
@@ -904,7 +901,7 @@ def load(config_path):
         with open(path_to_tags) as f:
             _tags["tags"] = json.load(f)
 
-    _object = Projit(**_dict, **_execs, **_tags )
+    _object = Projit(**_dict, **_execs, **_tags)
     _object.path = config_path
     return _object
 
@@ -918,7 +915,7 @@ def projit_load():
     :return: Projit Object
     :rtype: Projit
     """
-    return load( locate_projit_config() )
+    return load(locate_projit_config())
 
 
 ##########################################################################################
@@ -942,7 +939,9 @@ def init(template, name, desc=""):
     init_template(template)
     return project
 
+
 ##########################################################################################
+
 
 def init_template(template):
     """
@@ -950,8 +949,6 @@ def init_template(template):
     """
     if template != "":
         temp = load_template(template)
-        for d in temp['dirs']:
+        for d in temp["dirs"]:
             if not os.path.isdir(d):
                 os.mkdir(d)
-
-
